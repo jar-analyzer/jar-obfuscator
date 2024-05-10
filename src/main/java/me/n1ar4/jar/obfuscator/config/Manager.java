@@ -39,6 +39,7 @@ public class Manager {
         // CHARS
         if (config.getObfuscateChars() == null ||
                 config.getObfuscateChars().length < 3) {
+            logger.warn("obfuscate chars length too small");
             NameUtil.CHAR_POOL = new char[]{'i', 'l', 'L', '1', 'I'};
         } else {
             char[] data = new char[config.getObfuscateChars().length];

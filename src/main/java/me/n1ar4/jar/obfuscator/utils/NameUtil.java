@@ -3,7 +3,7 @@ package me.n1ar4.jar.obfuscator.utils;
 import java.security.SecureRandom;
 import java.util.HashSet;
 
-
+@SuppressWarnings("all")
 public class NameUtil {
     public static char[] CHAR_POOL = null;
     private static final SecureRandom random = new SecureRandom();
