@@ -1,0 +1,54 @@
+# jar obfuscator 配置文件
+
+# 日志级别
+# debug info warn error
+logLevel: info
+
+# 主类名
+# 不设置主类名可能无法正常执行主函数
+mainClass: me.n1ar4.fake.gui.Application
+
+# 混淆字符配置
+obfuscateChars: [i, l, L, '1', I]
+# 混淆包名称 必须配置否则无法运行
+# 建议仅设置关键部分不要设置范围过大
+obfuscatePackage: [me.n1ar4, org.n1ar4]
+
+# 开启类名混淆
+enableClassName: true
+# 开启方法名混淆
+enableMethodName: true
+# 开启字段混淆
+enableFieldName: true
+# 开启参数名混淆
+enableParamName: true
+
+# 开启加密字符串
+enableEncryptString: true
+# 开启进阶字符串混淆
+enableAdvanceString: true
+# 进阶字符串处理参数
+advanceStringName: GIiIiLA
+
+# 开启删除编译信息选项
+enableDeleteCompileInfo: true
+# 开启数字异或混淆
+enableXOR: true
+
+# 开启花指令混淆
+enableJunk: true
+# 花指令级别
+# 最低1 最高3
+junkLevel: 3
+# 一个类中的花指令数量上限
+maxJunkOneClass: 2000
+
+# 是否打印所有主函数
+showAllMainMethods: true
+
+# 是否开启进阶 JVMTI 加密字节码
+enableSuperObfuscate: true
+# 加密 KEY 配置
+superObfuscateKey: 4ra1n4ra1n4ra1n1
+# 加密包名配置
+superObfuscatePackage: me.n1ar4

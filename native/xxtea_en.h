@@ -1,0 +1,11 @@
+#ifndef NATIVE_XXTEA_EN_H
+#define NATIVE_XXTEA_EN_H
+
+#include <stdio.h>
+#include <stdint.h>
+
+#include "xxtea_common.h"
+
+void tea_encrypt(uint32_t *v, const uint32_t *k);
+
+#endif //NATIVE_XXTEA_EN_H
