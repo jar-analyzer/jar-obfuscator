@@ -1,13 +1,13 @@
 package me.n1ar4.jar.obfuscator.config;
 
 import me.n1ar4.jar.obfuscator.Const;
+import me.n1ar4.jar.obfuscator.utils.IOUtils;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.inspector.TagInspector;
-import sun.misc.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
