@@ -1,4 +1,6 @@
 # jar obfuscator 配置文件
+# jar obfuscator by jar-analyzer team (4ra1n)
+# https://github.com/jar-analyzer/jar-obfuscator
 
 # 日志级别
 # debug info warn error
