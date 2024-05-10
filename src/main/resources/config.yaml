@@ -47,8 +47,9 @@ maxJunkOneClass: 2000
 showAllMainMethods: true
 
 # 是否开启进阶 JVMTI 加密字节码
-enableSuperObfuscate: true
+enableSuperObfuscate: false
 # 加密 KEY 配置
+# 注意长度必须是 16 位
 superObfuscateKey: 4ra1n4ra1n4ra1n1
 # 加密包名配置
 superObfuscatePackage: me.n1ar4
