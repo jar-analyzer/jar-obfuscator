@@ -1,5 +1,12 @@
 # Jar-Obfuscator
 
+[CHANGE LOG](CHANGELOG.MD)
+
+![](https://img.shields.io/badge/build-passing-brightgreen)
+![](https://img.shields.io/badge/build-Java%208-orange)
+![](https://img.shields.io/github/downloads/jar-analyzer/jar-obfuscator/total)
+![](https://img.shields.io/github/v/release/jar-analyzer/jar-obfuscator)
+
 `Jar-Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
 - 命令行模式，简单易用
@@ -12,6 +19,8 @@
 - 简单：免费开源的代码混淆工具配置麻烦难以上手
 
 ## 开始
+
+[前往下载](https://github.com/jar-analyzer/jar-obfuscator/releases/latest)
 
 简单命令即可启动（第一次启动将自动生成配置文件）
 
@@ -193,6 +202,10 @@ static {
 }
 ```
 
+通过定义配置文件的 `obfuscateChars` 可以做更有趣的混淆
+
+![](img/004.png)
+
 ## 进阶
 
 开启 `JVMTI` 加密的混淆效果
@@ -205,7 +218,11 @@ static {
 
 使用 `JNI` 加密字节码，通过 `JVMTI` 解密字节码以保护代码
 
-提供两份 `DLL` 文件，一份加密一份解密，实际运行只需使用解密 `DLL` 文件，支持自定义密钥和包名
+提供两份 `DLL/SO` 文件，一份加密一份解密，实际运行只需使用解密 `DLL/SO` 文件，支持自定义密钥和包名
+
+```shell
+java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.pack,KEY=your-key --jar your-jar.jar
+```
 
 加密后的 `CLASS` 文件变成无法解析的畸形文件
 
