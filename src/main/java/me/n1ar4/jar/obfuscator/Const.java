@@ -1,6 +1,5 @@
 package me.n1ar4.jar.obfuscator;
 
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 
 import java.nio.file.Path;
@@ -12,5 +11,5 @@ public interface Const {
     String TEMP_DIR = "jar-obfuscator-temp";
     Path configPath = Paths.get("config.yaml");
     int ASMVersion = Opcodes.ASM9;
-    int AnalyzeASMOptions = ClassReader.EXPAND_FRAMES;
+    int AnalyzeASMOptions = 0;
 }

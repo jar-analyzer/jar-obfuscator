@@ -11,10 +11,10 @@ logLevel: info
 mainClass: me.n1ar4.fake.gui.Application
 
 # 混淆字符配置
-obfuscateChars: [i, l, L, '1', I]
+obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
-obfuscatePackage: [me.n1ar4, org.n1ar4]
+obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
 
 # 开启类名混淆
 enableClassName: true

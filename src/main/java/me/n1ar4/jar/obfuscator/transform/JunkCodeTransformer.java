@@ -30,9 +30,9 @@ public class JunkCodeTransformer {
             try {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader,
-                        ClassReader.EXPAND_FRAMES | ClassWriter.COMPUTE_FRAMES);
+                        ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
                 JunkCodeChanger changer = new JunkCodeChanger(classWriter, config);
-                classReader.accept(changer, ClassReader.EXPAND_FRAMES);
+                classReader.accept(changer, 0);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

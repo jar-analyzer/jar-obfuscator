@@ -28,8 +28,7 @@ public class XORTransformer {
             }
             try {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
-                ClassWriter classWriter = new ClassWriter(classReader,
-                        ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+                ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
                 IntToXorChanger changer = new IntToXorChanger(classWriter);
                 classReader.accept(changer, 0);
                 Files.delete(newClassPath);
