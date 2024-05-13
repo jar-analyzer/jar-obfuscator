@@ -23,10 +23,19 @@ public class BaseConfig {
 
     private String[] obfuscatePackage;
     private String[] obfuscateChars;
+    private String[] methodBlackList;
     private String mainClass;
     private boolean modifyManifest;
 
     private boolean showAllMainMethods;
+
+    public String[] getMethodBlackList() {
+        return methodBlackList;
+    }
+
+    public void setMethodBlackList(String[] methodBlackList) {
+        this.methodBlackList = methodBlackList;
+    }
 
     public boolean isEnablePackageName() {
         return enablePackageName;

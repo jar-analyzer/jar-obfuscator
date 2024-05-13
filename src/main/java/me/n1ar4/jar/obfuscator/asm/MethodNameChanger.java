@@ -8,15 +8,20 @@ import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("all")
 public class MethodNameChanger extends ClassVisitor {
     private String owner;
+    private final List<String> methodBlackList;
     private final List<MethodReference> ignoreMethods = new ArrayList<>();
 
     public MethodNameChanger(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
+        this.methodBlackList = Arrays.asList(ObfEnv.config.getMethodBlackList());
     }
 
     @Override
@@ -37,10 +42,21 @@ public class MethodNameChanger extends ClassVisitor {
         MethodVisitor mv;
         for (MethodReference mr : ignoreMethods) {
             if (mr.getName().equals(name) && mr.getDesc().equals(desc)) {
-                mv = super.visitMethod(access, name, desc, signature, exceptions);
-                return new MethodNameChangerMethodAdapter(mv, owner, name, desc);
+                return super.visitMethod(access, name, desc, signature, exceptions);
             }
         }
+
+        for (String s : this.methodBlackList) {
+            if (s.equals(name)) {
+                return super.visitMethod(access, name, desc, signature, exceptions);
+            }
+            Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.matches()) {
+                return super.visitMethod(access, name, desc, signature, exceptions);
+            }
+        }
+
         if ("main".equals(name) && desc.equals("([Ljava/lang/String;)V") && access == 9) {
             mv = super.visitMethod(access, name, desc, signature, exceptions);
         } else if (name.equals("<init>") || name.equals("<clinit>")) {
@@ -133,14 +149,6 @@ public class MethodNameChanger extends ClassVisitor {
     static class MethodNameChangerMethodAdapter extends MethodVisitor {
         MethodNameChangerMethodAdapter(MethodVisitor mv, String className, String name, String desc) {
             super(Const.ASMVersion, mv);
-            MethodReference mr = AnalyzeEnv.methodMap.get(new MethodReference.Handle(
-                    new ClassReference.Handle(className), name, desc
-            ));
-            if (mr != null) {
-                for (String anno : mr.getAnnotations()) {
-                    // TODO
-                }
-            }
         }
 
         @Override

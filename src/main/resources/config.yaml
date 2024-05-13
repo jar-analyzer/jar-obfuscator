@@ -17,6 +17,8 @@ obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
 obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
+# 不对某些 method 名做混淆
+methodBlackList: [ visit.* ]
 
 # 开启类名混淆
 enableClassName: true
