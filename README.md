@@ -14,6 +14,8 @@
 - 简洁的配置文件快速上手
 - 输入 `JAR` 直接输出混淆后的 `JAR`
 
+![](img/006.png)
+
 ## 开始
 
 [前往下载](https://github.com/jar-analyzer/jar-obfuscator/releases/latest)
