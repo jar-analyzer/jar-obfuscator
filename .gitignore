@@ -43,3 +43,4 @@ log/
 *.jar
 *.yml
 *.yaml
+cmake-*/
