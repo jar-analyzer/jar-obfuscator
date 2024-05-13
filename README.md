@@ -262,3 +262,17 @@ java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.
 ![LINUX](img/009.png)
 
 注意：可能不适用于启动扫描 `class` 的项目（典型的项目比如 `SpringBoot` 等）
+
+## BUILD
+
+Base:
+
+- Windows: JDK 8 + Maven
+- Linux: JDK 8 + Maven
+
+JVMTI: 
+
+- Windows: MSVC + ml64 + CMake 3.x
+- Linux: gcc + nasm + CMake 3.x
+- Optional: Python 3.x
+
