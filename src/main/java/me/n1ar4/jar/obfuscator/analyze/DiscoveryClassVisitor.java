@@ -12,6 +12,7 @@ public class DiscoveryClassVisitor extends ClassVisitor {
     private String superName;
     private String[] interfaces;
     private boolean isInterface;
+    private boolean isEnum;
     private List<ClassReference.Member> members;
     private ClassReference.Handle classHandle;
     private Set<String> annotations;
@@ -39,6 +40,7 @@ public class DiscoveryClassVisitor extends ClassVisitor {
         this.superName = superName;
         this.interfaces = interfaces;
         this.isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
+        this.isEnum = (access & Opcodes.ACC_ENUM) != 0;
         this.members = new ArrayList<>();
         this.classHandle = new ClassReference.Handle(name);
         annotations = new HashSet<>();
@@ -89,6 +91,7 @@ public class DiscoveryClassVisitor extends ClassVisitor {
                 superName,
                 Arrays.asList(interfaces),
                 isInterface,
+                isEnum,
                 members,
                 annotations,
                 jar);

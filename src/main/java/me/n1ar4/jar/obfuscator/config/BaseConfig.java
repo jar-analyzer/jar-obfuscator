@@ -23,8 +23,18 @@ public class BaseConfig {
     private String[] obfuscatePackage;
     private String[] obfuscateChars;
     private String mainClass;
+    private boolean modifyManifest;
 
     private boolean showAllMainMethods;
+
+    public boolean isModifyManifest() {
+        return modifyManifest;
+    }
+
+    public void setModifyManifest(boolean modifyManifest) {
+        this.modifyManifest = modifyManifest;
+    }
+
     private String advanceStringName;
 
     public String getSuperObfuscateKey() {

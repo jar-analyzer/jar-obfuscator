@@ -37,6 +37,7 @@ public class Runner {
     }
 
     public static void run(Path path, BaseConfig config) {
+        ObfEnv.config = config;
         logger.info("start obfuscator");
         String fileName = FileUtil.getFileNameWithoutExt(path);
         jarName = fileName + ".jar";
@@ -112,7 +113,8 @@ public class Runner {
                 ObfEnv.classNameObfMapping.put(c.getName(), newName);
             }
             if (c.getName().equals(ObfEnv.MAIN_CLASS)) {
-                logger.info("new main: {}", newName.replace("/", "."));
+                ObfEnv.NEW_MAIN_CLASS = newName.replace("/", ".");
+                logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);
             }
         }
 

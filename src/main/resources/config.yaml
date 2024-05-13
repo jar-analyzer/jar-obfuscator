@@ -8,7 +8,9 @@ logLevel: info
 
 # 主类名
 # 不设置主类名可能无法正常执行主函数
-mainClass: me.n1ar4.fake.gui.Application
+mainClass: me.n1ar4.jar.obfuscator.Main
+# 自动修改 META-INF 的主类配置
+modifyManifest: true
 
 # 混淆字符配置
 obfuscateChars: [ i, l, L, '1', I ]

@@ -1,5 +1,6 @@
 package me.n1ar4.jar.obfuscator.utils;
 
+import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -75,6 +76,22 @@ public class DirUtil {
             String entryName = parentDir + source.getName();
             ZipEntry entry = new ZipEntry(entryName);
             jos.putNextEntry(entry);
+            if (ObfEnv.config.isModifyManifest()) {
+                if (entryName.contains("META-INF/MANIFEST.MF")) {
+                    byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
+                    if(data.length>0) {
+                        String dataString = new String(data);
+                        try {
+                            dataString = dataString.replace(
+                                    ObfEnv.MAIN_CLASS.replace("/", "."), ObfEnv.NEW_MAIN_CLASS);
+                        }catch (Exception ignored){
+                        }
+                        jos.write(dataString.getBytes(), 0, dataString.length());
+                        jos.closeEntry();
+                        return;
+                    }
+                }
+            }
             try (FileInputStream fis = new FileInputStream(source)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
