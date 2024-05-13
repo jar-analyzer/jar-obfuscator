@@ -40,7 +40,7 @@ public class ClassReference {
     }
 
     public ClassReference(String name, String superClass, List<String> interfaces,
-                          boolean isInterface,boolean isEnum, List<Member> members, Set<String> annotations, String jar) {
+                          boolean isInterface, boolean isEnum, List<Member> members, Set<String> annotations, String jar) {
         this.name = name;
         this.superClass = superClass;
         this.interfaces = interfaces;

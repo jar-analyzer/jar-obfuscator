@@ -30,7 +30,7 @@ public class XORTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
                 IntToXorChanger changer = new IntToXorChanger(classWriter);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

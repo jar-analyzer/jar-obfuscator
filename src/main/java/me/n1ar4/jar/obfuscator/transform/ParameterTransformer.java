@@ -30,7 +30,7 @@ public class ParameterTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, 0);
                 ParameterChanger changer = new ParameterChanger(classWriter);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

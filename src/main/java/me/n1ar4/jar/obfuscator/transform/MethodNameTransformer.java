@@ -30,7 +30,7 @@ public class MethodNameTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, 0);
                 MethodNameChanger changer = new MethodNameChanger(classWriter);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

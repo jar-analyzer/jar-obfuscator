@@ -36,7 +36,7 @@ public class JunkCodeTransformer {
                 ClassWriter classWriter = new CustomClassWriter(classReader,
                         ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, loader);
                 JunkCodeChanger changer = new JunkCodeChanger(classWriter, config);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

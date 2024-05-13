@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.loader;
 
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 
 public class CustomClassWriter extends ClassWriter {
 

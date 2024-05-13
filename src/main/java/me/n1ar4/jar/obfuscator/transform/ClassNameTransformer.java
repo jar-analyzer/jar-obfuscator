@@ -35,7 +35,7 @@ public class ClassNameTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(classPath));
                 ClassWriter classWriter = new ClassWriter(classReader, 0);
                 ClassNameChanger changer = new ClassNameChanger(classWriter);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(classPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

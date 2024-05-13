@@ -29,7 +29,7 @@ public class DeleteInfoTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(classPath));
                 ClassWriter classWriter = new ClassWriter(classReader, 0);
                 CompileInfoChanger changer = new CompileInfoChanger(classWriter);
-                classReader.accept(changer, 0);
+                classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(classPath);
                 Files.write(classPath, classWriter.toByteArray());
             } catch (Exception ex) {
