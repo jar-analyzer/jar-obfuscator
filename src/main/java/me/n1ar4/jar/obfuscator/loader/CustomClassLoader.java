@@ -8,9 +8,12 @@ import java.nio.file.Paths;
 
 public class CustomClassLoader extends ClassLoader {
     @Override
-    public Class<?> findClass(String name) throws ClassNotFoundException {
+    public Class<?> findClass(String name) {
         byte[] b = loadClassData(name);
-        return defineClass(name, b, 0, b.length);
+        if (b != null) {
+            return defineClass(name, b, 0, b.length);
+        }
+        return null;
     }
 
     private byte[] loadClassData(String name) {

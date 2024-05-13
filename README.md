@@ -10,14 +10,9 @@
 `Jar-Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
 - 命令行模式，简单易用
-- 仅单个 `JAR` 文件小于 `1MB` 超轻量
+- 仅单个 `JAR` 文件小于 `1 MB` 超轻量
 - 简洁的配置文件快速上手
 - 输入 `JAR` 直接输出混淆后的 `JAR`
-
-该工具解决两个痛点
-
-- 免费：知名的好用的代码混淆工具一般会收费
-- 简单：免费开源的代码混淆工具配置麻烦难以上手
 
 ## 开始
 
@@ -43,7 +38,13 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 垃圾代码花指令混淆（可指定多级别的混淆）
 - 基于 `JVMTI` 的字节码加密（beta）
 
-配置文件和选项参考
+## 配置
+
+**一般而言用户不需要动这里的参数**
+
+- 如果是通过 `java -jar` 启动的 `jar` 配置 `mainClass` 即可
+- 如果需要开启 `JVMTI` 字节码加密功能配置 `enableSuperObfuscate` 即可
+- 如果混淆遇到 `BUG` 尝试调整 `methodBlackList` 和 `obfuscatePackage` 配置
 
 ```yaml
 # jar obfuscator 配置文件
@@ -65,6 +66,8 @@ obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
 obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
+# 不对某些 method 名做混淆
+methodBlackList: [ visit.* ]
 
 # 开启类名混淆
 enableClassName: true
