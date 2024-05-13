@@ -7,7 +7,7 @@
 ![](https://img.shields.io/github/downloads/jar-analyzer/jar-obfuscator/total)
 ![](https://img.shields.io/github/v/release/jar-analyzer/jar-obfuscator)
 
-`Jar-Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
+`Jar Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
 - 命令行模式，简单易用
 - 仅单个 `JAR` 文件小于 `1 MB` 超轻量
@@ -42,7 +42,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 ## 配置
 
-**一般而言用户不需要动这里的参数**
+一般的混淆需求保持默认配置参数即可
 
 - 如果是通过 `java -jar` 启动的 `jar` 配置 `mainClass` 即可
 - 如果需要开启 `JVMTI` 字节码加密功能配置 `enableSuperObfuscate` 即可
