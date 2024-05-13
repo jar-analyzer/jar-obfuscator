@@ -10,6 +10,7 @@ public class NameUtil {
     private static final HashSet<String> generatedStrings = new HashSet<>();
     private static final HashSet<String> generatedMethods = new HashSet<>();
     private static final HashSet<String> generatedFields = new HashSet<>();
+    private static final HashSet<String> packageNames = new HashSet<>();
 
     static {
         random.setSeed(System.currentTimeMillis());
@@ -25,6 +26,10 @@ public class NameUtil {
 
     public static String genNewFields() {
         return genBase(3);
+    }
+
+    public static String genPackage() {
+        return genBase(4);
     }
 
     public static String genWithSet(HashSet<String> exists) {
@@ -69,6 +74,11 @@ public class NameUtil {
             } else if (op == 3) {
                 if (!generatedFields.contains(result)) {
                     generatedFields.add(result);
+                    return result;
+                }
+            } else if (op == 4) {
+                if (!packageNames.contains(result)) {
+                    packageNames.add(result);
                     return result;
                 }
             } else {

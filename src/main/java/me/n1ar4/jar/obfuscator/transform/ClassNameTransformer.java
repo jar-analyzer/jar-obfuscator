@@ -23,6 +23,10 @@ public class ClassNameTransformer {
             Path tempDir = Paths.get(Const.TEMP_DIR);
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
+            try {
+                Files.createDirectories(newClassPath.getParent());
+            } catch (Exception ignored) {
+            }
             if (!Files.exists(classPath)) {
                 logger.error("class not exist: {}", classPath.toString());
                 continue;

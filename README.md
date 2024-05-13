@@ -10,8 +10,9 @@
 `Jar-Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
 - 命令行模式，简单易用
-- 仅单个 `JAR` 文件轻量启动
+- 仅单个 `JAR` 文件小于 `1MB` 超轻量
 - 简洁的配置文件快速上手
+- 输入 `JAR` 直接输出混淆后的 `JAR`
 
 该工具解决两个痛点
 
@@ -31,6 +32,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 支持的混淆内容
 
 - 类名混淆（包含引用修改）
+- 包名混淆（包含引用修改）
 - 方法名混淆（包含引用修改）
 - 字段名混淆（包含引用修改）
 - 方法内参数名混淆（包含引用修改）
@@ -45,6 +47,8 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 ```yaml
 # jar obfuscator 配置文件
+# jar obfuscator by jar-analyzer team (4ra1n)
+# https://github.com/jar-analyzer/jar-obfuscator
 
 # 日志级别
 # debug info warn error
@@ -52,16 +56,20 @@ logLevel: info
 
 # 主类名
 # 不设置主类名可能无法正常执行主函数
-mainClass: me.n1ar4.fake.gui.Application
+mainClass: me.n1ar4.jar.obfuscator.Main
+# 自动修改 META-INF 的主类配置
+modifyManifest: true
 
 # 混淆字符配置
-obfuscateChars: [i, l, L, '1', I]
+obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
-obfuscatePackage: [me.n1ar4, org.n1ar4]
+obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
 
 # 开启类名混淆
 enableClassName: true
+# 开启包名混淆（仅混淆 obfuscatePackage 配置）
+enablePackageName: true
 # 开启方法名混淆
 enableMethodName: true
 # 开启字段混淆
@@ -93,8 +101,9 @@ maxJunkOneClass: 2000
 showAllMainMethods: true
 
 # 是否开启进阶 JVMTI 加密字节码
-enableSuperObfuscate: true
+enableSuperObfuscate: false
 # 加密 KEY 配置
+# 注意长度必须是 16 位
 superObfuscateKey: 4ra1n4ra1n4ra1n1
 # 加密包名配置
 superObfuscatePackage: me.n1ar4
@@ -201,6 +210,10 @@ static {
     int var10000 = 0 + 1;
 }
 ```
+
+包名类名的混淆效果
+
+![](img/005.png)
 
 通过定义配置文件的 `obfuscateChars` 可以做更有趣的混淆
 

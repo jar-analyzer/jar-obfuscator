@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class MethodReference {
-    private final ClassReference.Handle classReference;
+    private ClassReference.Handle classReference;
     private final Set<String> annotations;
     private final String name;
     private final String desc;
@@ -21,6 +21,10 @@ public class MethodReference {
         this.isStatic = isStatic;
         this.annotations = annotations;
         this.access = access;
+    }
+
+    public void setClassReference(ClassReference.Handle classReference) {
+        this.classReference = classReference;
     }
 
     public int getAccess() {

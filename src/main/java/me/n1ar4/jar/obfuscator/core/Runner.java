@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -82,6 +83,8 @@ public class Runner {
         MethodCallRunner.start(AnalyzeEnv.classFileList, AnalyzeEnv.methodCalls);
         logger.info("method calls: {}", AnalyzeEnv.methodCalls.size());
 
+        Map<String, String> packageNameMap = new HashMap<>();
+
         // 处理 class name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
             if (c.isEnum()) {
@@ -90,11 +93,30 @@ public class Runner {
             String[] parts = c.getName().split("/");
             String className = parts[parts.length - 1];
             StringBuilder packageName = new StringBuilder();
+            StringBuilder newPackageName = new StringBuilder();
             for (int i = 0; i < parts.length - 1; i++) {
-                if (i > 0) packageName.append("/");
+                if (i > 0) {
+                    packageName.append("/");
+                    newPackageName.append("/");
+                }
                 packageName.append(parts[i]);
+                newPackageName.append(NameUtil.genPackage());
             }
             String packageNameS = packageName.toString();
+
+            String newPackageNameS;
+            if (config.isEnablePackageName()) {
+                String an = packageNameMap.get(packageNameS);
+                newPackageNameS = newPackageName.toString();
+                if (an == null) {
+                    packageNameMap.put(packageNameS, newPackageNameS);
+                    newPackageNameS = newPackageName.toString();
+                } else {
+                    newPackageNameS = an;
+                }
+            } else {
+                newPackageNameS = packageNameS;
+            }
 
             if (PackageUtil.notInWhiteList(packageNameS, config)) {
                 continue;
@@ -112,7 +134,7 @@ public class Runner {
                     ObfEnv.classNameObfMapping.put(a, newName);
                 }
             } else {
-                newName = packageNameS + "/" + NameUtil.genNewName();
+                newName = newPackageNameS + "/" + NameUtil.genNewName();
                 ObfEnv.classNameObfMapping.put(c.getName(), newName);
             }
             if (c.getName().equals(ObfEnv.MAIN_CLASS)) {
@@ -120,6 +142,24 @@ public class Runner {
                 logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);
             }
         }
+
+        // 修改 METHOD MAP 中的旧 CLASS NAME 变成新 CLASSNAME
+        Map<MethodReference.Handle, MethodReference> methodMap = new HashMap<>();
+        for (Map.Entry<MethodReference.Handle, MethodReference> entry : AnalyzeEnv.methodMap.entrySet()) {
+            MethodReference.Handle key = entry.getKey();
+            MethodReference value = entry.getValue();
+            String originName = key.getClassReference().getName();
+            String newName = ObfEnv.classNameObfMapping.getOrDefault(originName, originName);
+            MethodReference.Handle newKey = new MethodReference.Handle(
+                    new ClassReference.Handle(newName),
+                    key.getName(),
+                    key.getDesc()
+            );
+            value.setClassReference(new ClassReference.Handle(newName));
+            methodMap.put(newKey, value);
+        }
+        AnalyzeEnv.methodMap.clear();
+        AnalyzeEnv.methodMap.putAll(methodMap);
 
         // 处理 method name
         for (Map.Entry<ClassReference.Handle, List<MethodReference>> entry : AnalyzeEnv.methodsInClassMap.entrySet()) {

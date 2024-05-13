@@ -38,7 +38,7 @@ public class MethodNameChanger extends ClassVisitor {
         for (MethodReference mr : ignoreMethods) {
             if (mr.getName().equals(name) && mr.getDesc().equals(desc)) {
                 mv = super.visitMethod(access, name, desc, signature, exceptions);
-                return new MethodNameChangerMethodAdapter(mv);
+                return new MethodNameChangerMethodAdapter(mv, owner, name, desc);
             }
         }
         if ("main".equals(name) && desc.equals("([Ljava/lang/String;)V") && access == 9) {
@@ -57,7 +57,7 @@ public class MethodNameChanger extends ClassVisitor {
                 mv = super.visitMethod(access, m.getName(), desc, signature, exceptions);
             }
         }
-        return new MethodNameChangerMethodAdapter(mv);
+        return new MethodNameChangerMethodAdapter(mv, owner, name, desc);
     }
 
     @Override
@@ -131,8 +131,16 @@ public class MethodNameChanger extends ClassVisitor {
     }
 
     static class MethodNameChangerMethodAdapter extends MethodVisitor {
-        MethodNameChangerMethodAdapter(MethodVisitor mv) {
+        MethodNameChangerMethodAdapter(MethodVisitor mv, String className, String name, String desc) {
             super(Const.ASMVersion, mv);
+            MethodReference mr = AnalyzeEnv.methodMap.get(new MethodReference.Handle(
+                    new ClassReference.Handle(className), name, desc
+            ));
+            if (mr != null) {
+                for (String anno : mr.getAnnotations()) {
+                    // TODO
+                }
+            }
         }
 
         @Override

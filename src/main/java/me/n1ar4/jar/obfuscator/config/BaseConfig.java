@@ -4,6 +4,7 @@ public class BaseConfig {
     private String logLevel;
 
     private boolean enableFieldName;
+    private boolean enablePackageName;
     private boolean enableClassName;
     private boolean enableMethodName;
     private boolean enableParamName;
@@ -26,6 +27,14 @@ public class BaseConfig {
     private boolean modifyManifest;
 
     private boolean showAllMainMethods;
+
+    public boolean isEnablePackageName() {
+        return enablePackageName;
+    }
+
+    public void setEnablePackageName(boolean enablePackageName) {
+        this.enablePackageName = enablePackageName;
+    }
 
     public boolean isModifyManifest() {
         return modifyManifest;

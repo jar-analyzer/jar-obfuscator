@@ -20,6 +20,8 @@ obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
 
 # 开启类名混淆
 enableClassName: true
+# 开启包名混淆（仅混淆 obfuscatePackage 配置）
+enablePackageName: true
 # 开启方法名混淆
 enableMethodName: true
 # 开启字段混淆
