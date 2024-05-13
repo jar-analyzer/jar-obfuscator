@@ -8,6 +8,16 @@ public class BaseCmd {
 
     @Parameter(names = {"-c", "--config"}, description = "config yaml file")
     private String config;
+    @Parameter(names = {"-g", "--generate"}, description = "generate config file")
+    private boolean generate;
+
+    public boolean isGenerate() {
+        return generate;
+    }
+
+    public void setGenerate(boolean generate) {
+        this.generate = generate;
+    }
 
     public String getPath() {
         return path;

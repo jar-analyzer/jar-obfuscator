@@ -19,6 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         Logo.printLogo();
+        Parser parser = new Parser();
         JCommander commander = JCommander.newBuilder()
                 .addObject(baseCmd)
                 .build();
@@ -26,6 +27,11 @@ public class Main {
             commander.parse(args);
         } catch (Exception ignored) {
             commander.usage();
+            return;
+        }
+        if (baseCmd.isGenerate()) {
+            parser.generateConfig();
+            logger.info("generate config.yaml file");
             return;
         }
         if (baseCmd.getConfig() == null || baseCmd.getConfig().isEmpty()) {
@@ -36,7 +42,6 @@ public class Main {
             commander.usage();
             return;
         }
-        Parser parser = new Parser();
         BaseConfig config = parser.parse(Paths.get(baseCmd.getConfig()));
         if (config == null) {
             logger.warn("need config.yaml config");
