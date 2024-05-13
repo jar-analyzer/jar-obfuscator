@@ -84,6 +84,9 @@ public class Runner {
 
         // 处理 class name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
+            if (c.isEnum()) {
+                continue;
+            }
             String[] parts = c.getName().split("/");
             String className = parts[parts.length - 1];
             StringBuilder packageName = new StringBuilder();
@@ -123,6 +126,10 @@ public class Runner {
             ClassReference.Handle key = entry.getKey();
             List<MethodReference> value = entry.getValue();
 
+            if (AnalyzeEnv.classMap.get(key).isEnum()) {
+                continue;
+            }
+
             if (PackageUtil.notInWhiteList(key.getName(), config)) {
                 continue;
             }
@@ -155,6 +162,10 @@ public class Runner {
 
         // 处理 field name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
+
+            if (c.isEnum()) {
+                continue;
+            }
 
             if (PackageUtil.notInWhiteList(c.getName(), config)) {
                 continue;
