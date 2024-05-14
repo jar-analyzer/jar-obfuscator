@@ -44,3 +44,4 @@ log/
 *.yml
 *.yaml
 cmake-*/
+code-encryptor-temp/
