@@ -164,11 +164,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
         tokens = split_string((char *) pack, &num_tokens, "=");
         if (strcmp((char *) tokens[0], "PACKAGE_NAME") == 0) {
             v1 = tokens[1];
-            printf("PACKAGE_NAME: %s\n", v1);
-            printf("LENGTH: %lu\n", strlen((char *) v1));
             PACKAGE_NAME = (char *) malloc(strlen((char *) v1));
             strcpy(PACKAGE_NAME, (char *) v1);
-            printf("SET GLOBAL PACKAGE: %s\n", PACKAGE_NAME);
         } else {
             printf("ERROR");
             return 0;
@@ -177,11 +174,8 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
         tokens = split_string((char *) key, &num_tokens, "=");
         if (strcmp((char *) tokens[0], "KEY") == 0) {
             v2 = tokens[1];
-            printf("KEY: %s\n", v2);
-            printf("LENGTH: %lu\n", strlen((char *) v2));
             KEY = (char *) malloc(strlen((char *) v2));
             strcpy(KEY, (char *) v2);
-            printf("SET GLOBAL KEY: %s\n", KEY);
         } else {
             printf("ERROR");
             return 0;
