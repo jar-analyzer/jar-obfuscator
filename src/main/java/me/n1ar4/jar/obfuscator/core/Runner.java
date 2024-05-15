@@ -143,24 +143,6 @@ public class Runner {
             }
         }
 
-        // 修改 METHOD MAP 中的旧 CLASS NAME 变成新 CLASSNAME
-        Map<MethodReference.Handle, MethodReference> methodMap = new HashMap<>();
-        for (Map.Entry<MethodReference.Handle, MethodReference> entry : AnalyzeEnv.methodMap.entrySet()) {
-            MethodReference.Handle key = entry.getKey();
-            MethodReference value = entry.getValue();
-            String originName = key.getClassReference().getName();
-            String newName = ObfEnv.classNameObfMapping.getOrDefault(originName, originName);
-            MethodReference.Handle newKey = new MethodReference.Handle(
-                    new ClassReference.Handle(newName),
-                    key.getName(),
-                    key.getDesc()
-            );
-            value.setClassReference(new ClassReference.Handle(newName));
-            methodMap.put(newKey, value);
-        }
-        AnalyzeEnv.methodMap.clear();
-        AnalyzeEnv.methodMap.putAll(methodMap);
-
         // 处理 method name
         for (Map.Entry<ClassReference.Handle, List<MethodReference>> entry : AnalyzeEnv.methodsInClassMap.entrySet()) {
             ClassReference.Handle key = entry.getKey();
