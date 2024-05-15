@@ -138,8 +138,6 @@ JNIEXPORT void JNICALL Agent_OnUnload(JavaVM *vm) {
 }
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
-    printf("PARAMS: %s\n", options);
-
     // REPLACE . -> /
     char modified_str[256];
     size_t modified_str_size = sizeof(modified_str);
@@ -164,8 +162,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
         tokens = split_string((char *) pack, &num_tokens, "=");
         if (strcmp((char *) tokens[0], "PACKAGE_NAME") == 0) {
             v1 = tokens[1];
-            printf("PACKAGE_NAME: %s\n", v1);
-            printf("LENGTH: %llu\n", strlen((char *) v1));
         } else {
             printf("ERROR");
             return 0;
@@ -174,8 +170,6 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
         tokens = split_string((char *) key, &num_tokens, "=");
         if (strcmp((char *) tokens[0], "KEY") == 0) {
             v2 = tokens[1];
-            printf("KEY: %s\n", v2);
-            printf("LENGTH: %llu\n", strlen((char *) v2));
         } else {
             printf("ERROR");
             return 0;
@@ -195,12 +189,10 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
     // SET PACKAGE_NAME
     PACKAGE_NAME = (char *) malloc(strlen((char *) v1));
     strcpy(PACKAGE_NAME, (char *) v1);
-    printf("SET GLOBAL PACKAGE: %s\n", PACKAGE_NAME);
 
     // SET KEY
     KEY = (unsigned char *) malloc(16);
     strcpy((char *) KEY, (char *) v2);
-    printf("SET GLOBAL KEY: %s\n", KEY);
 
     jvmtiEnv *jvmti;
     DE_LOG("INIT JVMTI ENVIRONMENT");
