@@ -1,10 +1,25 @@
 package me.n1ar4.jar.obfuscator.templates;
 
 import me.n1ar4.jar.obfuscator.utils.NameUtil;
+import me.n1ar4.log.LogManager;
+import me.n1ar4.log.Logger;
 import org.objectweb.asm.*;
 
 public class StringDecryptDump implements Opcodes {
-    public static String name;
+    private static final Logger logger = LogManager.getLogger();
+    public static String AES_KEY = null;
+    public static String name = null;
+
+    public static void changeKEY(String key) {
+        if (key != null && key.length() == 16) {
+            AES_KEY = key;
+            logger.info("change decrypt aes key to: {}", key);
+            return;
+        }
+        AES_KEY = "Y4SuperSecretKey";
+        logger.warn("aes decrypt key length muse be 16");
+        logger.info("change decrypt aes key to: {}", key);
+    }
 
     public static byte[] dump() {
         ClassWriter classWriter = new ClassWriter(0);
@@ -16,7 +31,7 @@ public class StringDecryptDump implements Opcodes {
         classWriter.visitInnerClass("java/util/Base64$Encoder", "java/util/Base64", "Encoder", ACC_PUBLIC | ACC_STATIC);
         classWriter.visitInnerClass("java/util/Base64$Decoder", "java/util/Base64", "Decoder", ACC_PUBLIC | ACC_STATIC);
         {
-            fieldVisitor = classWriter.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, "KEY", "Ljava/lang/String;", null, "Y4SuperSecretKey");
+            fieldVisitor = classWriter.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, "KEY", "Ljava/lang/String;", null, AES_KEY);
             fieldVisitor.visitEnd();
         }
         {
@@ -28,7 +43,6 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitCode();
             Label label0 = new Label();
             methodVisitor.visitLabel(label0);
-            methodVisitor.visitLineNumber(7, label0);
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
             methodVisitor.visitInsn(RETURN);
@@ -46,30 +60,26 @@ public class StringDecryptDump implements Opcodes {
             Label label2 = new Label();
             methodVisitor.visitTryCatchBlock(label0, label1, label2, "java/lang/Exception");
             methodVisitor.visitLabel(label0);
-            methodVisitor.visitLineNumber(12, label0);
             methodVisitor.visitTypeInsn(NEW, "javax/crypto/spec/SecretKeySpec");
             methodVisitor.visitInsn(DUP);
-            methodVisitor.visitLdcInsn("Y4SuperSecretKey");
+            methodVisitor.visitLdcInsn(AES_KEY);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false);
             methodVisitor.visitLdcInsn("AES");
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "javax/crypto/spec/SecretKeySpec", "<init>", "([BLjava/lang/String;)V", false);
             methodVisitor.visitVarInsn(ASTORE, 1);
             Label label3 = new Label();
             methodVisitor.visitLabel(label3);
-            methodVisitor.visitLineNumber(13, label3);
             methodVisitor.visitLdcInsn("AES");
             methodVisitor.visitMethodInsn(INVOKESTATIC, "javax/crypto/Cipher", "getInstance", "(Ljava/lang/String;)Ljavax/crypto/Cipher;", false);
             methodVisitor.visitVarInsn(ASTORE, 2);
             Label label4 = new Label();
             methodVisitor.visitLabel(label4);
-            methodVisitor.visitLineNumber(14, label4);
             methodVisitor.visitVarInsn(ALOAD, 2);
             methodVisitor.visitInsn(ICONST_1);
             methodVisitor.visitVarInsn(ALOAD, 1);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "init", "(ILjava/security/Key;)V", false);
             Label label5 = new Label();
             methodVisitor.visitLabel(label5);
-            methodVisitor.visitLineNumber(16, label5);
             methodVisitor.visitVarInsn(ALOAD, 2);
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false);
@@ -77,19 +87,16 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitVarInsn(ASTORE, 3);
             Label label6 = new Label();
             methodVisitor.visitLabel(label6);
-            methodVisitor.visitLineNumber(17, label6);
             methodVisitor.visitMethodInsn(INVOKESTATIC, "java/util/Base64", "getEncoder", "()Ljava/util/Base64$Encoder;", false);
             methodVisitor.visitVarInsn(ALOAD, 3);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/Base64$Encoder", "encodeToString", "([B)Ljava/lang/String;", false);
             methodVisitor.visitLabel(label1);
             methodVisitor.visitInsn(ARETURN);
             methodVisitor.visitLabel(label2);
-            methodVisitor.visitLineNumber(18, label2);
             methodVisitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Exception"});
             methodVisitor.visitVarInsn(ASTORE, 1);
             Label label7 = new Label();
             methodVisitor.visitLabel(label7);
-            methodVisitor.visitLineNumber(19, label7);
             methodVisitor.visitInsn(ACONST_NULL);
             methodVisitor.visitInsn(ARETURN);
             Label label8 = new Label();
@@ -110,30 +117,26 @@ public class StringDecryptDump implements Opcodes {
             Label label2 = new Label();
             methodVisitor.visitTryCatchBlock(label0, label1, label2, "java/lang/Exception");
             methodVisitor.visitLabel(label0);
-            methodVisitor.visitLineNumber(24, label0);
             methodVisitor.visitTypeInsn(NEW, "javax/crypto/spec/SecretKeySpec");
             methodVisitor.visitInsn(DUP);
-            methodVisitor.visitLdcInsn("Y4SuperSecretKey");
+            methodVisitor.visitLdcInsn(AES_KEY);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false);
             methodVisitor.visitLdcInsn("AES");
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "javax/crypto/spec/SecretKeySpec", "<init>", "([BLjava/lang/String;)V", false);
             methodVisitor.visitVarInsn(ASTORE, 1);
             Label label3 = new Label();
             methodVisitor.visitLabel(label3);
-            methodVisitor.visitLineNumber(25, label3);
             methodVisitor.visitLdcInsn("AES");
             methodVisitor.visitMethodInsn(INVOKESTATIC, "javax/crypto/Cipher", "getInstance", "(Ljava/lang/String;)Ljavax/crypto/Cipher;", false);
             methodVisitor.visitVarInsn(ASTORE, 2);
             Label label4 = new Label();
             methodVisitor.visitLabel(label4);
-            methodVisitor.visitLineNumber(26, label4);
             methodVisitor.visitVarInsn(ALOAD, 2);
             methodVisitor.visitInsn(ICONST_2);
             methodVisitor.visitVarInsn(ALOAD, 1);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "init", "(ILjava/security/Key;)V", false);
             Label label5 = new Label();
             methodVisitor.visitLabel(label5);
-            methodVisitor.visitLineNumber(28, label5);
             methodVisitor.visitVarInsn(ALOAD, 2);
             methodVisitor.visitMethodInsn(INVOKESTATIC, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;", false);
             methodVisitor.visitVarInsn(ALOAD, 0);
@@ -142,7 +145,6 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitVarInsn(ASTORE, 3);
             Label label6 = new Label();
             methodVisitor.visitLabel(label6);
-            methodVisitor.visitLineNumber(29, label6);
             methodVisitor.visitTypeInsn(NEW, "java/lang/String");
             methodVisitor.visitInsn(DUP);
             methodVisitor.visitVarInsn(ALOAD, 3);
@@ -150,12 +152,10 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitLabel(label1);
             methodVisitor.visitInsn(ARETURN);
             methodVisitor.visitLabel(label2);
-            methodVisitor.visitLineNumber(30, label2);
             methodVisitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Exception"});
             methodVisitor.visitVarInsn(ASTORE, 1);
             Label label7 = new Label();
             methodVisitor.visitLabel(label7);
-            methodVisitor.visitLineNumber(31, label7);
             methodVisitor.visitInsn(ACONST_NULL);
             methodVisitor.visitInsn(ARETURN);
             Label label8 = new Label();

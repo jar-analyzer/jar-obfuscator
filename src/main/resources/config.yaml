@@ -33,6 +33,9 @@ enableParamName: true
 
 # 开启加密字符串
 enableEncryptString: true
+# 加密使用 AES KEY
+# 注意长度必须是 16 且不包含中文
+stringAesKey: Y4SuperSecretKey
 # 开启进阶字符串混淆
 enableAdvanceString: true
 # 进阶字符串处理参数

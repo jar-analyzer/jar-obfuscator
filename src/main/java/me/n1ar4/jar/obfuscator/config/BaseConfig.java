@@ -14,6 +14,8 @@ public class BaseConfig {
     private boolean enableJunk;
     private boolean enableDeleteCompileInfo;
 
+    private String stringAesKey;
+
     private boolean enableSuperObfuscate;
     private String superObfuscateKey;
     private String superObfuscatePackage;
@@ -28,6 +30,14 @@ public class BaseConfig {
     private boolean modifyManifest;
 
     private boolean showAllMainMethods;
+
+    public String getStringAesKey() {
+        return stringAesKey;
+    }
+
+    public void setStringAesKey(String stringAesKey) {
+        this.stringAesKey = stringAesKey;
+    }
 
     public String[] getMethodBlackList() {
         return methodBlackList;

@@ -1,12 +1,27 @@
 package me.n1ar4.jar.obfuscator.templates;
 
+import me.n1ar4.log.LogManager;
+import me.n1ar4.log.Logger;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 public class StringDecrypt {
-    private static final String KEY = "Y4SuperSecretKey";
+    private static final Logger logger = LogManager.getLogger();
+    private static String KEY = null;
     private static final String ALGORITHM = "AES";
+
+    public static void changeKEY(String key) {
+        if (key != null && key.length() == 16) {
+            KEY = key;
+            logger.info("change encrypt aes key to: {}", key);
+            return;
+        }
+        key = "Y4SuperSecretKey";
+        logger.warn("aes encrypt key length muse be 16");
+        logger.info("change encrypt aes key to: {}", key);
+    }
 
     public static String encrypt(String input) {
         try {
@@ -21,6 +36,7 @@ public class StringDecrypt {
         }
     }
 
+    @SuppressWarnings("unused")
     public static String decrypt(String encrypted) {
         try {
             SecretKeySpec key = new SecretKeySpec(KEY.getBytes(), ALGORITHM);

@@ -2,6 +2,8 @@ package me.n1ar4.jar.obfuscator.config;
 
 import me.n1ar4.jar.obfuscator.asm.JunkCodeChanger;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
+import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
+import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
 import me.n1ar4.jar.obfuscator.utils.NameUtil;
 import me.n1ar4.log.LogLevel;
 import me.n1ar4.log.LogManager;
@@ -65,6 +67,9 @@ public class Manager {
 
         JunkCodeChanger.MAX_JUNK_NUM = config.getMaxJunkOneClass();
         ObfEnv.ADVANCE_STRING_NAME = config.getAdvanceStringName();
+
+        StringDecrypt.changeKEY(config.getStringAesKey());
+        StringDecryptDump.changeKEY(config.getStringAesKey());
 
         return true;
     }
