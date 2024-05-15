@@ -64,3 +64,6 @@ enableSuperObfuscate: false
 superObfuscateKey: 4ra1n4ra1n4ra1n1
 # 加密包名配置
 superObfuscatePackage: me.n1ar4
+
+# 是否保留临时类文件
+keepTempFile: false

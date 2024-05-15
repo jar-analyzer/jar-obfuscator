@@ -290,7 +290,9 @@ public class Runner {
         // 生成混淆后目标
         try {
             DirUtil.zip(Const.TEMP_DIR, newFile);
-            DirUtil.deleteDirectory(new File(Const.TEMP_DIR));
+            if (!config.isKeepTempFile()) {
+                DirUtil.deleteDirectory(new File(Const.TEMP_DIR));
+            }
             logger.info("generate jar file: {}", newFile);
         } catch (Exception e) {
             logger.error("zip file error: {}", e.toString());

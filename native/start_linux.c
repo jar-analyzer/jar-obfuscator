@@ -139,8 +139,6 @@ JNIEXPORT void JNICALL Agent_OnUnload(JavaVM *vm) {
 }
 
 JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
-    printf("PARAMS: %s\n", options);
-
     // REPLACE . -> /
     char modified_str[256];
     size_t modified_str_size = sizeof(modified_str);

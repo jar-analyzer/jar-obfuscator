@@ -31,6 +31,16 @@ public class BaseConfig {
 
     private boolean showAllMainMethods;
 
+    private boolean keepTempFile;
+
+    public boolean isKeepTempFile() {
+        return keepTempFile;
+    }
+
+    public void setKeepTempFile(boolean keepTempFile) {
+        this.keepTempFile = keepTempFile;
+    }
+
     public String getStringAesKey() {
         return stringAesKey;
     }
