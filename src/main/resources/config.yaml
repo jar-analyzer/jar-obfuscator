@@ -49,8 +49,8 @@ enableXOR: true
 # 开启花指令混淆
 enableJunk: true
 # 花指令级别
-# 最低1 最高3
-junkLevel: 3
+# 最低1 最高5
+junkLevel: 5
 # 一个类中的花指令数量上限
 maxJunkOneClass: 2000
 

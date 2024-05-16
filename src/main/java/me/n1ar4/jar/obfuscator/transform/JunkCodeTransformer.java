@@ -10,6 +10,7 @@ import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodTooLargeException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,10 @@ public class JunkCodeTransformer {
                 classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
+            } catch (MethodTooLargeException ex) {
+                logger.error("method too large");
+                logger.error("please check max junk config");
+                return;
             } catch (Exception ex) {
                 logger.error("transform error: {}", ex.toString());
             }

@@ -2,6 +2,7 @@ package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
+import me.n1ar4.jar.obfuscator.utils.RandomUtil;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.objectweb.asm.*;
@@ -110,6 +111,7 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+            // LEVEL 1
             if (config.getJunkLevel() > 0) {
                 JUNK_NUM++;
                 if (JUNK_NUM > MAX_JUNK_NUM) {
@@ -120,9 +122,9 @@ public class JunkCodeChanger extends ClassVisitor {
 
                 mv.visitLdcInsn((int) (Math.random() * 100));
                 mv.visitInsn(Opcodes.DUP);
-                mv.visitInsn(Opcodes.ICONST_5);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
                 mv.visitInsn(Opcodes.IADD);
-                mv.visitInsn(Opcodes.ICONST_3);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
                 mv.visitInsn(Opcodes.ISUB);
                 mv.visitInsn(Opcodes.DUP_X1);
                 mv.visitInsn(Opcodes.SWAP);
@@ -135,6 +137,7 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+            // LEVEL 2
             if (config.getJunkLevel() > 1) {
                 JUNK_NUM++;
                 if (JUNK_NUM > MAX_JUNK_NUM) {
@@ -157,6 +160,7 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitTypeInsn(int opcode, String type) {
+            // LEVEL 3
             if (config.getJunkLevel() > 2) {
                 JUNK_NUM++;
                 if (JUNK_NUM > MAX_JUNK_NUM) {
@@ -238,18 +242,17 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitIincInsn(int varIndex, int increment) {
-            if (config.getJunkLevel() > 2) {
+            // LEVEL 4
+            if (config.getJunkLevel() > 3) {
                 JUNK_NUM++;
                 if (JUNK_NUM > MAX_JUNK_NUM) {
                     logger.debug("max junk code");
                     super.visitIincInsn(varIndex, increment);
                     return;
                 }
-                mv.visitInsn(Opcodes.ICONST_3);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
                 mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(Opcodes.ICONST_4);
-                mv.visitInsn(Opcodes.DUP);
-                mv.visitInsn(Opcodes.POP);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
                 mv.visitInsn(Opcodes.NOP);
                 mv.visitInsn(Opcodes.POP);
             }
@@ -258,15 +261,16 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitInsn(int opcode) {
-            if (config.getJunkLevel() > 2) {
+            // LEVEL 5
+            if (config.getJunkLevel() > 4) {
                 JUNK_NUM++;
                 if (JUNK_NUM > MAX_JUNK_NUM) {
                     logger.debug("max junk code");
                     super.visitInsn(opcode);
                     return;
                 }
-                mv.visitInsn(Opcodes.ICONST_0);
-                mv.visitInsn(Opcodes.ICONST_1);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
                 mv.visitInsn(Opcodes.IADD);
                 mv.visitInsn(Opcodes.POP);
             }
@@ -295,6 +299,21 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitLdcInsn(Object value) {
+            // LEVEL 5
+            if (config.getJunkLevel() > 4) {
+                JUNK_NUM++;
+                if (JUNK_NUM > MAX_JUNK_NUM) {
+                    logger.debug("max junk code");
+                    super.visitLdcInsn(value);
+                    return;
+                }
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
+                mv.visitInsn(Opcodes.POP);
+                mv.visitInsn(RandomUtil.genICONSTOpcode());
+                mv.visitInsn(Opcodes.POP);
+                super.visitLdcInsn(value);
+                return;
+            }
             super.visitLdcInsn(value);
         }
 
