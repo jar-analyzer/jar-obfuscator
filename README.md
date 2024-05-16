@@ -84,6 +84,9 @@ enableParamName: true
 
 # 开启加密字符串
 enableEncryptString: true
+# 加密使用 AES KEY
+# 注意长度必须是 16 且不包含中文
+stringAesKey: Y4SuperSecretKey
 # 开启进阶字符串混淆
 enableAdvanceString: true
 # 进阶字符串处理参数
@@ -97,8 +100,8 @@ enableXOR: true
 # 开启花指令混淆
 enableJunk: true
 # 花指令级别
-# 最低1 最高3
-junkLevel: 3
+# 最低1 最高5
+junkLevel: 5
 # 一个类中的花指令数量上限
 maxJunkOneClass: 2000
 
@@ -112,6 +115,9 @@ enableSuperObfuscate: false
 superObfuscateKey: 4ra1n4ra1n4ra1n1
 # 加密包名配置
 superObfuscatePackage: me.n1ar4
+
+# 是否保留临时类文件
+keepTempFile: false
 ```
 
 ## 效果
