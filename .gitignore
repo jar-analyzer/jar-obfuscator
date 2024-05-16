@@ -45,3 +45,4 @@ log/
 *.yaml
 cmake-*/
 code-encryptor-temp/
+token.txt
