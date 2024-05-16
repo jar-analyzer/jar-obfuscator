@@ -23,7 +23,7 @@ func main() {
 	token := string(data)
 
 	repoOwner := "jar-analyzer"
-	repoName := "jar-analyzer"
+	repoName := "jar-obfuscator"
 	action := "build.yml"
 
 	ctx := context.Background()

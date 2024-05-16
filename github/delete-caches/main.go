@@ -24,7 +24,7 @@ func main() {
 	token := string(data)
 
 	repoOwner := "jar-analyzer"
-	repoName := "jar-analyzer"
+	repoName := "jar-obfuscator"
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
