@@ -32,7 +32,7 @@ public class StringArrayTransformer {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
                 StringArrayChanger changer = new StringArrayChanger(classWriter);
-                classReader.accept(changer, Const.AnalyzeASMOptions);
+                classReader.accept(changer, ClassReader.EXPAND_FRAMES);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {
