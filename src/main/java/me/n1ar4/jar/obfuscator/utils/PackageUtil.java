@@ -14,11 +14,23 @@ public class PackageUtil {
         return !inWhiteList;
     }
 
-    public static boolean InBlackClass(String className, BaseConfig config) {
+    public static boolean inBlackClass(String className, BaseConfig config) {
         className = className.replace(".", "/");
         for (String s : config.getClassBlackList()) {
             s = s.replace(".", "/");
             if (className.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean inRootPackage(String className, BaseConfig config) {
+        boolean inRoot = false;
+        className = className.replace("/", ".");
+        for (String s : config.getRootPackages()) {
+            s = s.replace("/", ".");
+            if (className.startsWith(s)) {
                 return true;
             }
         }

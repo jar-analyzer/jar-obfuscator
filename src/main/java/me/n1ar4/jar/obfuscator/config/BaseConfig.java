@@ -27,12 +27,21 @@ public class BaseConfig {
     private String[] obfuscateChars;
     private String[] methodBlackList;
     private String[] classBlackList;
+    private String[] rootPackages;
     private String mainClass;
     private boolean modifyManifest;
 
     private boolean showAllMainMethods;
 
     private boolean keepTempFile;
+
+    public String[] getRootPackages() {
+        return rootPackages;
+    }
+
+    public void setRootPackages(String[] rootPackages) {
+        this.rootPackages = rootPackages;
+    }
 
     public String[] getClassBlackList() {
         return classBlackList;

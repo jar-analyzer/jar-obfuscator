@@ -123,11 +123,13 @@ public class Runner {
                 newPackageNameS = packageNameS;
             }
 
-            String newName;
+            String newName = c.getName();
 
-            if (PackageUtil.notInWhiteList(packageNameS, config) || PackageUtil.InBlackClass(c.getName(), config)) {
-                newName = c.getName();
-                ObfEnv.classNameObfMapping.put(c.getName(), c.getName());
+            if (PackageUtil.notInWhiteList(packageNameS, config) ||
+                    PackageUtil.inBlackClass(c.getName(), config)) {
+                if (PackageUtil.inRootPackage(c.getName(), config)) {
+                    ObfEnv.classNameObfMapping.put(c.getName(), c.getName());
+                }
             } else {
                 if (className.contains("$")) {
                     String a = c.getName();
@@ -181,11 +183,13 @@ public class Runner {
                         oldMethodName, desc);
 
                 if (PackageUtil.notInWhiteList(key.getName(), config) ||
-                        PackageUtil.InBlackClass(key.getName(), config)) {
-                    MethodReference.Handle newHandle = new MethodReference.Handle(
-                            new ClassReference.Handle(newClassName),
-                            oldMethodName, desc);
-                    ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
+                        PackageUtil.inBlackClass(key.getName(), config)) {
+                    if (PackageUtil.inRootPackage(key.getName(), config)) {
+                        MethodReference.Handle newHandle = new MethodReference.Handle(
+                                new ClassReference.Handle(newClassName),
+                                oldMethodName, desc);
+                        ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
+                    }
                 } else {
                     String newMethodName = NameUtil.genNewMethod();
                     MethodReference.Handle newHandle = new MethodReference.Handle(
@@ -209,8 +213,10 @@ public class Runner {
                 oldMember.setClassName(newClassName);
                 oldMember.setFieldName(s);
                 if (PackageUtil.notInWhiteList(c.getName(), config) ||
-                        PackageUtil.InBlackClass(c.getName(), config)) {
-                    ObfEnv.fieldNameObfMapping.put(oldMember, oldMember);
+                        PackageUtil.inBlackClass(c.getName(), config)) {
+                    if (PackageUtil.inRootPackage(c.getName(), config)) {
+                        ObfEnv.fieldNameObfMapping.put(oldMember, oldMember);
+                    }
                 } else {
                     ClassField newMember = new ClassField();
                     newMember.setClassName(newClassName);

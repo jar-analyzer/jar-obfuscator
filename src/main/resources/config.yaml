@@ -17,11 +17,14 @@ obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
 obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
+# 需要混淆的根包名
+# 避免处理 org.apache 等无关 class
+rootPackages: [ me.n1ar4, org.n1ar4 ]
 # 不对某些类做混淆（不混淆其中的所有内容）
 # 例如反射调用/JAVAFX FXML绑定等情况
-classBlackList: [ cherry.controller.CherryController ]
+classBlackList: [ javafx.controller.DemoController ]
 # 不对某些 method 名做混淆
-methodBlackList: [ visit.* ]
+methodBlackList: [ visit.*, start.* ]
 
 # 开启类名混淆
 enableClassName: true
