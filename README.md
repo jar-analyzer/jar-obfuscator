@@ -68,8 +68,14 @@ obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
 obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
+# 需要混淆的根包名
+# 避免处理 org.apache 等无关 class
+rootPackages: [ me.n1ar4, org.n1ar4 ]
+# 不对某些类做混淆（不混淆其中的所有内容）
+# 例如反射调用/JAVAFX FXML绑定等情况
+classBlackList: [ javafx.controller.DemoController ]
 # 不对某些 method 名做混淆
-methodBlackList: [ visit.* ]
+methodBlackList: [ visit.*, start.* ]
 
 # 开启类名混淆
 enableClassName: true
@@ -119,6 +125,48 @@ superObfuscatePackage: me.n1ar4
 # 是否保留临时类文件
 keepTempFile: false
 ```
+
+## 实战
+
+**示例一** 
+
+我有一个 `JAVAFX` 项目
+- 主类是 `com.n1ar4.gui.Main` 
+- 使用的 `fxml` 绑定的是 `com.n1ar4.controller.DemoController`
+
+由于 `fxml` 中的绑定类和方法无法修改，所以 `controller` 类暂不能混淆
+
+```xml
+<AnchorPane fx:controller="com.n1ar4.controller.DemoController"/>
+```
+
+如果我想完全混淆，应该给出这样的配置
+
+```yaml
+# 混淆包名称
+obfuscatePackage: [ com.n1ar4 ]
+# 混淆根包名
+rootPackages: [ com.n1ar4 ]
+# 不要混淆 fxml 绑定的 controller
+classBlackList: [ com.n1ar4.controller.DemoController ]
+# 注意 javafx 的启动类 start 方法不能改名
+methodBlackList: [ start.* ]
+```
+
+如果只混淆核心包 `com.n1ar4.core` 这样配置
+
+```yaml
+# 混淆包名称
+obfuscatePackage: [ com.n1ar4.core ]
+# 混淆根包名
+rootPackages: [ com.n1ar4 ]
+# 不要混淆 fxml 绑定的 controller
+classBlackList: [ com.n1ar4.controller.DemoController ]
+# 这时候不用特殊处理 javafx 启动类的问题了
+methodBlackList: [ ]
+```
+
+以上根包名的配置意义：只分析根包名下的类之间的引用关系
 
 ## 效果
 
