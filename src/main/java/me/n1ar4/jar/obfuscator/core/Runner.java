@@ -90,6 +90,11 @@ public class Runner {
             if (c.isEnum()) {
                 continue;
             }
+            // 不处理这个 CLASS
+            // 常见于高版本的 JAR 中
+            if (c.getName().contains("module-info")) {
+                continue;
+            }
             String[] parts = c.getName().split("/");
             String className = parts[parts.length - 1];
             StringBuilder packageName = new StringBuilder();
@@ -118,25 +123,28 @@ public class Runner {
                 newPackageNameS = packageNameS;
             }
 
-            if (PackageUtil.notInWhiteList(packageNameS, config)) {
-                continue;
+            String newName;
+
+            if (PackageUtil.notInWhiteList(packageNameS, config) || PackageUtil.InBlackClass(c.getName(), config)) {
+                newName = c.getName();
+                ObfEnv.classNameObfMapping.put(c.getName(), c.getName());
+            } else {
+                if (className.contains("$")) {
+                    String a = c.getName();
+                    String sa = a.split("\\$")[0];
+                    String exist = ObfEnv.classNameObfMapping.get(sa);
+                    if (exist == null) {
+                        continue;
+                    } else {
+                        newName = exist + "$" + NameUtil.genNewName();
+                        ObfEnv.classNameObfMapping.put(a, newName);
+                    }
+                } else {
+                    newName = newPackageNameS + "/" + NameUtil.genNewName();
+                    ObfEnv.classNameObfMapping.put(c.getName(), newName);
+                }
             }
 
-            String newName;
-            if (className.contains("$")) {
-                String a = c.getName();
-                String sa = a.split("\\$")[0];
-                String exist = ObfEnv.classNameObfMapping.get(sa);
-                if (exist == null) {
-                    continue;
-                } else {
-                    newName = exist + "$" + NameUtil.genNewName();
-                    ObfEnv.classNameObfMapping.put(a, newName);
-                }
-            } else {
-                newName = newPackageNameS + "/" + NameUtil.genNewName();
-                ObfEnv.classNameObfMapping.put(c.getName(), newName);
-            }
             if (c.getName().equals(ObfEnv.MAIN_CLASS)) {
                 ObfEnv.NEW_MAIN_CLASS = newName.replace("/", ".");
                 logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);
@@ -149,10 +157,6 @@ public class Runner {
             List<MethodReference> value = entry.getValue();
 
             if (AnalyzeEnv.classMap.get(key).isEnum()) {
-                continue;
-            }
-
-            if (PackageUtil.notInWhiteList(key.getName(), config)) {
                 continue;
             }
 
@@ -171,14 +175,24 @@ public class Runner {
                         oldMethodName.equals("<clinit>")) {
                     continue;
                 }
-                String newMethodName = NameUtil.genNewMethod();
+
                 MethodReference.Handle oldHandle = new MethodReference.Handle(
                         new ClassReference.Handle(newClassName),
                         oldMethodName, desc);
-                MethodReference.Handle newHandle = new MethodReference.Handle(
-                        new ClassReference.Handle(newClassName),
-                        newMethodName, desc);
-                ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
+
+                if (PackageUtil.notInWhiteList(key.getName(), config) ||
+                        PackageUtil.InBlackClass(key.getName(), config)) {
+                    MethodReference.Handle newHandle = new MethodReference.Handle(
+                            new ClassReference.Handle(newClassName),
+                            oldMethodName, desc);
+                    ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
+                } else {
+                    String newMethodName = NameUtil.genNewMethod();
+                    MethodReference.Handle newHandle = new MethodReference.Handle(
+                            new ClassReference.Handle(newClassName),
+                            newMethodName, desc);
+                    ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
+                }
             }
         }
 
@@ -189,19 +203,20 @@ public class Runner {
                 continue;
             }
 
-            if (PackageUtil.notInWhiteList(c.getName(), config)) {
-                continue;
-            }
-
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(c.getName(), c.getName());
             for (String s : AnalyzeEnv.fieldsInClassMap.get(c.getName())) {
                 ClassField oldMember = new ClassField();
                 oldMember.setClassName(newClassName);
                 oldMember.setFieldName(s);
-                ClassField newMember = new ClassField();
-                newMember.setClassName(newClassName);
-                newMember.setFieldName(NameUtil.genNewFields());
-                ObfEnv.fieldNameObfMapping.put(oldMember, newMember);
+                if (PackageUtil.notInWhiteList(c.getName(), config) ||
+                        PackageUtil.InBlackClass(c.getName(), config)) {
+                    ObfEnv.fieldNameObfMapping.put(oldMember, oldMember);
+                } else {
+                    ClassField newMember = new ClassField();
+                    newMember.setClassName(newClassName);
+                    newMember.setFieldName(NameUtil.genNewFields());
+                    ObfEnv.fieldNameObfMapping.put(oldMember, newMember);
+                }
             }
         }
 

@@ -13,4 +13,15 @@ public class PackageUtil {
         }
         return !inWhiteList;
     }
+
+    public static boolean InBlackClass(String className, BaseConfig config) {
+        className = className.replace(".", "/");
+        for (String s : config.getClassBlackList()) {
+            s = s.replace(".", "/");
+            if (className.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
