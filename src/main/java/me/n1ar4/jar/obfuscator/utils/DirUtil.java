@@ -37,6 +37,11 @@ public class DirUtil {
                     logger.warn("create dir {} error", destDirectory);
                 }
             } else {
+                // BUG FIX
+                try {
+                    Files.createDirectories(Paths.get(file.getParent()));
+                } catch (Exception ignored) {
+                }
                 byte[] buffer = new byte[1024];
                 FileOutputStream fos = new FileOutputStream(file);
                 int bytesRead;
