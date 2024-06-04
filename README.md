@@ -45,8 +45,15 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 一般的混淆需求保持默认配置参数即可
 
 - 如果是通过 `java -jar` 启动的 `jar` 配置 `mainClass` 即可
-- 如果需要开启 `JVMTI` 字节码加密功能配置 `enableSuperObfuscate` 即可
+- 如果需要开启 `JVMTI` 字节码加密功能配置 `enableSuperObfuscate` 即可（不稳定）
 - 如果混淆遇到 `BUG` 尝试调整 `methodBlackList` 和 `obfuscatePackage` 配置
+
+类名/方法名/字段名 的混淆需要分析整体项目的依赖引用，如果遇到报错可以考虑
+- 调节 `rootPackages` 分析依赖引用的范围
+- 搭配 `classBlackList` 和 `methodBlackList` 以及 `obfuscatePackage` 细调
+- 仅开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
+- 仅开启 `enableJunk` 花指令混淆
+- 仅开启 `enableXOR` 对数字进行异或加密
 
 ```yaml
 # jar obfuscator 配置文件
@@ -59,22 +66,33 @@ logLevel: info
 
 # 主类名
 # 不设置主类名可能无法正常执行主函数
+# 1. 遇到主类名会记录混淆后的新主类名
+# 2. 替换 MANIFEST.MF 中的主类名
+# 这样的操作可以使 java -jar 仍然可以正常启动
 mainClass: me.n1ar4.jar.obfuscator.Main
 # 自动修改 META-INF 的主类配置
+# 除非你的项目不含主类只是纯库函数
 modifyManifest: true
 
 # 混淆字符配置
+# 类名方法名等信息会根据字符进行随机排列组合
 obfuscateChars: [ i, l, L, '1', I ]
 # 混淆包名称 必须配置否则无法运行
 # 建议仅设置关键部分不要设置范围过大
+# 不需要通配符 只写 a.b.c 类型即可
+# 如果配置 a.b 会混淆 a.b.X 和 a.b.c.X 等以此类推
 obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
 # 需要混淆的根包名
 # 避免处理 org.apache 等无关 class
+# 这个配置主要的意义是分析 依赖引用关系 时仅考虑该配置下的
 rootPackages: [ me.n1ar4, org.n1ar4 ]
 # 不对某些类做混淆（不混淆其中的所有内容）
 # 例如反射调用/JAVAFX FXML绑定等情况
 classBlackList: [ javafx.controller.DemoController ]
-# 不对某些 method 名做混淆
+# 不对某些 method 名做混淆 正则
+# visit.* 忽略 JAVA ASM 的 visitCode visitMethod 等方法
+# start.* 忽略 JAVAFX 启动放啊 start
+# 以此类推某些方法和类是不能混淆的（类继承和接口实现等）
 methodBlackList: [ visit.*, start.* ]
 
 # 开启类名混淆
@@ -115,6 +133,7 @@ maxJunkOneClass: 2000
 showAllMainMethods: true
 
 # 是否开启进阶 JVMTI 加密字节码
+# 注意仅支持 WINDOWS 和 LINUX 且不一定稳定
 enableSuperObfuscate: false
 # 加密 KEY 配置
 # 注意长度必须是 16 位
