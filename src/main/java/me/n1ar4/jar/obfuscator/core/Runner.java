@@ -320,6 +320,12 @@ public class Runner {
         }
 
         if (config.isEnableSuperObfuscate()) {
+            // 不支持 MAC 系统
+            if (OSUtil.isMac()) {
+                logger.error("mac os not support super obfuscate");
+                return;
+            }
+
             PatchCommand patchCommand = new PatchCommand();
             patchCommand.setKey(config.getSuperObfuscateKey());
             patchCommand.setPackageName(config.getSuperObfuscatePackage());
