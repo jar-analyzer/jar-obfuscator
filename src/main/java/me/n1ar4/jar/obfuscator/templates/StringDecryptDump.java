@@ -21,7 +21,7 @@ public class StringDecryptDump implements Opcodes {
         logger.info("change decrypt aes key to: {}", key);
     }
 
-    public static byte[] dump(){
+    public static byte[] dump() {
         ClassWriter classWriter = new ClassWriter(0);
         FieldVisitor fieldVisitor;
         MethodVisitor methodVisitor;

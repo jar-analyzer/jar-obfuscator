@@ -153,6 +153,15 @@ public class Runner {
             }
         }
 
+        // FIX BUG
+        if (!config.isEnableClassName()) {
+            Map<String, String> tempMap = new HashMap<>();
+            for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
+                tempMap.put(entry.getKey(), entry.getKey());
+            }
+            ObfEnv.classNameObfMapping = tempMap;
+        }
+
         // 处理 method name
         for (Map.Entry<ClassReference.Handle, List<MethodReference>> entry : AnalyzeEnv.methodsInClassMap.entrySet()) {
             ClassReference.Handle key = entry.getKey();
@@ -237,18 +246,16 @@ public class Runner {
         }
 
         if (config.isEnableClassName()) {
+            logger.warn("class name obfuscate is not stable");
             // 类名重命名
             ClassNameTransformer.transform();
-        } else {
-            // 如果不开启混淆注意要恢复
-            Map<String, String> tempMap = new HashMap<>();
-            for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
-                tempMap.put(entry.getKey(), entry.getKey());
-            }
-            ObfEnv.classNameObfMapping = tempMap;
         }
 
         if (config.isEnableMethodName()) {
+            if (!config.isEnableClassName()) {
+                logger.info("recommend enable obfuscate class name");
+            }
+            logger.warn("method name obfuscate is not stable");
             // 方法名重命名
             MethodNameTransformer.transform();
         }
