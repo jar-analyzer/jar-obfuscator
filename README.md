@@ -7,6 +7,8 @@
 ![](https://img.shields.io/github/downloads/jar-analyzer/jar-obfuscator/total)
 ![](https://img.shields.io/github/v/release/jar-analyzer/jar-obfuscator)
 
+**该项目刚开始开发，可能存在较多的BUG，欢迎测试和提出问题**
+
 `Jar Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
 - 命令行模式，简单易用
