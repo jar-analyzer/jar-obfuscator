@@ -87,18 +87,20 @@ public class DirUtil {
             ZipEntry entry = new ZipEntry(entryName);
             jos.putNextEntry(entry);
             if (ObfEnv.config.isModifyManifest()) {
-                if (entryName.contains("META-INF/MANIFEST.MF")) {
-                    byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
-                    if (data.length > 0) {
-                        String dataString = new String(data);
-                        try {
-                            dataString = dataString.replace(
-                                    ObfEnv.MAIN_CLASS.replace("/", "."), ObfEnv.NEW_MAIN_CLASS);
-                        } catch (Exception ignored) {
+                if(ObfEnv.config.isEnableClassName()){
+                    if (entryName.contains("META-INF/MANIFEST.MF")) {
+                        byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
+                        if (data.length > 0) {
+                            String dataString = new String(data);
+                            try {
+                                dataString = dataString.replace(
+                                        ObfEnv.MAIN_CLASS.replace("/", "."), ObfEnv.NEW_MAIN_CLASS);
+                            } catch (Exception ignored) {
+                            }
+                            jos.write(dataString.getBytes(), 0, dataString.length());
+                            jos.closeEntry();
+                            return;
                         }
-                        jos.write(dataString.getBytes(), 0, dataString.length());
-                        jos.closeEntry();
-                        return;
                     }
                 }
             }

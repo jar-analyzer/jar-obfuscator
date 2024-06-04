@@ -239,6 +239,13 @@ public class Runner {
         if (config.isEnableClassName()) {
             // 类名重命名
             ClassNameTransformer.transform();
+        } else {
+            // 如果不开启混淆注意要恢复
+            Map<String, String> tempMap = new HashMap<>();
+            for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
+                tempMap.put(entry.getKey(), entry.getKey());
+            }
+            ObfEnv.classNameObfMapping = tempMap;
         }
 
         if (config.isEnableMethodName()) {
