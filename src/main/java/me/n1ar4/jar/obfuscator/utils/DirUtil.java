@@ -43,7 +43,12 @@ public class DirUtil {
                 } catch (Exception ignored) {
                 }
                 byte[] buffer = new byte[1024];
-                FileOutputStream fos = new FileOutputStream(file);
+                FileOutputStream fos;
+                try {
+                    fos = new FileOutputStream(file);
+                } catch (Exception ignored) {
+                    continue;
+                }
                 int bytesRead;
                 while ((bytesRead = ZipInputStream.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesRead);

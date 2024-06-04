@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 0.0.4-beta
+
+修复了一些 `BUG`
+
+注意，配置文件可能不兼容，请重新生成
+
+更新日志：
+
+- [BUG] 修复解压 `JAR` 是无法访问文件的问题
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 0.0.3-beta
 
 修复了一些 `BUG` 补全配置文件和文档
