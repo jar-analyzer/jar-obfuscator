@@ -42,20 +42,22 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 垃圾代码花指令混淆（可指定多级别的混淆）
 - 基于 `JVMTI` 的字节码加密（beta）
 
+其中 `包含引用修改` 的功能可能存在 `BUG` 或异常
+
+可以单独或者组合使用不存在引用修改的混淆模式
+
 ## 配置
 
-一般的混淆需求保持默认配置参数即可
+类名/包名/方法名/字段名的混淆需要分析整体项目的依赖引用
+- 类名混淆 `enableClassName`
+- 包名混淆 `enablePackageName`
+- 方法混淆 `enableMethodName`
+- 字段混淆 `enableFieldName`
 
-- 如果是通过 `java -jar` 启动的 `jar` 配置 `mainClass` 即可
-- 如果需要开启 `JVMTI` 字节码加密功能配置 `enableSuperObfuscate` 即可（不稳定）
-- 如果混淆遇到 `BUG` 尝试调整 `methodBlackList` 和 `obfuscatePackage` 配置
-
-类名/方法名/字段名 的混淆需要分析整体项目的依赖引用，如果遇到报错可以考虑
-- 调节 `rootPackages` 分析依赖引用的范围
-- 搭配 `classBlackList` 和 `methodBlackList` 以及 `obfuscatePackage` 细调
-- 仅开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
-- 仅开启 `enableJunk` 花指令混淆
-- 仅开启 `enableXOR` 对数字进行异或加密
+以下三种混淆不修改引用，如遇 `BUG` 可以仅使用这些配置
+- 开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
+- 开启 `enableJunk` 花指令混淆
+- 开启 `enableXOR` 对数字进行异或加密
 
 ```yaml
 # jar obfuscator 配置文件
