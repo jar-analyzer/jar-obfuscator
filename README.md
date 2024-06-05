@@ -54,7 +54,9 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 方法混淆 `enableMethodName`
 - 字段混淆 `enableFieldName`
 
-以下三种混淆不修改引用，如遇 `BUG` 可以仅使用这些配置
+由于需要修改引用，可能出现预期外的情况，例如 混淆后的方法名被调用处没有修改的问题
+
+**以下三种混淆不修改引用，相对稳定靠谱，如遇 `BUG` 可以搭配使用以下配置**
 - 开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
 - 开启 `enableJunk` 花指令混淆
 - 开启 `enableXOR` 对数字进行异或加密
