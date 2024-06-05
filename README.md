@@ -32,7 +32,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 - 类名混淆（包含引用修改）
 - 包名混淆（包含引用修改）
-- 方法名混淆（包含引用修改）
+- 方法名混淆（包含引用修改-该选项不稳定不建议开启）
 - 字段名混淆（包含引用修改）
 - 方法内参数名混淆（包含引用修改）
 - 删除编译调试信息（删除行号信息）
@@ -44,8 +44,6 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 其中 `包含引用修改` 的功能可能存在 `BUG` 或异常
 
-可以单独或者组合使用不存在引用修改的混淆模式
-
 ## 配置
 
 类名/包名/方法名/字段名的混淆需要分析整体项目的依赖引用
@@ -54,12 +52,18 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 方法混淆 `enableMethodName`
 - 字段混淆 `enableFieldName`
 
-由于需要修改引用，可能出现预期外的情况，例如 混淆后的方法名被调用处没有修改的问题
+由于需要修改引用，可能出现预期外的情况
 
-**以下三种混淆不修改引用，相对稳定靠谱，如遇 `BUG` 可以搭配使用以下配置**
+以下三种混淆不修改引用，相对稳定靠谱，如遇 `BUG` 可以搭配使用以下配置
 - 开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
 - 开启 `enableJunk` 花指令混淆
 - 开启 `enableXOR` 对数字进行异或加密
+
+**一个新手上手应该做的是**
+- `mainClass` 填写你的主类名
+- `obfuscatePackage` 填写你需要混淆的包名
+- `rootPackages` 填写你项目的根包（分析和修改引用的范围）
+- 其他可选配置**按需配置**即可
 
 ```yaml
 # jar obfuscator 配置文件
@@ -105,8 +109,8 @@ methodBlackList: [ visit.*, start.* ]
 enableClassName: true
 # 开启包名混淆（仅混淆 obfuscatePackage 配置）
 enablePackageName: true
-# 开启方法名混淆
-enableMethodName: true
+# 开启方法名混淆 - 不稳定
+enableMethodName: false
 # 开启字段混淆
 enableFieldName: true
 # 开启参数名混淆
@@ -230,6 +234,16 @@ java -agentpath:/path/to/libdecrypter.dll=PACKAGE_NAME=me.n1ar4,KEY=4ra1n4ra1n4r
 该命令将会在 `JVM` 启动时使用 `libdecrypter.dll` 库解密（该库文件会自动导出）
 
 你可以自行修改 `native` 目录的 `C/ASM` 代码自定义加密解密，是程序更安全
+
+**示例三**
+
+我混淆出来的为什么报错打不开
+
+解决：
+- 控制变量逐个尝试和搭配，逐个参数测试是否正常运行
+- 一定关闭了 `enableMethodName` 配置后再测试
+- 注意 `rootPackages` 和 `obfuscatePackage` 配置
+- 如果以上方案都不行，最终请使用**不修改引用**的几个配置（参考上文）
 
 ## 效果
 

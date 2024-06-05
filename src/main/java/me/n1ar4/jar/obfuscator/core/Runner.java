@@ -272,22 +272,18 @@ public class Runner {
         }
 
         if (config.isEnableClassName()) {
-            logger.warn("class name obfuscate is not stable");
             // 类名重命名
             ClassNameTransformer.transform();
         }
 
         if (config.isEnableMethodName()) {
-            if (!config.isEnableClassName()) {
-                logger.info("recommend enable obfuscate class name");
-            }
             logger.warn("method name obfuscate is not stable");
+            logger.warn("方法名混淆暂时不稳定建议在配置文件中关闭");
             // 方法名重命名
             MethodNameTransformer.transform();
         }
 
         if (config.isEnableFieldName()) {
-            logger.warn("field name obfuscate is not stable");
             // 属性重命名
             FieldNameTransformer.transform();
         }
