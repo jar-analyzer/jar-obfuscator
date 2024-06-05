@@ -1,0 +1,4 @@
+test1.jar https://github.com/4ra1n/mysql-fake-server/releases/download/0.0.4/fake-mysql-gui-0.0.4.jar
+
+main class: me.n1ar4.fake.gui.Application
+

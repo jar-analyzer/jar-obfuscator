@@ -27,6 +27,7 @@ public class MethodNameChanger extends ClassVisitor {
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         this.owner = name;
+        // 查接口 不改接口方法
         for (String in : interfaces) {
             List<MethodReference> mList = AnalyzeEnv.methodsInClassMap.get(new ClassReference.Handle(in));
             if (mList == null) {
@@ -46,17 +47,6 @@ public class MethodNameChanger extends ClassVisitor {
             }
         }
 
-        for (String s : this.methodBlackList) {
-            if (s.equals(name)) {
-                return super.visitMethod(access, name, desc, signature, exceptions);
-            }
-            Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(name);
-            if (matcher.matches()) {
-                return super.visitMethod(access, name, desc, signature, exceptions);
-            }
-        }
-
         if ("main".equals(name) && desc.equals("([Ljava/lang/String;)V") && access == 9) {
             mv = super.visitMethod(access, name, desc, signature, exceptions);
         } else if (name.equals("<init>") || name.equals("<clinit>")) {
@@ -69,11 +59,13 @@ public class MethodNameChanger extends ClassVisitor {
             ));
             if (m == null) {
                 mv = super.visitMethod(access, name, desc, signature, exceptions);
+                return new MethodNameChangerMethodAdapter(mv);
             } else {
-                mv = super.visitMethod(access, m.getName(), desc, signature, exceptions);
+                mv = super.visitMethod(access, m.getName(), m.getDesc(), signature, exceptions);
+                return new MethodNameChangerMethodAdapter(mv);
             }
         }
-        return new MethodNameChangerMethodAdapter(mv, owner, name, desc);
+        return new MethodNameChangerMethodAdapter(mv);
     }
 
     @Override
@@ -147,7 +139,7 @@ public class MethodNameChanger extends ClassVisitor {
     }
 
     static class MethodNameChangerMethodAdapter extends MethodVisitor {
-        MethodNameChangerMethodAdapter(MethodVisitor mv, String className, String name, String desc) {
+        MethodNameChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
         }
 
@@ -159,7 +151,7 @@ public class MethodNameChanger extends ClassVisitor {
                     descriptor
             ));
             if (m != null) {
-                super.visitMethodInsn(opcode, owner, m.getName(), descriptor, isInterface);
+                super.visitMethodInsn(opcode, m.getClassReference().getName(), m.getName(), m.getDesc(), isInterface);
                 return;
             }
             super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
@@ -266,9 +258,9 @@ public class MethodNameChanger extends ClassVisitor {
             if (m != null) {
                 handle = new Handle(
                         bootstrapMethodHandle.getTag(),
-                        bootstrapMethodHandle.getOwner(),
+                        m.getClassReference().getName(),
                         m.getName(),
-                        bootstrapMethodHandle.getDesc(),
+                        m.getDesc(),
                         bootstrapMethodHandle.isInterface());
             } else {
                 handle = bootstrapMethodHandle;
@@ -287,9 +279,9 @@ public class MethodNameChanger extends ClassVisitor {
                     if (mo != null) {
                         tempHandle = new Handle(
                                 ho.getTag(),
-                                ho.getOwner(),
+                                mo.getClassReference().getName(),
                                 mo.getName(),
-                                ho.getDesc(),
+                                mo.getDesc(),
                                 ho.isInterface());
                     } else {
                         tempHandle = ho;

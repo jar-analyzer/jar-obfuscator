@@ -26,7 +26,6 @@ public class PackageUtil {
     }
 
     public static boolean inRootPackage(String className, BaseConfig config) {
-        boolean inRoot = false;
         className = className.replace("/", ".");
         for (String s : config.getRootPackages()) {
             s = s.replace("/", ".");

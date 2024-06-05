@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class Runner {
@@ -209,6 +211,30 @@ public class Runner {
             }
         }
 
+        // 处理 method mapping 中的 black method 问题
+        Map<MethodReference.Handle, MethodReference.Handle>
+                methodNameObfMapping = new HashMap<>(ObfEnv.methodNameObfMapping);
+        for (Map.Entry<MethodReference.Handle, MethodReference.Handle> en : ObfEnv.methodNameObfMapping.entrySet()) {
+            String oldClassName = en.getKey().getName();
+            for (String s : ObfEnv.config.getMethodBlackList()) {
+                if (s.equals(oldClassName)) {
+                    methodNameObfMapping.remove(en.getKey());
+                    methodNameObfMapping.put(en.getKey(), en.getKey());
+                    break;
+                }
+                Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
+                Matcher matcher = pattern.matcher(oldClassName);
+                if (matcher.matches()) {
+                    methodNameObfMapping.remove(en.getKey());
+                    methodNameObfMapping.put(en.getKey(), en.getKey());
+                    break;
+                }
+            }
+        }
+        ObfEnv.methodNameObfMapping.clear();
+        ObfEnv.methodNameObfMapping.putAll(methodNameObfMapping);
+        methodNameObfMapping.clear();
+
         // 处理 field name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
 
@@ -261,6 +287,7 @@ public class Runner {
         }
 
         if (config.isEnableFieldName()) {
+            logger.warn("field name obfuscate is not stable");
             // 属性重命名
             FieldNameTransformer.transform();
         }
