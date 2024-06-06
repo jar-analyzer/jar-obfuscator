@@ -34,7 +34,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 - 类名混淆（包含引用修改）
 - 包名混淆（包含引用修改）
-- 方法名混淆（包含引用修改-该选项不稳定不建议开启）
+- 方法名混淆（包含引用修改）
 - 字段名混淆（包含引用修改）
 - 方法内参数名混淆（包含引用修改）
 - 删除编译调试信息（删除行号信息）
@@ -44,7 +44,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 垃圾代码花指令混淆（可指定多级别的混淆）
 - 基于 `JVMTI` 的字节码加密（beta）
 
-其中 `包含引用修改` 的功能可能存在 `BUG` 或异常
+其中 `包含引用修改` 的功能可能因为修改引用导致程序出问题
 
 ## 配置
 
@@ -56,7 +56,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 
 由于需要修改引用，可能出现预期外的情况
 
-以下三种混淆不修改引用，相对稳定靠谱，如遇 `BUG` 可以搭配使用以下配置
+以下混淆不修改引用，相对稳定靠谱，如遇报错可以搭配使用以下配置
 - 开启 `enableEncryptString` 和 `enableAdvanceString` 加密字符串
 - 开启 `enableJunk` 花指令混淆
 - 开启 `enableXOR` 对数字进行异或加密
@@ -66,6 +66,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - `obfuscatePackage` 填写你需要混淆的包名
 - `rootPackages` 填写你项目的根包（分析和修改引用的范围）
 - 其他可选配置**按需配置**即可
+- 如果要开启 `enableMethodName` 需要自行调参黑名单
 
 ```yaml
 # jar obfuscator 配置文件
@@ -249,7 +250,7 @@ java -agentpath:/path/to/libdecrypter.dll=PACKAGE_NAME=me.n1ar4,KEY=4ra1n4ra1n4r
 
 解决：
 - 控制变量逐个尝试和搭配，逐个参数测试是否正常运行
-- 一定关闭了 `enableMethodName` 配置后再测试
+- 关闭 `enableMethodName` 配置后再测试
 - 注意 `rootPackages` 和 `obfuscatePackage` 配置
 - 如果以上方案都不行，最终请使用**不修改引用**的几个配置（参考上文）
 
