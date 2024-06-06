@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 0.0.6-beta
+
+更新日志：
+
+- [功能] 启动时请求 `OSS` 检测是否有新版本可用
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 0.0.5-beta
 
 不建议开启 `enableMethodName` 配置，建议其他选项混合搭配测试
