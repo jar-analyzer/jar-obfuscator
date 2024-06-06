@@ -28,6 +28,8 @@
 java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 ```
 
+![](img/010.png)
+
 支持的混淆内容
 
 - 类名混淆（包含引用修改）

@@ -19,14 +19,14 @@ public class UpdateChecker {
             connection.setConnectTimeout(3000);
             connection.setReadTimeout(3000);
             String version = getString(connection);
-            System.out.println("[*] current version is " + Const.VERSION);
-            System.out.println("[*] the latest version is " + version);
+            System.out.println("[*] current version is " + ColorUtil.green(Const.VERSION));
+            System.out.println("[*] the latest version is " + ColorUtil.yellow(version));
             if (!version.equals(Const.VERSION)) {
-                System.out.println("[*] download url: " + Const.DOWNLOAD_URL);
+                System.out.println("[*] download url: " + ColorUtil.red(Const.DOWNLOAD_URL));
             }
             connection.disconnect();
         } catch (Exception ignored) {
-            System.out.println("[-] update check failed");
+            System.out.println(ColorUtil.red("[-] update check failed"));
         }
     }
 
