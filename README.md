@@ -28,7 +28,7 @@
 java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 ```
 
-![](img/010.png)
+![](img/011.png)
 
 支持的混淆内容
 
