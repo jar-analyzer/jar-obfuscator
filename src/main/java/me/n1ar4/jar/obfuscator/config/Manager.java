@@ -70,6 +70,10 @@ public class Manager {
 
         StringDecrypt.changeKEY(config.getStringAesKey());
         StringDecryptDump.changeKEY(config.getStringAesKey());
+        StringDecryptDump.initName(
+                config.getDecryptClassName(),
+                config.getDecryptMethodName(),
+                config.getDecryptKeyName());
 
         return true;
     }

@@ -1,6 +1,5 @@
 package me.n1ar4.jar.obfuscator.templates;
 
-import me.n1ar4.jar.obfuscator.utils.NameUtil;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.objectweb.asm.*;
@@ -8,7 +7,9 @@ import org.objectweb.asm.*;
 public class StringDecryptDump implements Opcodes {
     private static final Logger logger = LogManager.getLogger();
     public static String AES_KEY = null;
-    public static String name = null;
+    public static String className = null;
+    public static String methodName = null;
+    private static String keyName = null;
 
     public static void changeKEY(String key) {
         if (key != null && key.length() == 16) {
@@ -21,16 +22,43 @@ public class StringDecryptDump implements Opcodes {
         logger.info("change decrypt aes key to: {}", key);
     }
 
+    public static void initName(String c, String m, String k) {
+        String defaultClassName = "org/apache/commons/collections/list/AbstractHashMap";
+        String defaultMethodName = "newMap";
+        String defaultKeyName = "LiLiLLLiiiLLiiLLi";
+        if (c == null || m == null || k == null) {
+            className = defaultClassName;
+            methodName = defaultMethodName;
+            keyName = defaultKeyName;
+            return;
+        }
+        c = c.replace(".", "/");
+        if (c.isEmpty()) {
+            className = defaultClassName;
+        } else {
+            className = c;
+        }
+        if (m.isEmpty()) {
+            methodName = defaultMethodName;
+        } else {
+            methodName = m;
+        }
+        if (k.isEmpty()) {
+            keyName = defaultKeyName;
+        } else {
+            keyName = k;
+        }
+    }
+
     public static byte[] dump() {
         ClassWriter classWriter = new ClassWriter(0);
         FieldVisitor fieldVisitor;
         MethodVisitor methodVisitor;
-        name = NameUtil.genNewName() + "/" + NameUtil.genNewName();
-        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, name, null, "java/lang/Object", null);
+        classWriter.visit(V1_8, ACC_PUBLIC | ACC_SUPER, className, null, "java/lang/Object", null);
         classWriter.visitInnerClass("java/util/Base64$Encoder", "java/util/Base64", "Encoder", ACC_PUBLIC | ACC_STATIC);
         classWriter.visitInnerClass("java/util/Base64$Decoder", "java/util/Base64", "Decoder", ACC_PUBLIC | ACC_STATIC);
         {
-            fieldVisitor = classWriter.visitField(ACC_PRIVATE | ACC_STATIC, "KEY", "Ljava/lang/String;", null, null);
+            fieldVisitor = classWriter.visitField(ACC_PRIVATE | ACC_STATIC, keyName, "Ljava/lang/String;", null, null);
             fieldVisitor.visitEnd();
         }
         {
@@ -42,7 +70,7 @@ public class StringDecryptDump implements Opcodes {
             fieldVisitor.visitEnd();
         }
         {
-            methodVisitor = classWriter.visitMethod(ACC_PUBLIC | ACC_STATIC, "I", "(Ljava/lang/String;)Ljava/lang/String;", null, null);
+            methodVisitor = classWriter.visitMethod(ACC_PUBLIC | ACC_STATIC, methodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
             methodVisitor.visitCode();
             Label label0 = new Label();
             Label label1 = new Label();
@@ -51,8 +79,8 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitLabel(label0);
             methodVisitor.visitTypeInsn(NEW, "javax/crypto/spec/SecretKeySpec");
             methodVisitor.visitInsn(DUP);
-            methodVisitor.visitFieldInsn(GETSTATIC, name, "KEY", "Ljava/lang/String;");
-            methodVisitor.visitFieldInsn(GETSTATIC, name, "CHARSET", "Ljava/nio/charset/Charset;");
+            methodVisitor.visitFieldInsn(GETSTATIC, className, keyName, "Ljava/lang/String;");
+            methodVisitor.visitFieldInsn(GETSTATIC, className, "CHARSET", "Ljava/nio/charset/Charset;");
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "(Ljava/nio/charset/Charset;)[B", false);
             methodVisitor.visitLdcInsn("AES");
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "javax/crypto/spec/SecretKeySpec", "<init>", "([BLjava/lang/String;)V", false);
@@ -71,7 +99,7 @@ public class StringDecryptDump implements Opcodes {
             Label label5 = new Label();
             methodVisitor.visitLabel(label5);
             methodVisitor.visitVarInsn(ALOAD, 0);
-            methodVisitor.visitFieldInsn(GETSTATIC, name, "CHARSET", "Ljava/nio/charset/Charset;");
+            methodVisitor.visitFieldInsn(GETSTATIC, className, "CHARSET", "Ljava/nio/charset/Charset;");
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "(Ljava/nio/charset/Charset;)[B", false);
             methodVisitor.visitVarInsn(ASTORE, 3);
             Label label6 = new Label();
@@ -87,7 +115,7 @@ public class StringDecryptDump implements Opcodes {
             methodVisitor.visitTypeInsn(NEW, "java/lang/String");
             methodVisitor.visitInsn(DUP);
             methodVisitor.visitVarInsn(ALOAD, 4);
-            methodVisitor.visitFieldInsn(GETSTATIC, name, "CHARSET", "Ljava/nio/charset/Charset;");
+            methodVisitor.visitFieldInsn(GETSTATIC, className, "CHARSET", "Ljava/nio/charset/Charset;");
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([BLjava/nio/charset/Charset;)V", false);
             methodVisitor.visitLabel(label1);
             methodVisitor.visitInsn(ARETURN);
@@ -115,11 +143,11 @@ public class StringDecryptDump implements Opcodes {
             Label label0 = new Label();
             methodVisitor.visitLabel(label0);
             methodVisitor.visitLdcInsn(AES_KEY);
-            methodVisitor.visitFieldInsn(PUTSTATIC, name, "KEY", "Ljava/lang/String;");
+            methodVisitor.visitFieldInsn(PUTSTATIC, className, keyName, "Ljava/lang/String;");
             Label label1 = new Label();
             methodVisitor.visitLabel(label1);
             methodVisitor.visitFieldInsn(GETSTATIC, "java/nio/charset/StandardCharsets", "UTF_8", "Ljava/nio/charset/Charset;");
-            methodVisitor.visitFieldInsn(PUTSTATIC, name, "CHARSET", "Ljava/nio/charset/Charset;");
+            methodVisitor.visitFieldInsn(PUTSTATIC, className, "CHARSET", "Ljava/nio/charset/Charset;");
             methodVisitor.visitInsn(RETURN);
             methodVisitor.visitMaxs(1, 0);
             methodVisitor.visitEnd();

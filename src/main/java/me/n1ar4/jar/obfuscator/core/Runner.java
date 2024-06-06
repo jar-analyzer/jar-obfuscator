@@ -301,15 +301,18 @@ public class Runner {
         if (config.isEnableEncryptString()) {
             // 创建加密解密类
             byte[] code = StringDecryptDump.dump();
-            String name = StringDecryptDump.name;
+            String name = StringDecryptDump.className;
             String[] parts = name.split("/");
-            Path codePath = tmpDir.resolve(Paths.get(parts[0]));
+            Path dir = tmpDir;
+            for (int i = 0; i < parts.length - 1; i++) {
+                dir = dir.resolve(parts[i]);
+            }
             try {
-                Files.createDirectories(codePath);
+                Files.createDirectories(dir);
             } catch (Exception ignored) {
             }
             try {
-                Files.write(codePath.resolve(parts[1] + ".class"), code);
+                Files.write(dir.resolve(parts[parts.length - 1] + ".class"), code);
             } catch (Exception ignored) {
             }
 

@@ -86,7 +86,7 @@ public class StringChanger extends ClassVisitor {
         fieldValues.forEach((fieldName, encryptedValue) -> {
             encryptedValue = StringDecrypt.encrypt(encryptedValue);
             ga.push(encryptedValue);
-            ga.invokeStatic(Type.getObjectType(StringDecryptDump.name),
+            ga.invokeStatic(Type.getObjectType(StringDecryptDump.className),
                     new Method("I", "(Ljava/lang/String;)Ljava/lang/String;"));
             ga.putStatic(Type.getObjectType(className), fieldName, Type.getType("Ljava/lang/String;"));
         });
@@ -252,8 +252,8 @@ public class StringChanger extends ClassVisitor {
                 if (decryptedValue != null) {
                     super.visitLdcInsn(decryptedValue);
                     super.visitMethodInsn(Opcodes.INVOKESTATIC,
-                            StringDecryptDump.name,
-                            "I",
+                            StringDecryptDump.className,
+                            StringDecryptDump.methodName,
                             "(Ljava/lang/String;)Ljava/lang/String;",
                             false);
                     return;

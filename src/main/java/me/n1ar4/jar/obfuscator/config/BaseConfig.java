@@ -10,6 +10,11 @@ public class BaseConfig {
     private boolean enableParamName;
     private boolean enableEncryptString;
     private boolean enableAdvanceString;
+
+    private String decryptClassName;
+    private String decryptMethodName;
+    private String decryptKeyName;
+
     private boolean enableXOR;
     private boolean enableJunk;
     private boolean enableDeleteCompileInfo;
@@ -34,6 +39,30 @@ public class BaseConfig {
     private boolean showAllMainMethods;
 
     private boolean keepTempFile;
+
+    public String getDecryptKeyName() {
+        return decryptKeyName;
+    }
+
+    public void setDecryptKeyName(String decryptKeyName) {
+        this.decryptKeyName = decryptKeyName;
+    }
+
+    public String getDecryptClassName() {
+        return decryptClassName;
+    }
+
+    public void setDecryptClassName(String decryptClassName) {
+        this.decryptClassName = decryptClassName;
+    }
+
+    public String getDecryptMethodName() {
+        return decryptMethodName;
+    }
+
+    public void setDecryptMethodName(String decryptMethodName) {
+        this.decryptMethodName = decryptMethodName;
+    }
 
     public String[] getRootPackages() {
         return rootPackages;
