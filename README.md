@@ -125,6 +125,12 @@ stringAesKey: Y4SuperSecretKey
 enableAdvanceString: true
 # 进阶字符串处理参数
 advanceStringName: GIiIiLA
+# 字符串解密类名
+decryptClassName: org.apache.commons.collections.list.AbstractHashMap
+# 字符串解密方法名
+decryptMethodName: newMap
+# 字符串 AES KEY 名字
+decryptKeyName: LiLiLLLiiiLLiiLLi
 
 # 开启删除编译信息选项
 enableDeleteCompileInfo: true
