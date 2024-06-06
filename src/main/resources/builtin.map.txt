@@ -1,0 +1,8 @@
+org/objectweb/asm/ClassVisitor visit
+org/objectweb/asm/MethodVisitor visit
+com/sun/net/httpserver/HttpHandler handle
+javafx.application.Application start
+java/io/PrintStream println
+org/objectweb/asm/ClassWriter getCommonSuperClass
+java/lang/ClassLoader findClass
+java/lang/ClassLoader defineClass

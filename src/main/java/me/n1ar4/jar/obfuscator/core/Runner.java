@@ -261,6 +261,8 @@ public class Runner {
             }
         }
 
+        BuiltinFilter.doFilter();
+
         if (config.isShowAllMainMethods()) {
             // 向用户提示可能的主类
             MainClassTransformer.transform();

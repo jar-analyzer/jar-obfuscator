@@ -10,14 +10,14 @@ import org.objectweb.asm.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 @SuppressWarnings("all")
 public class MethodNameChanger extends ClassVisitor {
     private String owner;
     private final List<String> methodBlackList;
     private final List<MethodReference> ignoreMethods = new ArrayList<>();
+    private final List<String> ignoreMethodString = new ArrayList<>();
 
     public MethodNameChanger(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
@@ -35,14 +35,36 @@ public class MethodNameChanger extends ClassVisitor {
             }
             ignoreMethods.addAll(mList);
         }
+
+        // 检查内置黑名单
+        String key = null;
+        for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
+            if (entry.getValue().equals(name)) {
+                key = entry.getKey();
+                break;
+            }
+        }
+        if (key != null) {
+            List<String> methodNames = ObfEnv.ignoredClassMethodsMapping.get(key);
+            if(methodNames!=null){
+                ignoreMethodString.addAll(methodNames);
+            }
+        }
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv;
+
         for (MethodReference mr : ignoreMethods) {
             if (mr.getName().equals(name) && mr.getDesc().equals(desc)) {
+                return super.visitMethod(access, name, desc, signature, exceptions);
+            }
+        }
+
+        for (String method : this.ignoreMethodString) {
+            if (method.equals(name)) {
                 return super.visitMethod(access, name, desc, signature, exceptions);
             }
         }
