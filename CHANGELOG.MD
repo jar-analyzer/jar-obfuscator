@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.0.7-beta
+
+TODO
+
+更新日志：
+
+- [功能] 记录贡献者列表并在启动时打印感谢信息
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 0.0.6-beta
 
 内置 `父类/接口->方法` 的映射黑名单，阻止某些 `@Override` 方法的混淆
