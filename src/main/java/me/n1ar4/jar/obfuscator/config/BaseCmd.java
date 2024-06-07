@@ -5,11 +5,20 @@ import com.beust.jcommander.Parameter;
 public class BaseCmd {
     @Parameter(names = {"-j", "--jar"}, description = "jar file path")
     private String path;
-
     @Parameter(names = {"-c", "--config"}, description = "config yaml file")
     private String config;
     @Parameter(names = {"-g", "--generate"}, description = "generate config file")
     private boolean generate;
+    @Parameter(names = {"--check-update"}, description = "check update")
+    private boolean check;
+
+    public boolean isCheck() {
+        return check;
+    }
+
+    public void setCheck(boolean check) {
+        this.check = check;
+    }
 
     public boolean isGenerate() {
         return generate;

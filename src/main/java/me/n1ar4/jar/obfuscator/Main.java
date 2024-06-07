@@ -29,6 +29,9 @@ public class Main {
             commander.usage();
             return;
         }
+        if (baseCmd.isCheck()) {
+            return;
+        }
         if (baseCmd.isGenerate()) {
             parser.generateConfig();
             logger.info("generate config.yaml file");
