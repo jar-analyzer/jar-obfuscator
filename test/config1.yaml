@@ -1,87 +1,30 @@
-# jar obfuscator 配置文件
-# jar obfuscator by jar-analyzer team (4ra1n)
-# https://github.com/jar-analyzer/jar-obfuscator
-
-# 日志级别
-# debug info warn error
 logLevel: info
-
-# 主类名
-# 不设置主类名可能无法正常执行主函数
-# 1. 遇到主类名会记录混淆后的新主类名
-# 2. 替换 MANIFEST.MF 中的主类名
-# 这样的操作可以使 java -jar 仍然可以正常启动
 mainClass: me.n1ar4.fake.gui.Application
-# 自动修改 META-INF 的主类配置
-# 除非你的项目不含主类只是纯库函数
 modifyManifest: true
-
-# 混淆字符配置
-# 类名方法名等信息会根据字符进行随机排列组合
 obfuscateChars: [ i, l, L, '1', I ]
-# 混淆包名称 必须配置否则无法运行
-# 建议仅设置关键部分不要设置范围过大
-# 不需要通配符 只写 a.b.c 类型即可
-# 如果配置 a.b 会混淆 a.b.X 和 a.b.c.X 等以此类推
 obfuscatePackage: [ me.n1ar4 ]
-# 需要混淆的根包名
-# 避免处理 org.apache 等无关 class
-# 这个配置主要的意义是分析 依赖引用关系 时仅考虑该配置下的
 rootPackages: [ me.n1ar4 ]
-# 不对某些类做混淆（不混淆其中的所有内容）
-# 例如反射调用/JAVAFX FXML绑定等情况
 classBlackList: [ javafx.controller.DemoController ]
-# 不对某些 method 名做混淆 正则
-# visit.* 忽略 JAVA ASM 的 visitCode visitMethod 等方法
-# start.* 忽略 JAVAFX 启动放啊 start
-# 以此类推某些方法和类是不能混淆的（类继承和接口实现等）
 methodBlackList: [ visit.*, start.* ]
-
-# 开启类名混淆
 enableClassName: true
-# 开启包名混淆（仅混淆 obfuscatePackage 配置）
 enablePackageName: true
-# 开启方法名混淆
 enableMethodName: true
-# 开启字段混淆
 enableFieldName: true
-# 开启参数名混淆
 enableParamName: true
-
-# 开启加密字符串
-enableEncryptString: false
-# 加密使用 AES KEY
-# 注意长度必须是 16 且不包含中文
-stringAesKey: Y4SuperSecretKey
-# 开启进阶字符串混淆
-enableAdvanceString: false
-# 进阶字符串处理参数
+enableEncryptString: true
+stringAesKey: ABCED12345!@
+enableAdvanceString: true
 advanceStringName: GIiIiLA
-
-# 开启删除编译信息选项
+decryptClassName: org.apache.commons.collections.list.AbstractHashMaps
+decryptMethodName: newMap
+decryptKeyName: LiLiLLLiiiLLiiLLi
 enableDeleteCompileInfo: false
-# 开启数字异或混淆
 enableXOR: false
-
-# 开启花指令混淆
 enableJunk: false
-# 花指令级别
-# 最低1 最高5
 junkLevel: 5
-# 一个类中的花指令数量上限
 maxJunkOneClass: 2000
-
-# 是否打印所有主函数
 showAllMainMethods: true
-
-# 是否开启进阶 JVMTI 加密字节码
-# 注意仅支持 WINDOWS 和 LINUX 且不一定稳定
 enableSuperObfuscate: false
-# 加密 KEY 配置
-# 注意长度必须是 16 位
 superObfuscateKey: 4ra1n4ra1n4ra1n1
-# 加密包名配置
 superObfuscatePackage: me.n1ar4
-
-# 是否保留临时类文件
 keepTempFile: false
