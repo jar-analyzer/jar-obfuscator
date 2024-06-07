@@ -279,8 +279,8 @@ public class Runner {
         }
 
         if (config.isEnableMethodName()) {
-            logger.warn("method name obfuscate is not stable");
-            logger.warn("方法名混淆暂时不稳定建议在配置文件中关闭");
+            logger.warn("方法名混淆可能导致某些 子类和接口实现 出现问题");
+            logger.warn("如果混淆后无法运行请自行调整配置文件的 方法/类黑名单");
             // 方法名重命名
             MethodNameTransformer.transform();
         }
