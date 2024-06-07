@@ -21,3 +21,6 @@ main class: me.n1ar4.fake.gui.Application
 
 仅开启 JUNK CODE
 
+## config5
+
+测试错误的配置

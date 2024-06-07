@@ -61,10 +61,12 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 开启 `enableJunk` 花指令混淆
 - 开启 `enableXOR` 对数字进行异或加密
 
+注意：如果 `obfuscatePackage` 和 `rootPackages` 都不配置，其他的配置不会生效（系统不知道需要对哪些类混淆）
+
 **一个新手上手应该做的是**
 - `mainClass` 填写你的主类名
-- `obfuscatePackage` 填写你需要混淆的包名
-- `rootPackages` 填写你项目的根包（分析和修改引用的范围）
+- `obfuscatePackage` 填写你需要混淆的包名（必须）
+- `rootPackages` 填写你项目的根包（分析和修改引用的范围 必须）
 - 其他可选配置**按需配置**即可
 - 如果要开启 `enableMethodName` 需要自行调参黑名单
 
@@ -379,7 +381,7 @@ static {
 提供两份 `DLL/SO` 文件，一份加密一份解密，实际运行只需使用解密 `DLL/SO` 文件，支持自定义密钥和包名
 
 ```shell
-java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.pack,KEY=your-key --jar your-jar.jar
+java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.pack,KEY=your-key -jar your-jar.jar
 ```
 
 加密后的 `CLASS` 文件变成无法解析的畸形文件

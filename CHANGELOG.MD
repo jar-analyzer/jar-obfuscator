@@ -7,10 +7,12 @@ TODO
 更新日志：
 
 - [功能] 记录贡献者列表并在启动时打印感谢信息
+- [优化] 错误的配置会在启动时输出原因并停止
 
 感谢以下用户的贡献:
 
 - 4ra1n (https://github.com/4ra1n)
+- pcdlrzxx (https://github.com/pcdlrzxx)
 
 可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
 

@@ -40,6 +40,12 @@ public class Runner {
     }
 
     public static void run(Path path, BaseConfig config) {
+        if ((config.getObfuscatePackage() == null || config.getObfuscatePackage().length == 0) ||
+                (config.getRootPackages() == null || config.getRootPackages().length == 0)) {
+            logger.error("注意必须配置 " + ColorUtil.yellow("obfuscatePackage") +
+                    " 和 " + ColorUtil.yellow("rootPackages"));
+            return;
+        }
         ObfEnv.config = config;
         logger.info("start obfuscator");
         String fileName = FileUtil.getFileNameWithoutExt(path);
