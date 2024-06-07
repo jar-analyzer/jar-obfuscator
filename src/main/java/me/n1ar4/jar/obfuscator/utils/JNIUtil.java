@@ -32,7 +32,7 @@ public class JNIUtil implements Constants {
             sysPathsField.set(null, null);
             return true;
         } catch (Exception ex) {
-            logger.error("delete classloader sys_paths error: {}", ex.toString());
+            logger.debug("delete classloader sys_paths error: {}", ex.toString());
         }
         return false;
     }
@@ -46,11 +46,11 @@ public class JNIUtil implements Constants {
     public static boolean loadLib(String path) {
         Path p = Paths.get(path);
         if (!Files.exists(p)) {
-            logger.error("load lib error: file not found");
+            logger.debug("load lib error: file not found");
             return false;
         }
         if (Files.isDirectory(p)) {
-            logger.error("load lib error: input file is a dir");
+            logger.debug("load lib error: input file is a dir");
             return false;
         }
         String os = System.getProperty("os.name").toLowerCase();
@@ -64,20 +64,20 @@ public class JNIUtil implements Constants {
             }
             String dll = p.toFile().getName().toLowerCase();
             if (!dll.endsWith(DllFile)) {
-                logger.error("load lib error: must be a dll file");
+                logger.debug("load lib error: must be a dll file");
                 return false;
             }
             String file = dll.split("\\.dll")[0].trim();
-            logger.info("load library: " + file);
+            logger.debug("load library: " + file);
             System.loadLibrary(file);
         } else {
             String so = p.toFile().getAbsolutePath();
             if (!so.endsWith(SOFile)) {
-                logger.error("must be a so file");
+                logger.debug("must be a so file");
                 return false;
             }
             String outputName = p.toFile().getName().split("\\.so")[0].trim();
-            logger.info("load library: " + outputName);
+            logger.debug("load library: " + outputName);
             System.load(so);
         }
         return true;
@@ -93,7 +93,7 @@ public class JNIUtil implements Constants {
         try {
             is = JNIUtil.class.getClassLoader().getResourceAsStream(filename);
             if (is == null) {
-                logger.error("error dll name");
+                logger.debug("error dll name");
                 return;
             }
             if (dir == null || dir.isEmpty()) {
@@ -117,22 +117,22 @@ public class JNIUtil implements Constants {
                     buffer.write(data, 0, nRead);
                 }
                 Files.write(outputFile, buffer.toByteArray());
-                logger.info("write file: " + outputFile.toAbsolutePath());
+                logger.debug("write file: " + outputFile.toAbsolutePath());
             }
             if (load) {
                 boolean success = loadLib(outputFile.toAbsolutePath().toString());
                 if (!success) {
-                    logger.error("load lib failed");
+                    logger.debug("load lib failed");
                 }
             }
         } catch (Exception ex) {
-            logger.error("extract file error: {}", ex.toString());
+            logger.debug("extract file error: {}", ex.toString());
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    logger.error("close stream error: {}", e.toString());
+                    logger.debug("close stream error: {}", e.toString());
                 }
             }
         }

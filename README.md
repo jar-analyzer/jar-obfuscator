@@ -384,6 +384,8 @@ static {
 java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.pack,KEY=your-key -jar your-jar.jar
 ```
 
+注意：加密后的 `JAR` 第一次可能无法运行，第二次可以正常运行
+
 加密后的 `CLASS` 文件变成无法解析的畸形文件
 
 ![jd-gui](img/002.png)

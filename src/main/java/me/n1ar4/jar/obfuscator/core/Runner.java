@@ -374,6 +374,13 @@ public class Runner {
                 return;
             }
 
+            // 检查 JAVA 8 环境
+            String javaVersion = System.getProperty("java.version");
+            if (!javaVersion.startsWith("1.8.")) {
+                logger.error("该功能需要 JAVA 8 环境");
+                return;
+            }
+
             PatchCommand patchCommand = new PatchCommand();
             patchCommand.setKey(config.getSuperObfuscateKey());
             patchCommand.setPackageName(config.getSuperObfuscatePackage());
