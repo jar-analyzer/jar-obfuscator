@@ -24,3 +24,7 @@ main class: me.n1ar4.fake.gui.Application
 ## config5
 
 测试错误的配置
+
+## config6
+
+测试网友的代码，花指令报错的问题
