@@ -46,7 +46,7 @@ public class MethodNameChanger extends ClassVisitor {
         }
         if (key != null) {
             List<String> methodNames = ObfEnv.ignoredClassMethodsMapping.get(key);
-            if(methodNames!=null){
+            if (methodNames != null) {
                 ignoreMethodString.addAll(methodNames);
             }
         }
