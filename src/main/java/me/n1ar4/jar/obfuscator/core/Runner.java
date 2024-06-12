@@ -14,6 +14,7 @@ import me.n1ar4.jar.obfuscator.transform.*;
 import me.n1ar4.jar.obfuscator.utils.*;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
+import me.n1ar4.log.LoggingStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -381,6 +382,15 @@ public class Runner {
 
             PatchCommand patchCommand = new PatchCommand();
             patchCommand.setKey(config.getSuperObfuscateKey());
+
+            // FIX BUG
+            // 这里的 SuperObfuscatePackage 如果被混淆该怎么办
+            if (config.isEnablePackageName()) {
+                logger.error("字节码加密功能不允许开启包名混淆");
+                logger.error("请关闭 enablePackageName 选项");
+                return;
+            }
+
             patchCommand.setPackageName(config.getSuperObfuscatePackage());
             patchCommand.setJarPath(newFile);
 

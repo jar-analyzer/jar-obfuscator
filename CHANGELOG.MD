@@ -4,7 +4,8 @@
 
 更新日志：
 
-- [功能] 支持高版本 `JAVA` 使用 `enableSuperObfuscate` 功能
+- [功能] 解决报错并支持高版本 `JAVA` 的字节码加密功能
+- [BUG] 不允许开启 `enablePackageName` 时使用字节码加密
 
 感谢以下用户的贡献:
 
