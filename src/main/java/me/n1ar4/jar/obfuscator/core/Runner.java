@@ -130,44 +130,48 @@ public class Runner {
             } else {
                 newPackageNameS = packageNameS;
             }
-
-            String newName = c.getName();
-
-            if (PackageUtil.notInWhiteList(packageNameS, config) ||
-                    PackageUtil.inBlackClass(c.getName(), config)) {
-                if (PackageUtil.inRootPackage(c.getName(), config)) {
-                    ObfEnv.classNameObfMapping.put(c.getName(), c.getName());
-                }
-            } else {
-                if (className.contains("$")) {
-                    String a = c.getName();
-                    String sa = a.split("\\$")[0];
-                    String exist = ObfEnv.classNameObfMapping.get(sa);
-                    if (exist == null) {
-                        continue;
-                    } else {
-                        newName = exist + "$" + NameUtil.genNewName();
-                        ObfEnv.classNameObfMapping.put(a, newName);
-                    }
-                } else {
-                    newName = newPackageNameS + "/" + NameUtil.genNewName();
-                    ObfEnv.classNameObfMapping.put(c.getName(), newName);
-                }
+            
+            //修复"enableClassName: false & enablePackageName: true"时混淆未正确生效bug
+            String originalName = c.getName();
+            String finalName = originalName;
+            
+            boolean notInWhiteList = PackageUtil.notInWhiteList(packageNameS, config);
+            boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
+            boolean inRootPackage = PackageUtil.inRootPackage(originalName, config);
+            if (!(notInWhiteList || inBlackClass) || inRootPackage) {
+            	String result = ObfEnv.classNameObfMapping.putIfAbsent(originalName, originalName);
+            	if (result == null) {
+                	boolean isEnablePackageName = config.isEnablePackageName();
+                	boolean isEnableClassName = config.isEnableClassName();
+                	if (!inBlackClass && (isEnablePackageName || isEnableClassName)) {
+                		String finalPackageName = packageNameS;
+                		if (isEnablePackageName) {
+                			finalPackageName = newPackageNameS;
+                		}
+                		if (isEnableClassName) {
+    						if (className.contains("$")) {
+    							String outerClassName = originalName.split("\\$")[0];
+    							String exist = ObfEnv.classNameObfMapping.get(outerClassName);
+    							if (exist == null) {
+    								exist = finalPackageName + "/" + NameUtil.genNewName();
+    								ObfEnv.classNameObfMapping.put(outerClassName, exist);
+    							}
+    							finalName = exist + "$" + NameUtil.genNewName();
+    						} else {
+    	                		finalName = finalPackageName + "/" + NameUtil.genNewName();
+    						}
+                		} else {
+                    		finalName = finalPackageName + "/" + className;
+                		}
+    					ObfEnv.classNameObfMapping.put(originalName, finalName);
+                	}
+            	}
             }
-
-            if (c.getName().equals(ObfEnv.MAIN_CLASS)) {
-                ObfEnv.NEW_MAIN_CLASS = newName.replace("/", ".");
+            
+            if (originalName.equals(ObfEnv.MAIN_CLASS)) {
+                ObfEnv.NEW_MAIN_CLASS = finalName.replace("/", ".");
                 logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);
             }
-        }
-
-        // FIX BUG
-        if (!config.isEnableClassName()) {
-            Map<String, String> tempMap = new HashMap<>();
-            for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
-                tempMap.put(entry.getKey(), entry.getKey());
-            }
-            ObfEnv.classNameObfMapping = tempMap;
         }
 
         // 处理 method name
@@ -279,8 +283,8 @@ public class Runner {
             DeleteInfoTransformer.transform();
         }
 
-        if (config.isEnableClassName()) {
-            // 类名重命名
+        if (config.isEnablePackageName() || config.isEnableClassName()) {
+            // 包名或类名重命名
             ClassNameTransformer.transform();
         }
 

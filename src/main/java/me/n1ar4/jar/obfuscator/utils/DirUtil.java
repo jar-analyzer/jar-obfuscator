@@ -87,7 +87,7 @@ public class DirUtil {
             ZipEntry entry = new ZipEntry(entryName);
             jos.putNextEntry(entry);
             if (ObfEnv.config.isModifyManifest()) {
-                if (ObfEnv.config.isEnableClassName()) {
+                if (ObfEnv.config.isEnablePackageName() || ObfEnv.config.isEnableClassName()) {
                     if (entryName.contains("META-INF/MANIFEST.MF")) {
                         byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
                         if (data.length > 0) {
