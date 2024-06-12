@@ -1,6 +1,7 @@
 package me.n1ar4.jar.obfuscator.jvmti;
 
 import me.n1ar4.jar.obfuscator.utils.JNIUtil;
+import me.n1ar4.jar.obfuscator.utils.VerUtil;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -111,13 +112,15 @@ public class PatchHelper implements Constants {
                 try {
                     dstJar.putNextEntry(ne);
 
-                    // allow duplicate entry
-                    // https://stackoverflow.com/questions/39958486/
-                    Field namesField = ZipOutputStream.class.getDeclaredField("names");
-                    namesField.setAccessible(true);
-                    Object obj = namesField.get(dstJar);
-                    HashSet<String> names = (HashSet<String>) obj;
-                    names.remove(name);
+                    if (VerUtil.isJava8()) {
+                        // allow duplicate entry
+                        // https://stackoverflow.com/questions/39958486/
+                        Field namesField = ZipOutputStream.class.getDeclaredField("names");
+                        namesField.setAccessible(true);
+                        Object obj = namesField.get(dstJar);
+                        HashSet<String> names = (HashSet<String>) obj;
+                        names.remove(name);
+                    }
 
                     dstJar.write(bytes);
                 } catch (Exception z) {

@@ -57,19 +57,25 @@ public class JNIUtil implements Constants {
         String libDirAbsPath = Paths.get(p.toFile().getParent()).toAbsolutePath().toString();
         String originLib = System.getProperty(lib);
         if (os.contains(WindowsOS)) {
-            originLib = originLib + String.format(";%s;", libDirAbsPath);
-            System.setProperty(lib, originLib);
-            if (!deleteUrls()) {
-                return false;
+            if (VerUtil.isJava8()) {
+                originLib = originLib + String.format(";%s;", libDirAbsPath);
+                System.setProperty(lib, originLib);
+                if (!deleteUrls()) {
+                    return false;
+                }
+                String dll = p.toFile().getName().toLowerCase();
+                if (!dll.endsWith(DllFile)) {
+                    logger.debug("load lib error: must be a dll file");
+                    return false;
+                }
+                String file = dll.split("\\.dll")[0].trim();
+                logger.debug("load library: " + file);
+                System.loadLibrary(file);
+            } else {
+                // FIX BUG
+                // 修复高版本 JDK 无法运行的问题
+                System.load(p.toFile().getAbsolutePath());
             }
-            String dll = p.toFile().getName().toLowerCase();
-            if (!dll.endsWith(DllFile)) {
-                logger.debug("load lib error: must be a dll file");
-                return false;
-            }
-            String file = dll.split("\\.dll")[0].trim();
-            logger.debug("load library: " + file);
-            System.loadLibrary(file);
         } else {
             String so = p.toFile().getAbsolutePath();
             if (!so.endsWith(SOFile)) {

@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 0.0.8-beta
+
+更新日志：
+
+- [功能] 支持高版本 `JAVA` 使用 `enableSuperObfuscate` 功能
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+- pcdlrzxx (https://github.com/pcdlrzxx)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 0.0.7-beta
 
 更新日志：
