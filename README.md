@@ -43,6 +43,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 整型常数异或混淆（多重异或的加密）
 - 垃圾代码花指令混淆（可指定多级别的混淆）
 - 使用某些技巧可以在反编译时隐藏方法
+- 使用某些技巧可以在反编译时隐藏字段
 - 基于 `JVMTI` 的字节码加密（beta）
 
 其中 `包含引用修改` 的功能可能因为修改引用导致程序出问题
@@ -138,10 +139,16 @@ decryptMethodName: newMap
 # 字符串 AES KEY 名字
 decryptKeyName: LiLiLLLiiiLLiiLLi
 
-# 是否因此方法名
+# 是否隐藏方法
 # 给混淆方法添加 ACC_SYNTHETIC 可以在反编译时隐藏
 # 参考 Y4tacker 的 HackingFernFlower
+# 仅在混淆方法开启时生效
 enableHideMethod: true
+# 是否隐藏字段
+# 给字段添加 ACC_SYNTHETIC 可以在反编译时隐藏
+# 参考 Y4tacker 的 HackingFernFlower
+# 仅在混淆字段开启时生效
+enableHideField: true
 
 # 开启删除编译信息选项
 enableDeleteCompileInfo: true

@@ -64,10 +64,16 @@ decryptMethodName: newMap
 # 字符串 AES KEY 名字
 decryptKeyName: LiLiLLLiiiLLiiLLi
 
-# 是否因此方法名
+# 是否隐藏方法
 # 给混淆方法添加 ACC_SYNTHETIC 可以在反编译时隐藏
 # 参考 Y4tacker 的 HackingFernFlower
+# 仅在混淆方法开启时生效
 enableHideMethod: true
+# 是否隐藏字段
+# 给字段添加 ACC_SYNTHETIC 可以在反编译时隐藏
+# 参考 Y4tacker 的 HackingFernFlower
+# 仅在混淆字段开启时生效
+enableHideField: true
 
 # 开启删除编译信息选项
 enableDeleteCompileInfo: true

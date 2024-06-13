@@ -16,6 +16,7 @@ public class BaseConfig {
     private String decryptKeyName;
 
     private boolean enableHideMethod;
+    private boolean enableHideField;
 
     private boolean enableXOR;
     private boolean enableJunk;
@@ -41,6 +42,14 @@ public class BaseConfig {
     private boolean showAllMainMethods;
 
     private boolean keepTempFile;
+
+    public boolean isEnableHideField() {
+        return enableHideField;
+    }
+
+    public void setEnableHideField(boolean enableHideField) {
+        this.enableHideField = enableHideField;
+    }
 
     public boolean isEnableHideMethod() {
         return enableHideMethod;

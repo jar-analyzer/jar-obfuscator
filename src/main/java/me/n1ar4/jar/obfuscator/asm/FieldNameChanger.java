@@ -40,6 +40,9 @@ public class FieldNameChanger extends ClassVisitor {
         cf.setClassName(this.className);
         cf.setFieldName(name);
         ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
+        if (ObfEnv.config.isEnableHideField()) {
+            access = access | Opcodes.ACC_SYNTHETIC;
+        }
         return super.visitField(access, newCF.getFieldName(), descriptor, signature, value);
     }
 

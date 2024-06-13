@@ -2,9 +2,12 @@
 
 ## 0.0.8-beta
 
+修复了某些配置的 `BUG`并参考 `Y4tacker` 议题提供隐藏功能
+
 更新日志：
 
 - [功能] 通过添加 `SYNTHETIC` 使反编译时可以隐藏方法
+- [功能] 通过添加 `SYNTHETIC` 使反编译时可以隐藏字段
 - [功能] 解决报错并支持高版本 `JAVA` 的字节码加密功能
 - [BUG] 修复了开启包名混淆但不开启类名混淆无法生效的问题
 - [BUG] 不允许开启 `enablePackageName` 时使用字节码加密
@@ -13,6 +16,7 @@
 
 - 4ra1n (https://github.com/4ra1n)
 - pcdlrzxx (https://github.com/pcdlrzxx)
+- Y4tacker (https://github.com/Y4tacker)
 
 可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
 
