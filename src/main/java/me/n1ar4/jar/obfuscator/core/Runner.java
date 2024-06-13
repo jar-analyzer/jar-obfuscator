@@ -132,7 +132,7 @@ public class Runner {
                 newPackageNameS = packageNameS;
             }
             
-            //修复"enableClassName: false & enablePackageName: true"时混淆未正确生效bug
+            // 修复 enableClassName: false & enablePackageName: true 时混淆未正确生效 BUG
             String originalName = c.getName();
             String finalName = originalName;
             
