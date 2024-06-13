@@ -1,8 +1,22 @@
 # CHANGELOG
 
+## 0.0.9-beta
+
+todo
+
+更新日志：
+
+- todo
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 0.0.8-beta
 
-修复了某些配置的 `BUG`并参考 `Y4tacker` 议题提供隐藏功能
+修复了某些配置的 `BUG` 并参考 `Y4tacker` 议题提供隐藏功能
 
 注意，配置文件可能不兼容，请重新生成
 
