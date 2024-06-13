@@ -28,3 +28,7 @@ main class: me.n1ar4.fake.gui.Application
 ## config6
 
 测试网友的代码，花指令报错的问题
+
+## config7
+
+测试不开启类名混淆仅开启包名混淆的问题
