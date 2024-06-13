@@ -79,6 +79,9 @@ public class MethodNameChanger extends ClassVisitor {
                     name,
                     desc
             ));
+            if (ObfEnv.config.isEnableHideMethod()) {
+                access = access | Opcodes.ACC_SYNTHETIC;
+            }
             if (m == null) {
                 mv = super.visitMethod(access, name, desc, signature, exceptions);
                 return new MethodNameChangerMethodAdapter(mv);

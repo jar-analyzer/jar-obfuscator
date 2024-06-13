@@ -28,3 +28,4 @@ enableSuperObfuscate: false
 superObfuscateKey: 4ra1n4ra1n4ra1n1
 superObfuscatePackage: me.n1ar4
 keepTempFile: false
+enableHideMethod: true
