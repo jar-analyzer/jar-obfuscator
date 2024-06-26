@@ -5,6 +5,7 @@ import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
 import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
 import me.n1ar4.jar.obfuscator.utils.NameUtil;
+import me.n1ar4.jrandom.core.JRandom;
 import me.n1ar4.log.LogLevel;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -14,6 +15,11 @@ public class Manager {
     private static final Logger logger = LogManager.getLogger();
 
     public static boolean initConfig(BaseConfig config) {
+        if (config.isUseCpuRDRAND()) {
+            JRandom random = new JRandom();
+            JRandom.setInstance(random);
+        }
+
         // LOG LEVEL
         String logLevel = config.getLogLevel();
         switch (logLevel) {

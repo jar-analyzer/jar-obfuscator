@@ -1,20 +1,16 @@
 package me.n1ar4.jar.obfuscator.utils;
 
-import java.security.SecureRandom;
+import me.n1ar4.jrandom.core.JRandom;
+
 import java.util.HashSet;
 
 @SuppressWarnings("all")
 public class NameUtil {
     public static char[] CHAR_POOL = null;
-    private static final SecureRandom random = new SecureRandom();
     private static final HashSet<String> generatedStrings = new HashSet<>();
     private static final HashSet<String> generatedMethods = new HashSet<>();
     private static final HashSet<String> generatedFields = new HashSet<>();
     private static final HashSet<String> packageNames = new HashSet<>();
-
-    static {
-        random.setSeed(System.currentTimeMillis());
-    }
 
     public static String genNewName() {
         return genBase(1);
@@ -33,11 +29,12 @@ public class NameUtil {
     }
 
     public static String genWithSet(HashSet<String> exists) {
+        JRandom random = JRandom.getInstance();
         while (true) {
-            int length = 10 + random.nextInt(3);
+            int length = 10 + random.getInt(0,3);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < length; i++) {
-                sb.append(CHAR_POOL[random.nextInt(CHAR_POOL.length)]);
+                sb.append(CHAR_POOL[random.getInt(0,CHAR_POOL.length)]);
             }
             if (sb.charAt(0) == '~' || sb.charAt(0) == '1') {
                 continue;
@@ -51,11 +48,12 @@ public class NameUtil {
     }
 
     private static String genBase(int op) {
+        JRandom random = JRandom.getInstance();
         while (true) {
-            int length = 10 + random.nextInt(3);
+            int length = 10 + random.getInt(0,3);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < length; i++) {
-                sb.append(CHAR_POOL[random.nextInt(CHAR_POOL.length)]);
+                sb.append(CHAR_POOL[random.getInt(0,CHAR_POOL.length)]);
             }
             if (sb.charAt(0) == '~' || sb.charAt(0) == '1') {
                 continue;

@@ -1,16 +1,11 @@
 package me.n1ar4.jar.obfuscator.utils;
 
+import me.n1ar4.jrandom.core.JRandom;
 import org.objectweb.asm.Opcodes;
-
-import java.util.Random;
 
 public class RandomUtil {
     public static int genInt(int start, int end) {
-        if (start >= end) {
-            return 0;
-        }
-        Random random = new Random(System.currentTimeMillis());
-        return start + random.nextInt(end - start);
+        return JRandom.getInstance().getInt(start, end);
     }
 
     public static int genICONSTOpcode() {

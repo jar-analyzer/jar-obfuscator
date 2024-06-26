@@ -102,3 +102,7 @@ superObfuscatePackage: me.n1ar4
 
 # 是否保留临时类文件
 keepTempFile: false
+
+# 是否使用 CPU 的 rdrand 指令获取随机数
+# 如果报错请设置为 FALSE
+useCpuRDRAND: true

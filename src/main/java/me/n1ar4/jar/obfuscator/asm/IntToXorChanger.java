@@ -1,11 +1,10 @@
 package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
+import me.n1ar4.jrandom.core.JRandom;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-
-import java.security.SecureRandom;
 
 public class IntToXorChanger extends ClassVisitor {
     public IntToXorChanger(ClassVisitor cv) {
@@ -52,8 +51,8 @@ public class IntToXorChanger extends ClassVisitor {
         }
 
         private void replaceIntWithXor(int value) {
-            SecureRandom rand = new SecureRandom();
-            int partA = 10000000 + rand.nextInt(90000000);
+            JRandom rand = JRandom.getInstance();
+            int partA = 10000000 + rand.getInt(0, 90000000);
             int partB = partA ^ value;
             super.visitLdcInsn(partA);
             super.visitLdcInsn(partB);

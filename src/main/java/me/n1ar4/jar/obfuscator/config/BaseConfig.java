@@ -43,6 +43,16 @@ public class BaseConfig {
 
     private boolean keepTempFile;
 
+    private boolean useCpuRDRAND;
+
+    public boolean isUseCpuRDRAND() {
+        return useCpuRDRAND;
+    }
+
+    public void setUseCpuRDRAND(boolean useCpuRDRAND) {
+        this.useCpuRDRAND = useCpuRDRAND;
+    }
+
     public boolean isEnableHideField() {
         return enableHideField;
     }

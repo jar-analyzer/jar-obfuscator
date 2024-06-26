@@ -30,3 +30,4 @@ superObfuscatePackage: me.n1ar4
 keepTempFile: false
 enableHideMethod: true
 enableHideField: true
+useCpuRDRAND: true
