@@ -35,6 +35,7 @@ public class BaseConfig {
     private String[] obfuscateChars;
     private String[] methodBlackList;
     private String[] classBlackList;
+    private String[] classBlackRegexList;
     private String[] rootPackages;
     private String mainClass;
     private boolean modifyManifest;
@@ -44,6 +45,14 @@ public class BaseConfig {
     private boolean keepTempFile;
 
     private boolean useCpuRDRAND;
+
+    public String[] getClassBlackRegexList() {
+        return classBlackRegexList != null ? classBlackRegexList : new String[0];
+    }
+
+    public void setClassBlackRegexList(String[] classBlackRegexList) {
+        this.classBlackRegexList = classBlackRegexList;
+    }
 
     public boolean isUseCpuRDRAND() {
         return useCpuRDRAND;
@@ -94,7 +103,7 @@ public class BaseConfig {
     }
 
     public String[] getRootPackages() {
-        return rootPackages;
+        return rootPackages!=null ? rootPackages : new String[0];
     }
 
     public void setRootPackages(String[] rootPackages) {
@@ -102,7 +111,7 @@ public class BaseConfig {
     }
 
     public String[] getClassBlackList() {
-        return classBlackList;
+        return classBlackList != null ? classBlackList : new String[0];
     }
 
     public void setClassBlackList(String[] classBlackList) {
@@ -126,7 +135,7 @@ public class BaseConfig {
     }
 
     public String[] getMethodBlackList() {
-        return methodBlackList;
+        return methodBlackList!=null ? methodBlackList : new String[0];
     }
 
     public void setMethodBlackList(String[] methodBlackList) {
@@ -288,7 +297,7 @@ public class BaseConfig {
     }
 
     public String[] getObfuscatePackage() {
-        return obfuscatePackage;
+        return obfuscatePackage!=null ? obfuscatePackage : new String[0];
     }
 
     public void setObfuscatePackage(String[] obfuscatePackage) {
@@ -296,7 +305,7 @@ public class BaseConfig {
     }
 
     public String[] getObfuscateChars() {
-        return obfuscateChars;
+        return obfuscateChars!=null ? obfuscateChars : new String[0];
     }
 
     public void setObfuscateChars(String[] obfuscateChars) {

@@ -31,6 +31,10 @@ rootPackages: [ me.n1ar4, org.n1ar4 ]
 # 不对某些类做混淆（不混淆其中的所有内容）
 # 例如反射调用/JAVAFX FXML绑定等情况
 classBlackList: [ javafx.controller.DemoController ]
+# 不对指定正则的类进行混淆
+# 注意这里的类名匹配是 java/lang/String 而不是 java.lang.String
+# 该配置和 classBlackList 同时生效
+classBlackRegexList: [ java/.*, com/intellij/.* ]
 # 不对某些 method 名做混淆 正则
 # visit.* 忽略 JAVA ASM 的 visitCode visitMethod 等方法
 # start.* 忽略 JAVAFX 因为启动基于 start 方法

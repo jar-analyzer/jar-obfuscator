@@ -9,6 +9,8 @@ import org.objectweb.asm.Opcodes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PackageUtil {
     private static final List<String> internalList = new ArrayList<>();
@@ -45,6 +47,14 @@ public class PackageUtil {
         for (String s : config.getClassBlackList()) {
             s = s.replace(".", "/");
             if (className.equals(s)) {
+                return true;
+            }
+        }
+        for (String s : config.getClassBlackRegexList()) {
+            className = className.replace(".", "/");
+            Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
+            Matcher matcher = pattern.matcher(className);
+            if (matcher.matches()) {
                 return true;
             }
         }
