@@ -11,15 +11,8 @@ public class StringDecryptDump implements Opcodes {
     public static String methodName = null;
     private static String keyName = null;
 
-    public static void changeKEY(String key) {
-        if (key != null && key.length() == 16) {
-            AES_KEY = key;
-            logger.info("change decrypt aes key to: {}", key);
-            return;
-        }
-        AES_KEY = "Y4SuperSecretKey";
-        logger.warn("aes decrypt key length muse be 16");
-        logger.info("change decrypt aes key to: {}", key);
+    public static void changeKEY() {
+        AES_KEY = StringDecrypt.KEY;
     }
 
     public static void initName(String c, String m, String k) {

@@ -75,7 +75,7 @@ public class Manager {
         ObfEnv.ADVANCE_STRING_NAME = config.getAdvanceStringName();
 
         StringDecrypt.changeKEY(config.getStringAesKey());
-        StringDecryptDump.changeKEY(config.getStringAesKey());
+        StringDecryptDump.changeKEY();
         StringDecryptDump.initName(
                 config.getDecryptClassName(),
                 config.getDecryptMethodName(),

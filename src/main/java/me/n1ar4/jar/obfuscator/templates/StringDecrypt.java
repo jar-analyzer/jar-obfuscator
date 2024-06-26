@@ -1,5 +1,6 @@
 package me.n1ar4.jar.obfuscator.templates;
 
+import me.n1ar4.jrandom.core.JRandom;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -11,19 +12,30 @@ import java.util.Base64;
 
 public class StringDecrypt {
     private static final Logger logger = LogManager.getLogger();
-    private static String KEY = null;
+    public static String KEY = null;
     private static final String ALGORITHM = "AES";
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public static void changeKEY(String key) {
-        if (key != null && key.length() == 16) {
-            KEY = key;
-            logger.info("change encrypt aes key to: {}", key);
+        if (key == null) {
+            KEY = JRandom.getInstance().randomString(16);
+            logger.info("设置随机 AES_KEY 为 " + KEY);
             return;
         }
-        key = "Y4SuperSecretKey";
-        logger.warn("aes encrypt key length muse be 16");
-        logger.info("change encrypt aes key to: {}", key);
+        if (key.equals("Y4SuperSecretKey")) {
+            logger.warn("默认 AES_KEY 是不安全的");
+            KEY = JRandom.getInstance().randomString(16);
+            logger.info("设置随机 AES_KEY 为 " + KEY);
+        } else {
+            if (key.length() == 16) {
+                KEY = key;
+                logger.info("change encrypt aes key to: {}", key);
+            } else {
+                logger.warn("AES_KEY 长度必须是 16 当前长度是 " + key.length());
+                KEY = JRandom.getInstance().randomString(16);
+                logger.info("设置随机 AES_KEY 为 " + KEY);
+            }
+        }
     }
 
     public static String encrypt(String input) {
