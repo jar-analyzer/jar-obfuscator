@@ -44,6 +44,7 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - 垃圾代码花指令混淆（可指定多级别的混淆）
 - 使用某些技巧可以在反编译时隐藏方法
 - 使用某些技巧可以在反编译时隐藏字段
+- 安全的随机（支持通过 `CPU` 指令获得随机数）
 - 基于 `JVMTI` 的字节码加密（beta）
 
 其中 `包含引用修改` 的功能可能因为修改引用导致程序出问题
@@ -71,6 +72,29 @@ java -jar jar-obfuscator.jar --jar test.jar --config config.yaml
 - `rootPackages` 填写你项目的根包（分析和修改引用的范围 必须）
 - 其他可选配置**按需配置**即可
 - 如果要开启 `enableMethodName` 需要自行调参黑名单
+
+随机数的来源可以配置 `useCpuRDRAND` 参数
+- 直接通过 `CPU` 的 `RDRAND` 指令生成
+- 使用 `SecureRandom` 生成
+
+```asm
+get_rand_int PROC
+    mov rdi, rdi
+    test rdi, rdi
+    je fail
+    rdrand eax
+    jc success
+fail:
+    xor eax, eax
+    ret
+success:
+    mov [rdi], eax
+    mov eax, 1
+    ret
+get_rand_int ENDP
+```
+
+参考配置
 
 ```yaml
 # jar obfuscator 配置文件
@@ -177,6 +201,10 @@ superObfuscatePackage: me.n1ar4
 
 # 是否保留临时类文件
 keepTempFile: false
+
+# 是否使用 CPU 的 rdrand 指令获取随机数
+# 如果报错请设置为 FALSE
+useCpuRDRAND: true
 ```
 
 ## 实战
