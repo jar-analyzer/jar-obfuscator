@@ -92,6 +92,8 @@ public class Runner {
         MethodCallRunner.start(AnalyzeEnv.classFileList, AnalyzeEnv.methodCalls);
         logger.info("method calls: {}", AnalyzeEnv.methodCalls.size());
 
+        PackageUtil.buildInternalBlackList();
+
         Map<String, String> packageNameMap = new HashMap<>();
 
         // 处理 class name
