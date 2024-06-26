@@ -14,7 +14,6 @@ import me.n1ar4.jar.obfuscator.transform.*;
 import me.n1ar4.jar.obfuscator.utils.*;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
-import me.n1ar4.log.LoggingStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,44 +132,44 @@ public class Runner {
             } else {
                 newPackageNameS = packageNameS;
             }
-            
+
             // 修复 enableClassName: false & enablePackageName: true 时混淆未正确生效 BUG
             String originalName = c.getName();
             String finalName = originalName;
-            
+
             boolean notInWhiteList = PackageUtil.notInWhiteList(packageNameS, config);
             boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
             boolean inRootPackage = PackageUtil.inRootPackage(originalName, config);
             if (!(notInWhiteList || inBlackClass) || inRootPackage) {
-            	String result = ObfEnv.classNameObfMapping.putIfAbsent(originalName, originalName);
-            	if (result == null) {
-                	boolean isEnablePackageName = config.isEnablePackageName();
-                	boolean isEnableClassName = config.isEnableClassName();
-                	if (!inBlackClass && (isEnablePackageName || isEnableClassName)) {
-                		String finalPackageName = packageNameS;
-                		if (isEnablePackageName) {
-                			finalPackageName = newPackageNameS;
-                		}
-                		if (isEnableClassName) {
-    						if (className.contains("$")) {
-    							String outerClassName = originalName.split("\\$")[0];
-    							String exist = ObfEnv.classNameObfMapping.get(outerClassName);
-    							if (exist == null) {
-    								exist = finalPackageName + "/" + NameUtil.genNewName();
-    								ObfEnv.classNameObfMapping.put(outerClassName, exist);
-    							}
-    							finalName = exist + "$" + NameUtil.genNewName();
-    						} else {
-    	                		finalName = finalPackageName + "/" + NameUtil.genNewName();
-    						}
-                		} else {
-                    		finalName = finalPackageName + "/" + className;
-                		}
-    					ObfEnv.classNameObfMapping.put(originalName, finalName);
-                	}
-            	}
+                String result = ObfEnv.classNameObfMapping.putIfAbsent(originalName, originalName);
+                if (result == null) {
+                    boolean isEnablePackageName = config.isEnablePackageName();
+                    boolean isEnableClassName = config.isEnableClassName();
+                    if (!inBlackClass && (isEnablePackageName || isEnableClassName)) {
+                        String finalPackageName = packageNameS;
+                        if (isEnablePackageName) {
+                            finalPackageName = newPackageNameS;
+                        }
+                        if (isEnableClassName) {
+                            if (className.contains("$")) {
+                                String outerClassName = originalName.split("\\$")[0];
+                                String exist = ObfEnv.classNameObfMapping.get(outerClassName);
+                                if (exist == null) {
+                                    exist = finalPackageName + "/" + NameUtil.genNewName();
+                                    ObfEnv.classNameObfMapping.put(outerClassName, exist);
+                                }
+                                finalName = exist + "$" + NameUtil.genNewName();
+                            } else {
+                                finalName = finalPackageName + "/" + NameUtil.genNewName();
+                            }
+                        } else {
+                            finalName = finalPackageName + "/" + className;
+                        }
+                        ObfEnv.classNameObfMapping.put(originalName, finalName);
+                    }
+                }
             }
-            
+
             if (originalName.equals(ObfEnv.MAIN_CLASS)) {
                 ObfEnv.NEW_MAIN_CLASS = finalName.replace("/", ".");
                 logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);

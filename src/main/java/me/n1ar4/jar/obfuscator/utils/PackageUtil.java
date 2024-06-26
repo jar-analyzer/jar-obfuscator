@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class PackageUtil {
     private static final List<String> internalList = new ArrayList<>();
+
     public static void buildInternalBlackList() {
         // JNI 的 CLASS 默认加到黑名单里面
         for (Map.Entry<ClassReference.Handle, List<MethodReference>> entry :

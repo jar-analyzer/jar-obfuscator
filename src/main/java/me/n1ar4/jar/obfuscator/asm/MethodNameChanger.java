@@ -8,20 +8,17 @@ import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("all")
 public class MethodNameChanger extends ClassVisitor {
     private String owner;
-    private final List<String> methodBlackList;
     private final List<MethodReference> ignoreMethods = new ArrayList<>();
     private final List<String> ignoreMethodString = new ArrayList<>();
 
     public MethodNameChanger(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
-        this.methodBlackList = Arrays.asList(ObfEnv.config.getMethodBlackList());
     }
 
     @Override
