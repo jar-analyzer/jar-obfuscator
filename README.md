@@ -130,6 +130,10 @@ rootPackages: [ me.n1ar4, org.n1ar4 ]
 # 不对某些类做混淆（不混淆其中的所有内容）
 # 例如反射调用/JAVAFX FXML绑定等情况
 classBlackList: [ javafx.controller.DemoController ]
+# 不对指定正则的类进行混淆
+# 注意这里的类名匹配是 java/lang/String 而不是 java.lang.String
+# 该配置和 classBlackList 同时生效
+classBlackRegexList: [ java/.*, com/intellij/.* ]
 # 不对某些 method 名做混淆 正则
 # visit.* 忽略 JAVA ASM 的 visitCode visitMethod 等方法
 # start.* 忽略 JAVAFX 因为启动基于 start 方法
@@ -207,260 +211,26 @@ keepTempFile: false
 useCpuRDRAND: true
 ```
 
-## 实战
+## 混淆效果
 
-**示例一** 
+参考 [文档](doc/README-result.md)
 
-我有一个 `JAVAFX` 项目
-- 主类是 `com.n1ar4.gui.Main` 
-- 使用的 `fxml` 绑定的是 `com.n1ar4.controller.DemoController`
+## 配置示例
 
-由于 `fxml` 中的绑定类和方法无法修改，所以 `controller` 类暂不能混淆
+参考 [文档](doc/README-example.md)
 
-```xml
-<AnchorPane fx:controller="com.n1ar4.controller.DemoController"/>
-```
+## 关于 JVMTI 字节码加密
 
-如果我想完全混淆，应该给出这样的配置
-
-```yaml
-# 混淆包名称
-obfuscatePackage: [ com.n1ar4 ]
-# 混淆根包名
-rootPackages: [ com.n1ar4 ]
-# 不要混淆 fxml 绑定的 controller
-classBlackList: [ com.n1ar4.controller.DemoController ]
-# 注意 javafx 的启动类 start 方法不能改名
-methodBlackList: [ start.* ]
-```
-
-如果只混淆核心包 `com.n1ar4.core` 这样配置
-
-```yaml
-# 混淆包名称
-obfuscatePackage: [ com.n1ar4.core ]
-# 混淆根包名
-rootPackages: [ com.n1ar4 ]
-# 不要混淆 fxml 绑定的 controller
-classBlackList: [ com.n1ar4.controller.DemoController ]
-# 这时候不用特殊处理 javafx 启动类的问题了
-methodBlackList: [ ]
-```
-
-以上根包名的配置意义：只分析根包名下的类之间的引用关系
-
-**示例二**
-
-我项目使用了 `Apache Log4j2` 等组件如果我混淆类名和方法名，会报错无法启动
-
-于是我使用不修改引用的混淆手段
-
-```yaml
-enableEncryptString: true
-stringAesKey: Y4SuperSecretKey # 注意必须16位的KEY
-enableAdvanceString: true
-advanceStringName: GIiIiLA # 随意取名
-
-enableDeleteCompileInfo: true
-enableXOR: true
-
-enableJunk: true
-junkLevel: 5
-maxJunkOneClass: 2000 # 防止混淆太大超出方法最大限制
-```
-
-如果你想体验进一步更强的加密混淆，可以开启超级配置
-
-```yaml
-enableSuperObfuscate: true
-superObfuscateKey: 4ra1n4ra1n4ra1n1 # 注意必须16位的KEY
-superObfuscatePackage: me.n1ar4 # 需要 JVMTI 加密的包名
-```
-
-启动 `JAR` 时使用以下的参数即可
-
-```shell
-java -agentpath:/path/to/libdecrypter.dll=PACKAGE_NAME=me.n1ar4,KEY=4ra1n4ra1n4ra1n1 -jar test.jar
-```
-
-该命令将会在 `JVM` 启动时使用 `libdecrypter.dll` 库解密（该库文件会自动导出）
-
-你可以自行修改 `native` 目录的 `C/ASM` 代码自定义加密解密，是程序更安全
-
-**示例三**
-
-我混淆出来的为什么报错打不开
-
-解决：
-- 控制变量逐个尝试和搭配，逐个参数测试是否正常运行
-- 关闭 `enableMethodName` 配置后再测试
-- 注意 `rootPackages` 和 `obfuscatePackage` 配置
-- 如果以上方案都不行，最终请使用**不修改引用**的几个配置（参考上文）
-
-## 效果
-
-测试类
-
-```java
-package com.test;
-
-public class Hello {
-    private static void add(int a, int b) {
-        int c = a + b;
-        System.out.println("a + b = " + c);
-    }
-
-    public static void main(String[] args) {
-        add(1, 2);
-    }
-}
-```
-
-混淆后 `main` 方法部分指令 (全部指令过长不便显示)
-
-```java
-public static main([Ljava/lang/String;)V
-    LDC 50917067
-    LDC 133762565
-    ICONST_0
-    ICONST_1
-    IADD
-    POP
-    IXOR
-    LDC 83446414
-    LDC 567873
-    ICONST_0
-    ICONST_1
-    IADD
-    POP
-    IXOR
-    ICONST_0
-    ICONST_1
-    IADD
-    // ...
-    POP
-    POP
-    POP
-    INVOKESTATIC com/test/Ll1L1IlIIii.lLil1Ll11l1 (II)V
-    // ...
-```
-
-混淆后 `main` 方法代码
-
-```java
-public static void main(String[] lLiIIiIiLlI) {
-    int var10002 = 0 + 1;
-    int var10000 = 50917067 ^ 133762565;
-    int var10003 = 0 + 1;
-    int var10001 = 83446414 ^ 567873;
-    var10002 = 0 + 1;
-    var10000 ^= var10001;
-    var10003 = 0 + 1;
-    var10001 = 44140772 ^ 109412867;
-    int var10004 = 0 + 1;
-    var10002 = 25080190 ^ 89832347;
-    var10003 = 0 + 1;
-    var10001 ^= var10002;
-    int var10005 = 54 + 5 - 3;
-    byte var1 = 54;
-    lLil1Ll11l1(var10000, var10001);
-    var10000 = 0 + 1;
-}
-```
-
-对于字符串 `"a + b = "` 的混淆
-
-```java
-// ...
-private static ArrayList<String> GIiIiLA;
-// ...
-// 全局数组提取
-String var5 = (String)GIiIiLA.get(var10003);
-var10006 = 74 + 5 - 3;
-byte var6 = 74;
-// AES解密
-var5 = i1LL1iLiLI.I(var5);
-var10006 = 9 + 5 - 3;
-var6 = 9;
-// 字符串拼接
-var10001 = var10001.append(var5);
-//...
-static {
-    int var10001 = 0 + 1;
-    int var10005 = 57 + 5 - 3;
-    byte var10004 = 57;
-    GIiIiLA = new ArrayList();
-    var10005 = 99 + 5 - 3;
-    var10004 = 99;
-    // 全局数组初始化
-    GIiIiLA.add("ahKHK3TcdrEge+jLkE23xg==");
-    var10001 = 0 + 1;
-    int var10000 = 0 + 1;
-}
-```
-
-包名类名的混淆效果
-
-![](img/005.png)
-
-通过定义配置文件的 `obfuscateChars` 可以做更有趣的混淆
-
-![](img/004.png)
-
-## 进阶
-
-开启 `JVMTI` 加密的混淆效果
-
-（该类是非法字节码无法直接运行也无法反编译）
-
-![](img/001.png)
-
-如果开启该选项，比如启动时指定特殊本地库进行解密
-
-使用 `JNI` 加密字节码，通过 `JVMTI` 解密字节码以保护代码
-
-提供两份 `DLL/SO` 文件，一份加密一份解密，实际运行只需使用解密 `DLL/SO` 文件，支持自定义密钥和包名
-
-```shell
-java -XX:+DisableAttachMechanism -agentpath:decrypter.dll=PACKAGE_NAME=com.your.pack,KEY=your-key -jar your-jar.jar
-```
-
-注意：加密后的 `JAR` 第一次可能无法运行，第二次可以正常运行
-
-加密后的 `CLASS` 文件变成无法解析的畸形文件
-
-![jd-gui](img/002.png)
-
-除了开头保持了 `MAGIC` 部分，后续是无法解析的字节
-
-![hex](img/003.png)
-
-使用指定参数启动即可禁止 `Java Agent` 动态 `dump` 字节码
-
-![](img/007.png)
-
-对于更资深的黑客，他们会想到 `sa-jdi` 的 `HSDB` 来 `dump` 字节码
-
-我参考 `Beichen` 师傅议题的思路，从 `JVM` 里禁用了 `gHotSpotVMStructs` 函数
-
-支持 `Windows` 系统
-
-![WINDOWS](img/008.png)
-
-支持 `Linux` 系统
-
-![LINUX](img/009.png)
-
-注意：可能不适用于启动扫描 `class` 的项目（典型的项目比如 `SpringBoot` 等）
+参考 [文档](doc/README-advance.md)
 
 ## BUILD
 
-Base:
+Base Project
 
 - Windows: JDK 8 + Maven
 - Linux: JDK 8 + Maven
 
-JVMTI: 
+JVMTI / JRandom 
 
 - Windows: MSVC + ml64 + CMake 3.x
 - Linux: gcc + nasm + CMake 3.x
