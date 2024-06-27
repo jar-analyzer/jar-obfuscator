@@ -103,7 +103,7 @@ public class BaseConfig {
     }
 
     public String[] getRootPackages() {
-        return rootPackages!=null ? rootPackages : new String[0];
+        return rootPackages != null ? rootPackages : new String[0];
     }
 
     public void setRootPackages(String[] rootPackages) {
@@ -135,7 +135,7 @@ public class BaseConfig {
     }
 
     public String[] getMethodBlackList() {
-        return methodBlackList!=null ? methodBlackList : new String[0];
+        return methodBlackList != null ? methodBlackList : new String[0];
     }
 
     public void setMethodBlackList(String[] methodBlackList) {
@@ -297,7 +297,7 @@ public class BaseConfig {
     }
 
     public String[] getObfuscatePackage() {
-        return obfuscatePackage!=null ? obfuscatePackage : new String[0];
+        return obfuscatePackage != null ? obfuscatePackage : new String[0];
     }
 
     public void setObfuscatePackage(String[] obfuscatePackage) {
@@ -305,7 +305,7 @@ public class BaseConfig {
     }
 
     public String[] getObfuscateChars() {
-        return obfuscateChars!=null ? obfuscateChars : new String[0];
+        return obfuscateChars != null ? obfuscateChars : new String[0];
     }
 
     public void setObfuscateChars(String[] obfuscateChars) {

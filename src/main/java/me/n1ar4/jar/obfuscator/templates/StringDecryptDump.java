@@ -1,11 +1,8 @@
 package me.n1ar4.jar.obfuscator.templates;
 
-import me.n1ar4.log.LogManager;
-import me.n1ar4.log.Logger;
 import org.objectweb.asm.*;
 
 public class StringDecryptDump implements Opcodes {
-    private static final Logger logger = LogManager.getLogger();
     public static String AES_KEY = null;
     public static String className = null;
     public static String methodName = null;
