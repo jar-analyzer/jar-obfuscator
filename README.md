@@ -225,14 +225,22 @@ useCpuRDRAND: true
 
 ## BUILD
 
-Base Project
+对于 `JAVA` 层提供了 `docker` 构建方式
+
+- ./docker-build.sh
+
+构建完成后，当前目录会出现一个 `jar-obfuscator.jar` 文件
+
+`JAVA` 层构建
 
 - Windows: JDK 8 + Maven
 - Linux: JDK 8 + Maven
 
-JVMTI / JRandom 
+JVMTI / JRandom 的构建
 
 - Windows: MSVC + ml64 + CMake 3.x
 - Linux: gcc + nasm + CMake 3.x
 - Optional: Python 3.x
+
+目前不支持 `MacOS` 系统，欢迎大佬提交 `PR`
 
