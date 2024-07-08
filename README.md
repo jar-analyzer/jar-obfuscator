@@ -1,8 +1,11 @@
 # Jar-Obfuscator
 
+<img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
+
 [CHANGE LOG](CHANGELOG.MD)
 
-![](https://img.shields.io/badge/build-passing-brightgreen)
+![](https://github.com/jar-analyzer/jar-obfuscator/workflows/maven%20check/badge.svg)
+![](https://github.com/jar-analyzer/jar-obfuscator/workflows/leak%20check/badge.svg)
 ![](https://img.shields.io/badge/build-Java%208-orange)
 ![](https://img.shields.io/github/downloads/jar-analyzer/jar-obfuscator/total)
 ![](https://img.shields.io/github/v/release/jar-analyzer/jar-obfuscator)
