@@ -2,15 +2,13 @@
 
 <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
 
-[CHANGE LOG](CHANGELOG.MD)
-
 ![](https://github.com/jar-analyzer/jar-obfuscator/workflows/maven%20check/badge.svg)
 ![](https://github.com/jar-analyzer/jar-obfuscator/workflows/leak%20check/badge.svg)
 ![](https://img.shields.io/badge/build-Java%208-orange)
 ![](https://img.shields.io/github/downloads/jar-analyzer/jar-obfuscator/total)
 ![](https://img.shields.io/github/v/release/jar-analyzer/jar-obfuscator)
 
-**该项目刚开始开发，可能存在较多的BUG，欢迎测试和提出问题**
+[CHANGE LOG](CHANGELOG.MD)
 
 `Jar Obfuscator` 是一个 `JAR/CLASS` 文件混淆工具
 
@@ -236,8 +234,8 @@ useCpuRDRAND: true
 
 `JAVA` 层构建
 
-- Windows: JDK 8 + Maven
-- Linux: JDK 8 + Maven
+- JDK 8
+- Maven
 
 JVMTI / JRandom 的构建
 
