@@ -4,6 +4,7 @@ import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
 import me.n1ar4.jar.obfuscator.utils.JunkUtil;
 import me.n1ar4.jar.obfuscator.utils.RandomUtil;
+import me.n1ar4.jrandom.core.JRandom;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.objectweb.asm.*;
@@ -126,17 +127,28 @@ public class JunkCodeChanger extends ClassVisitor {
                     return;
                 }
 
-                mv.visitLdcInsn((int) (Math.random() * 100));
+                mv.visitTypeInsn(Opcodes.NEW, "java/lang/String");
                 mv.visitInsn(Opcodes.DUP);
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.IADD);
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.ISUB);
-                mv.visitInsn(Opcodes.DUP_X1);
-                mv.visitInsn(Opcodes.SWAP);
+                mv.visitLdcInsn(JRandom.getInstance().randomString(16));
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/String", "<init>",
+                        "(Ljava/lang/String;)V", false);
                 mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(Opcodes.POP);
+
+                Label ifLabel = new Label();
+                Label endLabel = new Label();
+
+                mv.visitInsn(Opcodes.ICONST_1);
+                mv.visitJumpInsn(Opcodes.IFNE, endLabel);
+
+                mv.visitLabel(ifLabel);
+                mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System",
+                        "out", "Ljava/io/PrintStream;");
+                mv.visitLdcInsn(JRandom.getInstance().randomString(16));
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
+                        "println", "(Ljava/lang/String;)V", false);
+                mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+                mv.visitLabel(endLabel);
+                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
             }
             super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
         }
@@ -176,6 +188,11 @@ public class JunkCodeChanger extends ClassVisitor {
                 }
                 mv.visitInsn(Opcodes.NOP);
                 mv.visitInsn(Opcodes.NOP);
+                mv.visitTypeInsn(Opcodes.NEW, "java/util/ArrayList");
+                mv.visitInsn(Opcodes.DUP);
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList",
+                        "<init>", "()V", false);
+                mv.visitInsn(Opcodes.POP);
                 mv.visitInsn(Opcodes.NOP);
             }
             super.visitTypeInsn(opcode, type);
