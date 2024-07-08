@@ -2,6 +2,7 @@ package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
+import me.n1ar4.jar.obfuscator.utils.JunkUtil;
 import me.n1ar4.jar.obfuscator.utils.RandomUtil;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -63,6 +64,11 @@ public class JunkCodeChanger extends ClassVisitor {
 
     @Override
     public void visitEnd() {
+        // 添加无意义的代码
+        if (config.getJunkLevel() > 2) {
+            JunkUtil.addHttpCode(cv);
+            JunkUtil.addPrintMethod(cv);
+        }
         super.visitEnd();
     }
 
