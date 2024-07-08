@@ -15,22 +15,34 @@ public class JunkCodeChanger extends ClassVisitor {
     public static int MAX_JUNK_NUM = 1000;
     public static int JUNK_NUM = 0;
     private final BaseConfig config;
+    private boolean shouldSkip;
 
     public JunkCodeChanger(ClassVisitor classVisitor, BaseConfig config) {
         super(Const.ASMVersion, classVisitor);
         JUNK_NUM = 0;
         this.config = config;
+        this.shouldSkip = false;
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
+        boolean isAbstract = (access & Opcodes.ACC_ABSTRACT) != 0;
+        boolean isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
+        boolean isEnum = (access & Opcodes.ACC_ENUM) != 0;
+        if (isAbstract || isInterface || isEnum) {
+            shouldSkip = true;
+        }
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new JunkChangerMethodAdapter(mv, this.config);
+        if (shouldSkip) {
+            return mv;
+        } else {
+            return new JunkChangerMethodAdapter(mv, this.config);
+        }
     }
 
     @Override
@@ -66,7 +78,7 @@ public class JunkCodeChanger extends ClassVisitor {
     @Override
     public void visitEnd() {
         // 添加无意义的代码
-        if (config.getJunkLevel() > 2) {
+        if (!shouldSkip && config.getJunkLevel() > 2) {
             JunkUtil.addHttpCode(cv);
             JunkUtil.addPrintMethod(cv);
         }
