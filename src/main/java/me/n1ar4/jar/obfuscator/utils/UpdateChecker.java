@@ -10,7 +10,6 @@ import java.net.URL;
 
 public class UpdateChecker {
     public static void check() {
-        System.out.println("[*] checking for updates...");
         try {
             URL url = new URL(Const.UPDATE_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -22,7 +21,10 @@ public class UpdateChecker {
             System.out.println("[*] current version is " + ColorUtil.green(Const.VERSION));
             System.out.println("[*] the latest version is " + ColorUtil.yellow(version));
             if (!version.equals(Const.VERSION)) {
+                System.out.println(ColorUtil.red("[*] new version to update"));
                 System.out.println("[*] download url: " + ColorUtil.red(Const.DOWNLOAD_URL));
+            } else {
+                System.out.println(ColorUtil.green("[*] no new versions to update"));
             }
             connection.disconnect();
         } catch (Exception ignored) {
