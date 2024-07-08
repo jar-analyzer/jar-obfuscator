@@ -6,7 +6,7 @@
 
     <groupId>me.n1ar4.jar.obfuscator</groupId>
     <artifactId>jar-obfuscator</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <packaging>jar</packaging>
     <description>Jar Obfuscator Project</description>
