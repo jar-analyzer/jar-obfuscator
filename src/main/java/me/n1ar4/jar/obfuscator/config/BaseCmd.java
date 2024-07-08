@@ -11,6 +11,16 @@ public class BaseCmd {
     private boolean generate;
     @Parameter(names = {"--check-update"}, description = "check update")
     private boolean check;
+    @Parameter(names = {"-v", "--version"}, description = "version")
+    private boolean version;
+
+    public boolean isVersion() {
+        return version;
+    }
+
+    public void setVersion(boolean version) {
+        this.version = version;
+    }
 
     public boolean isCheck() {
         return check;

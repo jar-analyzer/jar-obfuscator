@@ -32,6 +32,9 @@ public class Main {
         if (baseCmd.isCheck()) {
             return;
         }
+        if (baseCmd.isVersion()) {
+            return;
+        }
         if (baseCmd.isGenerate()) {
             parser.generateConfig();
             logger.info("generate config.yaml file");
