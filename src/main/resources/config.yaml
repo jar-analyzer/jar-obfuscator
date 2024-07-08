@@ -88,6 +88,7 @@ enableXOR: true
 enableJunk: true
 # 花指令级别
 # 最低1 最高5
+# 使用 3 以上会生成垃圾方法
 junkLevel: 5
 # 一个类中的花指令数量上限
 maxJunkOneClass: 2000
