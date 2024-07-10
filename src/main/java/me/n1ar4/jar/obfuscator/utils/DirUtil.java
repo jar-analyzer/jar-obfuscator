@@ -79,6 +79,9 @@ public class DirUtil {
     public static void addToZip(File source, ZipOutputStream jos, String parentDir) throws IOException {
         if (source.isDirectory()) {
             String dirPath = parentDir + source.getName() + "/";
+            ZipEntry entry = new ZipEntry(dirPath);
+            jos.putNextEntry(entry);
+            jos.closeEntry();
             for (File file : Objects.requireNonNull(source.listFiles())) {
                 addToZip(file, jos, dirPath);
             }
