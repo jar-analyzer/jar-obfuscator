@@ -312,6 +312,9 @@ public class Runner {
             XORTransformer.transform();
         }
 
+        // BUG FIX 处理 Class.forName 等反射遇到的类名
+        ReflectionTransformer.transform();
+
         if (config.isEnableEncryptString()) {
             // 创建加密解密类
             byte[] code = StringDecryptDump.dump();

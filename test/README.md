@@ -32,3 +32,7 @@ main class: me.n1ar4.fake.gui.Application
 ## config7
 
 测试不开启类名混淆仅开启包名混淆的问题
+
+## config8
+
+测试 `test-reflect.jar` 反射
