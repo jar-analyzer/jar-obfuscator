@@ -1,3 +1,8 @@
+# 注意 这是内置的用于处理 @Override 问题的黑名单
+# 由于编译后的字节码去除了 @Override 注解
+# 这里记录的是 父类/父接口 -> 方法名 的关系
+# 如果某个类的父类/父接口匹配到 那么方法名以该方法名开头的将会跳过
+
 org/objectweb/asm/ClassVisitor visit
 org/objectweb/asm/MethodVisitor visit
 com/sun/net/httpserver/HttpHandler handle

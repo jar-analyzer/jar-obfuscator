@@ -26,6 +26,12 @@ public class BuiltinFilter {
                     split = split.substring(0, split.length() - 1);
                 }
                 split = split.trim();
+                if (split.startsWith("#")) {
+                    continue;
+                }
+                if (split == null || split.length() == 0 || split.equals("")) {
+                    continue;
+                }
                 String[] items = split.split(" ");
                 builtinFilters.put(items[0], items[1]);
             }

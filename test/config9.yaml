@@ -1,0 +1,33 @@
+logLevel: info
+mainClass: org.example.Main
+modifyManifest: true
+obfuscateChars: [ i, l, L, '1', I ]
+obfuscatePackage: [ org.example ]
+rootPackages: [ org.example ]
+classBlackList: [ javafx.controller.DemoController ]
+methodBlackList: [ visit.*, start.* ]
+enableClassName: true
+enablePackageName: true
+enableMethodName: true
+enableFieldName: true
+enableParamName: true
+enableEncryptString: true
+stringAesKey: A1S2W3E51728S6DA
+enableAdvanceString: false
+advanceStringName: GIiIiLA
+decryptClassName: org.apache.commons.collections.list.AbstractHashMaps
+decryptMethodName: newMap
+decryptKeyName: LiLiLLLiiiLLiiLLi
+enableDeleteCompileInfo: false
+enableXOR: false
+enableJunk: false
+junkLevel: 5
+maxJunkOneClass: 2000
+showAllMainMethods: false
+enableSuperObfuscate: false
+superObfuscateKey: 4ra1n4ra1n4ra1n1
+superObfuscatePackage: me.n1ar4
+keepTempFile: false
+enableHideMethod: true
+enableHideField: true
+useCpuRDRAND: true

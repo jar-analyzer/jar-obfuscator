@@ -1,11 +1,9 @@
 package me.n1ar4.jar.obfuscator.asm;
 
-import javassist.runtime.Desc;
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.jar.obfuscator.utils.DescUtil;
 import org.objectweb.asm.*;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.util.List;
 
@@ -22,10 +20,12 @@ public class ClassNameChanger extends ClassVisitor {
         for (int i = 0; i < interfaces.length; i++) {
             interfaces[i] = ObfEnv.classNameObfMapping.getOrDefault(interfaces[i], interfaces[i]);
         }
-        List<String> s = DescUtil.extractClassNames(signature);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            signature = signature.replace(c, co);
+        if (signature != null) {
+            List<String> sig = DescUtil.extractClassNames(signature);
+            for (String c : sig) {
+                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
+                signature = signature.replace(c, co);
+            }
         }
         super.visit(version, access, name, signature, superName, interfaces);
     }
@@ -37,10 +37,12 @@ public class ClassNameChanger extends ClassVisitor {
             String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
             desc = desc.replace(c, co);
         }
-        List<String> sig = DescUtil.extractClassNames(signature);
-        for (String c : sig) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            signature = signature.replace(c, co);
+        if (signature != null) {
+            List<String> sig = DescUtil.extractClassNames(signature);
+            for (String c : sig) {
+                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
+                signature = signature.replace(c, co);
+            }
         }
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         return new ClassNameChangerMethodAdapter(mv);
@@ -73,10 +75,12 @@ public class ClassNameChanger extends ClassVisitor {
             String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
             descriptor = descriptor.replace(c, co);
         }
-        List<String> sig = DescUtil.extractClassNames(signature);
-        for (String c : sig) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            signature = signature.replace(c, co);
+        if (signature != null) {
+            List<String> sig = DescUtil.extractClassNames(signature);
+            for (String c : sig) {
+                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
+                signature = signature.replace(c, co);
+            }
         }
         return super.visitField(access, name, descriptor, signature, value);
     }
@@ -399,10 +403,12 @@ public class ClassNameChanger extends ClassVisitor {
                 String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
                 descriptor = descriptor.replace(c, co);
             }
-            List<String> sig = DescUtil.extractClassNames(signature);
-            for (String c : sig) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                signature = signature.replace(c, co);
+            if (signature != null) {
+                List<String> sig = DescUtil.extractClassNames(signature);
+                for (String c : sig) {
+                    String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
+                    signature = signature.replace(c, co);
+                }
             }
             super.visitLocalVariable(name, descriptor, signature, start, end, index);
         }
