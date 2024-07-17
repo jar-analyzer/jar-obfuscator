@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -93,12 +94,14 @@ public class DirUtil {
                 if (ObfEnv.config.isEnablePackageName() || ObfEnv.config.isEnableClassName()) {
                     if (entryName.contains("META-INF/MANIFEST.MF")) {
                         byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
+                        String dataString = new String(data);
                         if (data.length > 0) {
-                            String dataString = new String(data);
-                            try {
-                                dataString = dataString.replace(
-                                        ObfEnv.MAIN_CLASS.replace("/", "."), ObfEnv.NEW_MAIN_CLASS);
-                            } catch (Exception ignored) {
+                            for (Map.Entry<String, String> en : ObfEnv.classNameObfMapping.entrySet()) {
+                                String origin = en.getKey().replace("/", ".");
+                                String obf = en.getValue().replace("/", ".");
+                                if (dataString.contains(origin)) {
+                                    dataString = dataString.replace(origin, obf);
+                                }
                             }
                             jos.write(dataString.getBytes(), 0, dataString.length());
                             jos.closeEntry();
