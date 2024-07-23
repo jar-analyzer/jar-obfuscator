@@ -58,6 +58,9 @@ public class PatchCommand implements Constants {
         if (OSUtil.isWin()) {
             JNIUtil.extractDllSo(EncryptorDLL, null, false);
             libPath = tmp.resolve(EncryptorDLL);
+        } else if (OSUtil.isMac()) {
+            JNIUtil.extractDllSo(EncryptorDylib, null, false);
+            libPath = tmp.resolve(EncryptorDylib);
         } else {
             JNIUtil.extractDllSo(EncryptorSO, null, false);
             libPath = tmp.resolve(EncryptorSO);

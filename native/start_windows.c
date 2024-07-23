@@ -187,11 +187,11 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
     }
 
     // SET PACKAGE_NAME
-    PACKAGE_NAME = (char *) malloc(strlen((char *) v1));
+    PACKAGE_NAME = (char *) malloc(strlen((char *) v1) + 1);
     strcpy(PACKAGE_NAME, (char *) v1);
 
     // SET KEY
-    KEY = (unsigned char *) malloc(16);
+    KEY = (unsigned char *) malloc(strlen((char *) v2) + 1);
     strcpy((char *) KEY, (char *) v2);
 
     jvmtiEnv *jvmti;

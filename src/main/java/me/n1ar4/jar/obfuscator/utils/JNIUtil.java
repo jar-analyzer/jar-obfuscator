@@ -78,11 +78,11 @@ public class JNIUtil implements Constants {
             }
         } else {
             String so = p.toFile().getAbsolutePath();
-            if (!so.endsWith(SOFile)) {
-                logger.debug("must be a so file");
+            if (!(so.endsWith(SOFile) || so.endsWith(DylibFile))) {
+                logger.debug("must be a so/dylib file");
                 return false;
             }
-            String outputName = p.toFile().getName().split("\\.so")[0].trim();
+            String outputName = p.toFile().getName().split("\\.so")[0].split("\\.dylib")[0].trim();
             logger.debug("load library: " + outputName);
             System.load(so);
         }

@@ -30,6 +30,11 @@ public class ExportCommand implements Constants {
             System.out.println("----------- ADD VM OPTIONS (WINDOWS) -----------");
             System.out.println("java -XX:+DisableAttachMechanism " +
                     "-agentpath:/path/to/libdecrypter.dll=PACKAGE_NAME=xxx,KEY=YOUR-KEY [other-params]");
+        } else if (OSUtil.isMac()) {
+            JNIUtil.extractDllSo(DecrypterDylib, outputPath, false);
+            System.out.println("----------- ADD VM OPTIONS (MacOS) -----------");
+            System.out.println("java -XX:+DisableAttachMechanism " +
+                    "-agentpath:/path/to/libdecrypter.dylib=PACKAGE_NAME=xxx,KEY=YOUR-KEY [other-params]");
         } else {
             JNIUtil.extractDllSo(DecrypterSo, outputPath, false);
             System.out.println("----------- ADD VM OPTIONS (LINUX) -----------");
