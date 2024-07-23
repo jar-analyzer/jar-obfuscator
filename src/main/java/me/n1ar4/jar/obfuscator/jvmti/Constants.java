@@ -5,7 +5,7 @@ package me.n1ar4.jar.obfuscator.jvmti;
  */
 @SuppressWarnings("all")
 public interface Constants {
-	String DecrypterDLL = "libdecrypter.dll";
+    String DecrypterDLL = "libdecrypter.dll";
     String DecrypterSo = "libdecrypter.so";
     String DecrypterDylib = "libdecrypter.dylib";
     String EncryptorDLL = "libencryptor.dll";
