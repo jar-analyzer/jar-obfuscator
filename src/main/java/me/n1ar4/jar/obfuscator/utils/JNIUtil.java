@@ -1,6 +1,5 @@
 package me.n1ar4.jar.obfuscator.utils;
 
-import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.jvmti.Constants;
 
 import java.io.ByteArrayOutputStream;
@@ -42,11 +41,9 @@ public class JNIUtil {
     public static boolean loadLib(String path) {
         Path p = Paths.get(path);
         if (!Files.exists(p)) {
-
             return false;
         }
         if (Files.isDirectory(p)) {
-
             return false;
         }
         String os = System.getProperty("os.name").toLowerCase();
@@ -63,14 +60,15 @@ public class JNIUtil {
                 return false;
             }
             System.load(p.toFile().getAbsolutePath());
+            return true;
         } else {
             String so = p.toFile().getAbsolutePath();
-            if (!so.endsWith(".so")) {
-                return false;
+            if (so.endsWith(".so") || so.endsWith(".dylib")) {
+                System.load(so);
+                return true;
             }
-            System.load(so);
+            return false;
         }
-        return true;
     }
 
     /**
