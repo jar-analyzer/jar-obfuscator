@@ -37,7 +37,14 @@ public class JunkCodeTransformer {
                 ClassWriter classWriter = new CustomClassWriter(classReader,
                         ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, loader);
                 JunkCodeChanger changer = new JunkCodeChanger(classWriter, config);
-                classReader.accept(changer, Const.AnalyzeASMOptions);
+                try {
+                    classReader.accept(changer, Const.AnalyzeASMOptions);
+                } catch (Exception ignored) {
+                    // CustomClassLoader 可能会找不到类
+                    // 这个地方目前做法是跳过这个类的花指令混淆
+                    logger.debug("花指令混淆使用自定义类加载器出现错误");
+                    continue;
+                }
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (MethodTooLargeException ex) {
