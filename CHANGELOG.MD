@@ -2,10 +2,13 @@
 
 ## 0.1.2
 
+字节码加密功能支持了 `MAC` 系统（由 `pcdlrzxx` 提供）
+
 解决了目标代码写法存在 `class.getResource("/dir/")` 时得到 `null` 的问题，这是最终打包 `JAR` 部分的代码问题
 
 更新日志：
 
+- [功能] 字节码加密功能支持 `MAC` 系统
 - [功能] 字符串替换时处理反射字符串类名
 - [功能] 添加对泛型 `signature` 的处理
 - [优化] 优化 `builtin` 黑名单解析和注释
@@ -16,6 +19,7 @@
 感谢以下用户的贡献:
 
 - 4ra1n (https://github.com/4ra1n)
+- pcdlrzxx (https://github.com/pcdlrzxx)
 
 可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
 
