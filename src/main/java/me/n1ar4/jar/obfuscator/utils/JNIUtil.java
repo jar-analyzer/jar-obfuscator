@@ -1,6 +1,7 @@
 package me.n1ar4.jar.obfuscator.utils;
 
 import me.n1ar4.jar.obfuscator.Const;
+import me.n1ar4.jar.obfuscator.jvmti.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -83,7 +84,7 @@ public class JNIUtil {
                 return false;
             }
             if (dir == null || dir.isEmpty()) {
-                dir = Const.TEMP_DIR;
+                dir = Constants.TempDir;
             }
             Path targetDir = Paths.get(dir);
             Path outputFile;
