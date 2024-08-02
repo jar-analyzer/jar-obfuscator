@@ -9,6 +9,7 @@
 - [功能] 字符串替换时处理反射字符串类名
 - [功能] 添加对泛型 `signature` 的处理
 - [优化] 优化 `builtin` 黑名单解析和注释
+- [BUG] 修复 `NATIVE` 的 `malloc` 错误
 - [BUG] 修复没有添加目录到 `JAR ENTRY` 的问题
 - [BUG] 花指令混淆部分遇到类加载报错解决
 - [BUG] 修复 `MANIFEST.MF` 没有完全修改的问题
