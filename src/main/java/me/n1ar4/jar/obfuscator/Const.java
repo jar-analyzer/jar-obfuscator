@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public interface Const {
-    String VERSION = "0.1.1";
+    String VERSION = "0.2.0";
     String PROJECT_URL = "https://github.com/jar-analyzer/jar-obfuscator";
     String UPDATE_URL = "https://jar-analyzer.oss-cn-hangzhou.aliyuncs.com/jar-obfuscator/version.txt";
     String DOWNLOAD_URL = "https://github.com/jar-analyzer/jar-obfuscator/releases/latest";

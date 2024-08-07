@@ -6,7 +6,7 @@
 
     <groupId>me.n1ar4.jar.obfuscator</groupId>
     <artifactId>jar-obfuscator</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0</version>
 
     <packaging>jar</packaging>
     <description>Jar Obfuscator Project</description>
@@ -16,7 +16,7 @@
         <asm.version>9.7</asm.version>
         <jcommander.version>1.82</jcommander.version>
         <snake.yaml.version>2.2</snake.yaml.version>
-        <flatlaf.version>3.5</flatlaf.version>
+        <flatlaf.version>3.5.1</flatlaf.version>
         <idea.forms.version>7.0.3</idea.forms.version>
         <!-- Maven Build Version -->
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->

@@ -23,6 +23,14 @@
 
 [前往下载](https://github.com/jar-analyzer/jar-obfuscator/releases/latest)
 
+从 `0.2.0` 版本后支持了简单的 `GUI`
+
+```shell
+java -jar jar-obfuscator.jar --gui
+```
+
+![](img/012.png)
+
 简单命令即可启动（第一次启动将自动生成配置文件）
 
 ```shell
