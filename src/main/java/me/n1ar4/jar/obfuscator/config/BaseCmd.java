@@ -13,6 +13,16 @@ public class BaseCmd {
     private boolean check;
     @Parameter(names = {"-v", "--version"}, description = "version")
     private boolean version;
+    @Parameter(names = {"-gui","--gui"},description = "use GUI")
+    private boolean gui;
+
+    public boolean isGui() {
+        return gui;
+    }
+
+    public void setGui(boolean gui) {
+        this.gui = gui;
+    }
 
     public boolean isVersion() {
         return version;

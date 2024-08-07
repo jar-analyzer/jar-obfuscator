@@ -6,6 +6,7 @@ import me.n1ar4.jar.obfuscator.config.BaseConfig;
 import me.n1ar4.jar.obfuscator.config.Manager;
 import me.n1ar4.jar.obfuscator.config.Parser;
 import me.n1ar4.jar.obfuscator.core.Runner;
+import me.n1ar4.jar.obfuscator.gui.MainForm;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -29,6 +30,12 @@ public class Main {
             commander.usage();
             return;
         }
+
+        if (baseCmd.isGui()){
+            MainForm.start();
+            return;
+        }
+
         if (baseCmd.isCheck()) {
             return;
         }

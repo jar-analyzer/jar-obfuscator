@@ -61,7 +61,7 @@ public class DirUtil {
         ZipInputStream.close();
     }
 
-    public static void zip(String sourceDir, String outputZip) throws IOException {
+    public static void zip(String sourceDir, String outputZip) {
         File sourceFolder = new File(sourceDir);
         try (ZipOutputStream jos = new ZipOutputStream(Files.newOutputStream(Paths.get(outputZip)))) {
             if (sourceFolder.exists() && sourceFolder.isDirectory()) {
