@@ -6,16 +6,6 @@
 # debug info warn error
 logLevel: info
 
-# 主类名
-# 不设置主类名可能无法正常执行主函数
-# 1. 遇到主类名会记录混淆后的新主类名
-# 2. 替换 MANIFEST.MF 中的主类名
-# 这样的操作可以使 java -jar 仍然可以正常启动
-mainClass: me.n1ar4.jar.obfuscator.Main
-# 自动修改 META-INF 的主类配置
-# 除非你的项目不含主类只是纯库函数
-modifyManifest: true
-
 # 混淆字符配置
 # 类名方法名等信息会根据字符进行随机排列组合
 obfuscateChars:

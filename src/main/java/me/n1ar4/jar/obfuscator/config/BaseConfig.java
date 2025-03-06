@@ -2,8 +2,6 @@ package me.n1ar4.jar.obfuscator.config;
 
 public class BaseConfig {
     private String logLevel;
-    private String mainClass;
-    private boolean modifyManifest;
     private String[] obfuscateChars;
     private String[] classBlackList;
     private String[] classBlackRegexList;
@@ -36,22 +34,6 @@ public class BaseConfig {
 
     public void setLogLevel(String logLevel) {
         this.logLevel = logLevel;
-    }
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    public boolean isModifyManifest() {
-        return modifyManifest;
-    }
-
-    public void setModifyManifest(boolean modifyManifest) {
-        this.modifyManifest = modifyManifest;
     }
 
     public String[] getObfuscateChars() {

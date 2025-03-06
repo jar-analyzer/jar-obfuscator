@@ -90,26 +90,6 @@ public class DirUtil {
             String entryName = parentDir + source.getName();
             ZipEntry entry = new ZipEntry(entryName);
             jos.putNextEntry(entry);
-            if (ObfEnv.config.isModifyManifest()) {
-                if (ObfEnv.config.isEnablePackageName() || ObfEnv.config.isEnableClassName()) {
-                    if (entryName.contains("META-INF/MANIFEST.MF")) {
-                        byte[] data = Files.readAllBytes(Paths.get(source.getAbsolutePath()));
-                        String dataString = new String(data);
-                        if (data.length > 0) {
-                            for (Map.Entry<String, String> en : ObfEnv.classNameObfMapping.entrySet()) {
-                                String origin = en.getKey().replace("/", ".");
-                                String obf = en.getValue().replace("/", ".");
-                                if (dataString.contains(origin)) {
-                                    dataString = dataString.replace(origin, obf);
-                                }
-                            }
-                            jos.write(dataString.getBytes(), 0, dataString.length());
-                            jos.closeEntry();
-                            return;
-                        }
-                    }
-                }
-            }
             try (FileInputStream fis = new FileInputStream(source)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;

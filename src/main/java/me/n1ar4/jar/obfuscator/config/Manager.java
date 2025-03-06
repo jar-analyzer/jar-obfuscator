@@ -60,10 +60,6 @@ public class Manager {
             NameUtil.CHAR_POOL = data;
         }
 
-        // OTHERS
-        config.setMainClass(config.getMainClass().replace(".", "/"));
-        ObfEnv.MAIN_CLASS = config.getMainClass();
-
         JunkCodeChanger.MAX_JUNK_NUM = config.getMaxJunkOneClass();
         ObfEnv.ADVANCE_STRING_NAME = config.getAdvanceStringName();
 
