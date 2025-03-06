@@ -65,13 +65,8 @@ public class Parser {
 
         config.setLogLevel("info");
         config.setObfuscateChars(new String[]{"i", "l", "L", "1", "I"});
-        config.setObfuscatePackage(new String[]{"me.n1ar4", "org.n1ar4"});
         config.setMainClass("me.n1ar4.fake.gui.Application");
         config.setAdvanceStringName("GLOBAL_LLLiii");
-
-        config.setEnableSuperObfuscate(true);
-        config.setSuperObfuscateKey("4ra1n4ra1n4ra1n1");
-        config.setSuperObfuscatePackage("me.n1ar4");
 
         String prefix = "# jar obfuscator config\n";
 

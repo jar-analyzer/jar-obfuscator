@@ -1,13 +1,8 @@
 package me.n1ar4.jrandom.core;
 
-import me.n1ar4.jar.obfuscator.jvmti.Constants;
-import me.n1ar4.jar.obfuscator.utils.JNIUtil;
-import me.n1ar4.jar.obfuscator.utils.OSUtil;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.List;
 
@@ -17,13 +12,6 @@ public class JRandom {
     private static final String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    // ---------- NATIVE ----------
-    private native static int checkRDRAND();
-
-    private native static long getRandInt();
-
-    // ---------- PRIVATE ---------
-    private final boolean supportRDRAND;
     private final SecureRandom random = new SecureRandom();
 
     private static JRandom fakeInstance = null;
@@ -48,34 +36,11 @@ public class JRandom {
     }
 
     public JRandom(long seed) {
-        supportRDRAND = false;
         random.setSeed(System.currentTimeMillis());
     }
 
     public JRandom() {
-        // JNI 加载
-        try {
-            Files.createDirectories(Paths.get(Constants.TempDir));
-            if (OSUtil.getOSType().equals(OSUtil.OSType.LINUX)) {
-                JNIUtil.extractDllSo("libjrandom.so", Constants.TempDir, true);
-            } else if (OSUtil.getOSType().equals(OSUtil.OSType.WINDOWS)) {
-                JNIUtil.extractDllSo("jrandom.dll", Constants.TempDir, true);
-            } else {
-                logger.debug("target os not supported");
-            }
-        } catch (Exception ex) {
-            logger.debug("load native error: {}", ex.toString());
-        }
-
-        if (checkRDRAND() == 0) {
-            supportRDRAND = false;
-            random.setSeed(System.currentTimeMillis());
-            logger.error("你的 CPU 不支持 RDRAND 指令");
-            return;
-        }
-        supportRDRAND = true;
-        logger.debug("你的 CPU 支持 RDRAND 指令");
-        logger.info("成功开启 CPU RDRAND 随机数模块");
+        random.setSeed(System.currentTimeMillis());
     }
 
     /**
@@ -84,11 +49,7 @@ public class JRandom {
      * @return 随机的 long 类型
      */
     private long getLong() {
-        if (supportRDRAND) {
-            return getRandInt();
-        } else {
-            return random.nextLong();
-        }
+        return random.nextLong();
     }
 
     /**

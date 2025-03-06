@@ -18,39 +18,42 @@ modifyManifest: true
 
 # 混淆字符配置
 # 类名方法名等信息会根据字符进行随机排列组合
-obfuscateChars: [ i, l, L, '1', I ]
-# 混淆包名称 必须配置否则无法运行
-# 建议仅设置关键部分不要设置范围过大
-# 不需要通配符 只写 a.b.c 包名即可
-# 如果配置 a.b 会混淆 a.b.X 和 a.b.c.X 等以此类推
-obfuscatePackage: [ me.n1ar4, org.n1ar4 ]
-# 需要混淆的根包名
-# 避免处理 org.apache 等无关 class
-# 这个配置主要的意义是分析引用关系时仅考虑该配置下的
-rootPackages: [ me.n1ar4, org.n1ar4 ]
+obfuscateChars:
+- "i"
+- "l"
+- "L"
+- "1"
+- "I"
 # 不对某些类做混淆（不混淆其中的所有内容）
 # 例如反射调用/JAVAFX FXML绑定等情况
-classBlackList: [ javafx.controller.DemoController ]
+classBlackList:
+- "javafx.controller.DemoController"
 # 不对指定正则的类进行混淆
 # 注意这里的类名匹配是 java/lang/String 而不是 java.lang.String
 # 该配置和 classBlackList 同时生效
-classBlackRegexList: [ java/.*, com/intellij/.* ]
+classBlackRegexList:
+- "java/.*"
+- "com/intellij/.*"
 # 不对某些 method 名做混淆 正则
 # visit.* 忽略 JAVA ASM 的 visitCode visitMethod 等方法
 # start.* 忽略 JAVAFX 因为启动基于 start 方法
 # 以此类推某些方法和类是不能混淆的（类继承和接口实现等）
-methodBlackList: [ visit.*, start.* ]
+methodBlackList:
+- "visit.*"
+- "start.*"
 
 # 开启类名混淆
 enableClassName: true
-# 开启包名混淆（仅混淆 obfuscatePackage 配置）
+# 开启包名混淆
 enablePackageName: true
-# 开启方法名混淆 - 不稳定
+# 开启方法名混淆
 enableMethodName: false
 # 开启字段混淆
 enableFieldName: true
 # 开启参数名混淆
 enableParamName: true
+# 开启数字异或混淆
+enableXOR: true
 
 # 开启加密字符串
 enableEncryptString: true
@@ -69,20 +72,12 @@ decryptMethodName: newMap
 decryptKeyName: LiLiLLLiiiLLiiLLi
 
 # 是否隐藏方法
-# 给混淆方法添加 ACC_SYNTHETIC 可以在反编译时隐藏
-# 参考 Y4tacker 的 HackingFernFlower
-# 仅在混淆方法开启时生效
 enableHideMethod: true
 # 是否隐藏字段
-# 给字段添加 ACC_SYNTHETIC 可以在反编译时隐藏
-# 参考 Y4tacker 的 HackingFernFlower
-# 仅在混淆字段开启时生效
 enableHideField: true
 
 # 开启删除编译信息选项
 enableDeleteCompileInfo: true
-# 开启数字异或混淆
-enableXOR: true
 
 # 开启花指令混淆
 enableJunk: true
@@ -96,18 +91,5 @@ maxJunkOneClass: 2000
 # 是否打印所有主函数
 showAllMainMethods: true
 
-# 是否开启进阶 JVMTI 加密字节码
-# 注意仅支持 WINDOWS 和 LINUX 且不一定稳定
-enableSuperObfuscate: false
-# 加密 KEY 配置
-# 注意长度必须是 16 位
-superObfuscateKey: 4ra1n4ra1n4ra1n1
-# 加密包名配置
-superObfuscatePackage: me.n1ar4
-
 # 是否保留临时类文件
 keepTempFile: false
-
-# 是否使用 CPU 的 rdrand 指令获取随机数
-# 如果报错请设置为 FALSE
-useCpuRDRAND: true
