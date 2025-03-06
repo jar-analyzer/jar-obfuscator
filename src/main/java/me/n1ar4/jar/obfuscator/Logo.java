@@ -2,7 +2,6 @@ package me.n1ar4.jar.obfuscator;
 
 import me.n1ar4.jar.obfuscator.utils.ColorUtil;
 import me.n1ar4.jar.obfuscator.utils.IOUtils;
-import me.n1ar4.jar.obfuscator.utils.UpdateChecker;
 
 import java.io.InputStream;
 
@@ -42,13 +41,8 @@ public class Logo {
             }
         }
 
-        System.out.println("注意：方法名混淆 " + ColorUtil.yellow("enableMethodName") + " 需要考虑多种情况\n" +
-                "例如混淆了某个 " + ColorUtil.yellow("@Override") + " 的方法名会导致方法无法正常执行\n" +
-                "如果不是很熟悉目标 JAR 或新手，建议暂时关闭 " + ColorUtil.yellow("enableMethodName") + " 配置\n");
         System.out.println(ColorUtil.green("感谢使用！有问题和建议欢迎在 GITHUB ISSUE 反馈"));
         System.out.println(ColorUtil.yellow("LINK: https://github.com/jar-analyzer/jar-obfuscator/issues/new\n"));
-
-        UpdateChecker.check();
 
         System.out.println();
     }

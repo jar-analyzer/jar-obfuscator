@@ -6,8 +6,6 @@ import me.n1ar4.jar.obfuscator.base.ClassFileEntity;
 import me.n1ar4.jar.obfuscator.base.ClassReference;
 import me.n1ar4.jar.obfuscator.base.MethodReference;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
-import me.n1ar4.jar.obfuscator.jvmti.ExportCommand;
-import me.n1ar4.jar.obfuscator.jvmti.PatchCommand;
 import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
 import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
 import me.n1ar4.jar.obfuscator.transform.*;
@@ -40,12 +38,6 @@ public class Runner {
     }
 
     public static void run(Path path, BaseConfig config) {
-        if ((config.getObfuscatePackage() == null || config.getObfuscatePackage().length == 0) ||
-                (config.getRootPackages() == null || config.getRootPackages().length == 0)) {
-            logger.error("注意必须配置 " + ColorUtil.yellow("obfuscatePackage") +
-                    " 和 " + ColorUtil.yellow("rootPackages"));
-            return;
-        }
         ObfEnv.config = config;
         logger.info("start obfuscator");
         String fileName = FileUtil.getFileNameWithoutExt(path);
@@ -137,15 +129,13 @@ public class Runner {
             String originalName = c.getName();
             String finalName = originalName;
 
-            boolean notInWhiteList = PackageUtil.notInWhiteList(packageNameS, config);
             boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
-            boolean inRootPackage = PackageUtil.inRootPackage(originalName, config);
-            if (!(notInWhiteList || inBlackClass) || inRootPackage) {
+            if (!inBlackClass) {
                 String result = ObfEnv.classNameObfMapping.putIfAbsent(originalName, originalName);
                 if (result == null) {
                     boolean isEnablePackageName = config.isEnablePackageName();
                     boolean isEnableClassName = config.isEnableClassName();
-                    if (!inBlackClass && (isEnablePackageName || isEnableClassName)) {
+                    if (isEnablePackageName || isEnableClassName) {
                         String finalPackageName = packageNameS;
                         if (isEnablePackageName) {
                             finalPackageName = newPackageNameS;
@@ -205,21 +195,11 @@ public class Runner {
                         new ClassReference.Handle(newClassName),
                         oldMethodName, desc);
 
-                if (PackageUtil.notInWhiteList(key.getName(), config) ||
-                        PackageUtil.inBlackClass(key.getName(), config)) {
-                    if (PackageUtil.inRootPackage(key.getName(), config)) {
-                        MethodReference.Handle newHandle = new MethodReference.Handle(
-                                new ClassReference.Handle(newClassName),
-                                oldMethodName, desc);
-                        ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
-                    }
-                } else {
-                    String newMethodName = NameUtil.genNewMethod();
-                    MethodReference.Handle newHandle = new MethodReference.Handle(
-                            new ClassReference.Handle(newClassName),
-                            newMethodName, desc);
-                    ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
-                }
+                String newMethodName = NameUtil.genNewMethod();
+                MethodReference.Handle newHandle = new MethodReference.Handle(
+                        new ClassReference.Handle(newClassName),
+                        newMethodName, desc);
+                ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
             }
         }
 
@@ -259,21 +239,13 @@ public class Runner {
                 ClassField oldMember = new ClassField();
                 oldMember.setClassName(newClassName);
                 oldMember.setFieldName(s);
-                if (PackageUtil.notInWhiteList(c.getName(), config) ||
-                        PackageUtil.inBlackClass(c.getName(), config)) {
-                    if (PackageUtil.inRootPackage(c.getName(), config)) {
-                        ObfEnv.fieldNameObfMapping.put(oldMember, oldMember);
-                    }
-                } else {
-                    ClassField newMember = new ClassField();
-                    newMember.setClassName(newClassName);
-                    newMember.setFieldName(NameUtil.genNewFields());
-                    ObfEnv.fieldNameObfMapping.put(oldMember, newMember);
-                }
+
+                ClassField newMember = new ClassField();
+                newMember.setClassName(newClassName);
+                newMember.setFieldName(NameUtil.genNewFields());
+                ObfEnv.fieldNameObfMapping.put(oldMember, newMember);
             }
         }
-
-        BuiltinFilter.doFilter();
 
         if (config.isShowAllMainMethods()) {
             // 向用户提示可能的主类
@@ -374,40 +346,6 @@ public class Runner {
             logger.info("generate jar file: {}", newFile);
         } catch (Exception e) {
             logger.error("zip file error: {}", e.toString());
-        }
-
-        if (config.isEnableSuperObfuscate()) {
-            // 不支持 MAC 系统
-            if (OSUtil.isMac()) {
-                logger.error("mac os not support super obfuscate");
-                return;
-            }
-
-            // 检查 JAVA 8 环境
-            if (!VerUtil.isJava8()) {
-                logger.warn("字节码加密功能建议使用 JAVA 8 环境");
-            }
-
-            PatchCommand patchCommand = new PatchCommand();
-            patchCommand.setKey(config.getSuperObfuscateKey());
-
-            // FIX BUG
-            // 这里的 SuperObfuscatePackage 如果被混淆该怎么办
-            if (config.isEnablePackageName()) {
-                logger.error("字节码加密功能不允许开启包名混淆");
-                logger.error("请关闭 enablePackageName 选项");
-                return;
-            }
-
-            patchCommand.setPackageName(config.getSuperObfuscatePackage());
-            patchCommand.setJarPath(newFile);
-
-            patchCommand.execute();
-
-            ExportCommand exportCommand = new ExportCommand();
-            exportCommand.setOutputPath(null);
-
-            exportCommand.execute();
         }
     }
 }

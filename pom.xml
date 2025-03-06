@@ -6,10 +6,10 @@
 
     <groupId>me.n1ar4.jar.obfuscator</groupId>
     <artifactId>jar-obfuscator</artifactId>
-    <version>0.2.0</version>
+    <version>2.0.0</version>
 
     <packaging>jar</packaging>
-    <description>Jar Obfuscator Project</description>
+    <description>Jar Obfuscator Project V2</description>
 
     <properties>
         <!-- Dependencies Version -->
@@ -56,31 +56,6 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${snake.yaml.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.formdev</groupId>
-            <artifactId>flatlaf</artifactId>
-            <version>${flatlaf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>forms_rt</artifactId>
-            <version>${idea.forms.version}</version>
-            <!-- Avoiding Conflicts -->
-            <exclusions>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm-tree</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

@@ -15,10 +15,8 @@ public class Manager {
     private static final Logger logger = LogManager.getLogger();
 
     public static boolean initConfig(BaseConfig config) {
-        if (config.isUseCpuRDRAND()) {
             JRandom random = new JRandom();
             JRandom.setInstance(random);
-        }
 
         // LOG LEVEL
         String logLevel = config.getLogLevel();
@@ -65,11 +63,6 @@ public class Manager {
         // OTHERS
         config.setMainClass(config.getMainClass().replace(".", "/"));
         ObfEnv.MAIN_CLASS = config.getMainClass();
-        String[] newData = new String[config.getObfuscatePackage().length];
-        for (int i = 0; i < config.getObfuscatePackage().length; i++) {
-            newData[i] = config.getObfuscatePackage()[i].replace(".", "/");
-        }
-        config.setObfuscatePackage(newData);
 
         JunkCodeChanger.MAX_JUNK_NUM = config.getMaxJunkOneClass();
         ObfEnv.ADVANCE_STRING_NAME = config.getAdvanceStringName();
