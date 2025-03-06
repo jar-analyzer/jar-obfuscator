@@ -1,6 +1,6 @@
 package me.n1ar4.jar.obfuscator.config;
 
-import me.n1ar4.jar.obfuscator.asm.JunkCodeChanger;
+import me.n1ar4.jar.obfuscator.asm.JunkCodeVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
 import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
@@ -60,7 +60,7 @@ public class Manager {
             NameUtil.CHAR_POOL = data;
         }
 
-        JunkCodeChanger.MAX_JUNK_NUM = config.getMaxJunkOneClass();
+        JunkCodeVisitor.MAX_JUNK_NUM = config.getMaxJunkOneClass();
         ObfEnv.ADVANCE_STRING_NAME = config.getAdvanceStringName();
 
         StringDecrypt.changeKEY(config.getStringAesKey());

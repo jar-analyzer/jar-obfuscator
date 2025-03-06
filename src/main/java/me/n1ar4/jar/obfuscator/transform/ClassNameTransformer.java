@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.transform;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.asm.ClassNameChanger;
+import me.n1ar4.jar.obfuscator.asm.ClassNameVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -34,7 +34,7 @@ public class ClassNameTransformer {
             try {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(classPath));
                 ClassWriter classWriter = new ClassWriter(classReader, 0);
-                ClassNameChanger changer = new ClassNameChanger(classWriter);
+                ClassNameVisitor changer = new ClassNameVisitor(classWriter);
                 classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(classPath);
                 Files.write(newClassPath, classWriter.toByteArray());

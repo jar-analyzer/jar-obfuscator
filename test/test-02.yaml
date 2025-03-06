@@ -23,7 +23,7 @@ methodBlackList:
 - "start.*"
 
 enableClassName: true
-enablePackageName: false
+enablePackageName: true
 enableMethodName: false
 enableFieldName: false
 enableParamName: false

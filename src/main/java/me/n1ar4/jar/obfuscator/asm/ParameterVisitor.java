@@ -1,48 +1,25 @@
 package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.config.BaseConfig;
-import me.n1ar4.jar.obfuscator.utils.JunkUtil;
-import me.n1ar4.jar.obfuscator.utils.RandomUtil;
-import me.n1ar4.jrandom.core.JRandom;
-import me.n1ar4.log.LogManager;
-import me.n1ar4.log.Logger;
+import me.n1ar4.jar.obfuscator.utils.NameUtil;
 import org.objectweb.asm.*;
 
+import java.util.HashSet;
 
-public class JunkCodeChanger extends ClassVisitor {
-    private static final Logger logger = LogManager.getLogger();
-    public static int MAX_JUNK_NUM = 1000;
-    public static int JUNK_NUM = 0;
-    private final BaseConfig config;
-    private boolean shouldSkip;
-
-    public JunkCodeChanger(ClassVisitor classVisitor, BaseConfig config) {
+public class ParameterVisitor extends ClassVisitor {
+    public ParameterVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
-        JUNK_NUM = 0;
-        this.config = config;
-        this.shouldSkip = false;
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
-        boolean isAbstract = (access & Opcodes.ACC_ABSTRACT) != 0;
-        boolean isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
-        boolean isEnum = (access & Opcodes.ACC_ENUM) != 0;
-        if (isAbstract || isInterface || isEnum) {
-            shouldSkip = true;
-        }
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        if (shouldSkip) {
-            return mv;
-        } else {
-            return new JunkChangerMethodAdapter(mv, this.config);
-        }
+        return new ParameterChangerMethodAdapter(mv);
     }
 
     @Override
@@ -77,11 +54,6 @@ public class JunkCodeChanger extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        // 添加无意义的代码
-        if (!shouldSkip && config.getJunkLevel() > 2) {
-            JunkUtil.addHttpCode(cv);
-            JunkUtil.addPrintMethod(cv);
-        }
         super.visitEnd();
     }
 
@@ -120,93 +92,25 @@ public class JunkCodeChanger extends ClassVisitor {
         return super.getDelegate();
     }
 
-    static class JunkChangerMethodAdapter extends MethodVisitor {
-        private final BaseConfig config;
+    static class ParameterChangerMethodAdapter extends MethodVisitor {
+        private final HashSet<String> obfNames = new HashSet<>();
 
-        JunkChangerMethodAdapter(MethodVisitor mv, BaseConfig config) {
+        ParameterChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
-            this.config = config;
         }
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-            // LEVEL 1
-            if (config.getJunkLevel() > 0) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-                    return;
-                }
-
-                mv.visitTypeInsn(Opcodes.NEW, "java/lang/String");
-                mv.visitInsn(Opcodes.DUP);
-                mv.visitLdcInsn(JRandom.getInstance().randomString(16));
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/String", "<init>",
-                        "(Ljava/lang/String;)V", false);
-                mv.visitInsn(Opcodes.POP);
-
-                Label ifLabel = new Label();
-                Label endLabel = new Label();
-
-                mv.visitInsn(Opcodes.ICONST_1);
-                mv.visitJumpInsn(Opcodes.IFNE, endLabel);
-
-                mv.visitLabel(ifLabel);
-                mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System",
-                        "out", "Ljava/io/PrintStream;");
-                mv.visitLdcInsn(JRandom.getInstance().randomString(16));
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
-                        "println", "(Ljava/lang/String;)V", false);
-                mv.visitJumpInsn(Opcodes.GOTO, endLabel);
-                mv.visitLabel(endLabel);
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
             super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
         }
 
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-            // LEVEL 2
-            if (config.getJunkLevel() > 1) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitFieldInsn(opcode, owner, name, descriptor);
-                    return;
-                }
-
-                Label startLoop = new Label();
-                Label endLoop = new Label();
-                mv.visitLabel(startLoop);
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-                mv.visitInsn(Opcodes.NOP);
-                mv.visitJumpInsn(Opcodes.GOTO, endLoop);
-                mv.visitLabel(endLoop);
-                mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
-            }
             super.visitFieldInsn(opcode, owner, name, descriptor);
         }
 
         @Override
         public void visitTypeInsn(int opcode, String type) {
-            // LEVEL 3
-            if (config.getJunkLevel() > 2) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitTypeInsn(opcode, type);
-                    return;
-                }
-                mv.visitInsn(Opcodes.NOP);
-                mv.visitInsn(Opcodes.NOP);
-                mv.visitTypeInsn(Opcodes.NEW, "java/util/ArrayList");
-                mv.visitInsn(Opcodes.DUP);
-                mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList",
-                        "<init>", "()V", false);
-                mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(Opcodes.NOP);
-            }
             super.visitTypeInsn(opcode, type);
         }
 
@@ -277,38 +181,11 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitIincInsn(int varIndex, int increment) {
-            // LEVEL 4
-            if (config.getJunkLevel() > 3) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitIincInsn(varIndex, increment);
-                    return;
-                }
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.NOP);
-                mv.visitInsn(Opcodes.POP);
-            }
             super.visitIincInsn(varIndex, increment);
         }
 
         @Override
         public void visitInsn(int opcode) {
-            // LEVEL 5
-            if (config.getJunkLevel() > 4) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitInsn(opcode);
-                    return;
-                }
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.IADD);
-                mv.visitInsn(Opcodes.POP);
-            }
             super.visitInsn(opcode);
         }
 
@@ -334,21 +211,6 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitLdcInsn(Object value) {
-            // LEVEL 5
-            if (config.getJunkLevel() > 4) {
-                JUNK_NUM++;
-                if (JUNK_NUM > MAX_JUNK_NUM) {
-                    logger.debug("max junk code");
-                    super.visitLdcInsn(value);
-                    return;
-                }
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.POP);
-                mv.visitInsn(RandomUtil.genICONSTOpcode());
-                mv.visitInsn(Opcodes.POP);
-                super.visitLdcInsn(value);
-                return;
-            }
             super.visitLdcInsn(value);
         }
 
@@ -359,6 +221,11 @@ public class JunkCodeChanger extends ClassVisitor {
 
         @Override
         public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+            if (name.equals("this") || name.equals("super")) {
+                super.visitLocalVariable(name, descriptor, signature, start, end, index);
+                return;
+            }
+            name = NameUtil.genWithSet(obfNames);
             super.visitLocalVariable(name, descriptor, signature, start, end, index);
         }
 

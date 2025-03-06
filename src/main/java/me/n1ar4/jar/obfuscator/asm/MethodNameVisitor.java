@@ -1,40 +1,93 @@
 package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
-import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
+import me.n1ar4.jar.obfuscator.base.ClassReference;
+import me.n1ar4.jar.obfuscator.base.MethodReference;
+import me.n1ar4.jar.obfuscator.core.AnalyzeEnv;
+import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.*;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("all")
+public class MethodNameVisitor extends ClassVisitor {
+    private String owner;
+    private final List<MethodReference> ignoreMethods = new ArrayList<>();
+    private final List<String> ignoreMethodString = new ArrayList<>();
 
-public class StringChanger extends ClassVisitor {
-    private final Map<String, String> fieldValues = new HashMap<>();
-    private String className;
-    private boolean isInterface = false;
-    private boolean noClinit = true;
-
-    public StringChanger(ClassVisitor classVisitor) {
+    public MethodNameVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.owner = name;
+        // 查接口 不改接口方法
+        for (String in : interfaces) {
+            List<MethodReference> mList = AnalyzeEnv.methodsInClassMap.get(new ClassReference.Handle(in));
+            if (mList == null) {
+                continue;
+            }
+            ignoreMethods.addAll(mList);
+        }
+
+        // 检查内置黑名单
+        String key = null;
+        for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
+            if (entry.getValue().equals(name)) {
+                key = entry.getKey();
+                break;
+            }
+        }
+        if (key != null) {
+            List<String> methodNames = ObfEnv.ignoredClassMethodsMapping.get(key);
+            if (methodNames != null) {
+                ignoreMethodString.addAll(methodNames);
+            }
+        }
         super.visit(version, access, name, signature, superName, interfaces);
-        this.className = name;
-        isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        if (name.equals("<clinit>")) {
-            noClinit = false;
+        MethodVisitor mv;
+
+        for (MethodReference mr : ignoreMethods) {
+            if (mr.getName().equals(name) && mr.getDesc().equals(desc)) {
+                return super.visitMethod(access, name, desc, signature, exceptions);
+            }
         }
-        MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new StringChangerMethodAdapter(mv);
+
+        for (String method : this.ignoreMethodString) {
+            if (method.equals(name)) {
+                return super.visitMethod(access, name, desc, signature, exceptions);
+            }
+        }
+
+        if ("main".equals(name) && desc.equals("([Ljava/lang/String;)V") && access == 9) {
+            mv = super.visitMethod(access, name, desc, signature, exceptions);
+        } else if (name.equals("<init>") || name.equals("<clinit>")) {
+            mv = super.visitMethod(access, name, desc, signature, exceptions);
+        } else {
+            MethodReference.Handle m = ObfEnv.methodNameObfMapping.get(new MethodReference.Handle(
+                    new ClassReference.Handle(owner),
+                    name,
+                    desc
+            ));
+            if (ObfEnv.config.isEnableHideMethod()) {
+                access = access | Opcodes.ACC_SYNTHETIC;
+            }
+            if (m == null) {
+                mv = super.visitMethod(access, name, desc, signature, exceptions);
+                return new MethodNameChangerMethodAdapter(mv);
+            } else {
+                mv = super.visitMethod(access, m.getName(), m.getDesc(), signature, exceptions);
+                return new MethodNameChangerMethodAdapter(mv);
+            }
+        }
+        return new MethodNameChangerMethodAdapter(mv);
     }
 
     @Override
@@ -49,10 +102,7 @@ public class StringChanger extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        if (value instanceof String) {
-            fieldValues.put(name, (String) value);
-        }
-        return super.visitField(access, name, descriptor, signature, null);
+        return super.visitField(access, name, descriptor, signature, value);
     }
 
     @Override
@@ -72,27 +122,7 @@ public class StringChanger extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        if (isInterface && noClinit) {
-            generateClinit();
-        }
         super.visitEnd();
-    }
-
-    private void generateClinit() {
-        MethodVisitor mv = cv.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-        GeneratorAdapter ga = new GeneratorAdapter(mv, Opcodes.ACC_STATIC, "<clinit>", "()V");
-        ga.visitCode();
-
-        fieldValues.forEach((fieldName, encryptedValue) -> {
-            encryptedValue = StringDecrypt.encrypt(encryptedValue);
-            ga.push(encryptedValue);
-            ga.invokeStatic(Type.getObjectType(StringDecryptDump.className),
-                    new Method("I", "(Ljava/lang/String;)Ljava/lang/String;"));
-            ga.putStatic(Type.getObjectType(className), fieldName, Type.getType("Ljava/lang/String;"));
-        });
-
-        ga.returnValue();
-        ga.endMethod();
     }
 
     @Override
@@ -130,13 +160,22 @@ public class StringChanger extends ClassVisitor {
         return super.getDelegate();
     }
 
-    static class StringChangerMethodAdapter extends MethodVisitor {
-        StringChangerMethodAdapter(MethodVisitor mv) {
+    static class MethodNameChangerMethodAdapter extends MethodVisitor {
+        MethodNameChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
         }
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+            MethodReference.Handle m = ObfEnv.methodNameObfMapping.get(new MethodReference.Handle(
+                    new ClassReference.Handle(owner),
+                    name,
+                    descriptor
+            ));
+            if (m != null) {
+                super.visitMethodInsn(opcode, m.getClassReference().getName(), m.getName(), m.getDesc(), isInterface);
+                return;
+            }
             super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
         }
 
@@ -232,7 +271,47 @@ public class StringChanger extends ClassVisitor {
 
         @Override
         public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle, Object... bootstrapMethodArguments) {
-            super.visitInvokeDynamicInsn(name, descriptor, bootstrapMethodHandle, bootstrapMethodArguments);
+            MethodReference.Handle m = ObfEnv.methodNameObfMapping.get(new MethodReference.Handle(
+                    new ClassReference.Handle(bootstrapMethodHandle.getOwner()),
+                    bootstrapMethodHandle.getName(),
+                    bootstrapMethodHandle.getDesc()
+            ));
+            Handle handle;
+            if (m != null) {
+                handle = new Handle(
+                        bootstrapMethodHandle.getTag(),
+                        m.getClassReference().getName(),
+                        m.getName(),
+                        m.getDesc(),
+                        bootstrapMethodHandle.isInterface());
+            } else {
+                handle = bootstrapMethodHandle;
+            }
+
+            for (int i = 0; i < bootstrapMethodArguments.length; i++) {
+                Object obj = bootstrapMethodArguments[i];
+                if (obj instanceof Handle) {
+                    Handle ho = (Handle) obj;
+                    MethodReference.Handle mo = ObfEnv.methodNameObfMapping.get(new MethodReference.Handle(
+                            new ClassReference.Handle(ho.getOwner()),
+                            ho.getName(),
+                            ho.getDesc()
+                    ));
+                    Handle tempHandle;
+                    if (mo != null) {
+                        tempHandle = new Handle(
+                                ho.getTag(),
+                                mo.getClassReference().getName(),
+                                mo.getName(),
+                                mo.getDesc(),
+                                ho.isInterface());
+                    } else {
+                        tempHandle = ho;
+                    }
+                    bootstrapMethodArguments[i] = tempHandle;
+                }
+            }
+            super.visitInvokeDynamicInsn(name, descriptor, handle, bootstrapMethodArguments);
         }
 
         @Override
@@ -247,18 +326,6 @@ public class StringChanger extends ClassVisitor {
 
         @Override
         public void visitLdcInsn(Object value) {
-            if (value instanceof String) {
-                String decryptedValue = StringDecrypt.encrypt((String) value);
-                if (decryptedValue != null) {
-                    super.visitLdcInsn(decryptedValue);
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC,
-                            StringDecryptDump.className,
-                            StringDecryptDump.methodName,
-                            "(Ljava/lang/String;)Ljava/lang/String;",
-                            false);
-                    return;
-                }
-            }
             super.visitLdcInsn(value);
         }
 

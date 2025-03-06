@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.transform;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.asm.StringArrayChanger;
+import me.n1ar4.jar.obfuscator.asm.StringArrayVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -31,7 +31,7 @@ public class StringArrayTransformer {
                 INDEX = 0;
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
-                StringArrayChanger changer = new StringArrayChanger(classWriter);
+                StringArrayVisitor changer = new StringArrayVisitor(classWriter);
                 classReader.accept(changer, ClassReader.EXPAND_FRAMES);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
