@@ -14,8 +14,8 @@ public class Logo {
                         "/\\__|    |/    |    \\ \\_\\ \\  | |  |  /\\___ \\\\  \\___ / __ \\|  | (  <_> )  | \\/\n" +
                         "\\________|\\_______  /___  /__| |____//____  >\\___  >____  /__|  \\____/|__|   \n" +
                         "                  \\/    \\/                \\/     \\/     \\/                   "));
-        System.out.println(ColorUtil.blue("Jar Obfuscator - An Open-Source Java Bytecode Obfuscation Tool"));
-        System.out.println(ColorUtil.yellow("Jar Obfuscator - 一个开源的配置简单容易上手的 JAVA 字节码混淆工具"));
+        System.out.println(ColorUtil.blue("Jar Obfuscator V2 - An Open-Source Java Bytecode Obfuscation Tool"));
+        System.out.println(ColorUtil.yellow("Jar Obfuscator V2 - 一个开源的配置简单容易上手的 JAVA 字节码混淆工具"));
         System.out.println("Version: " + ColorUtil.red(Const.VERSION) +
                 " URL: " + ColorUtil.red(Const.PROJECT_URL) + "\n");
 
@@ -42,7 +42,7 @@ public class Logo {
         }
 
         System.out.println(ColorUtil.green("感谢使用！有问题和建议欢迎在 GITHUB ISSUE 反馈"));
-        System.out.println(ColorUtil.yellow("LINK: https://github.com/jar-analyzer/jar-obfuscator/issues/new\n"));
+        System.out.println(ColorUtil.yellow("LINK: https://github.com/jar-analyzer/jar-obfuscator/issues/new"));
 
         System.out.println();
     }

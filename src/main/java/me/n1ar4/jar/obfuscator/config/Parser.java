@@ -46,39 +46,6 @@ public class Parser {
         }
     }
 
-    @SuppressWarnings("all")
-    public void generateConfigSTD() {
-        BaseConfig config = new BaseConfig();
-        config.setEnableClassName(true);
-        config.setEnableJunk(true);
-        config.setEnableAdvanceString(true);
-        config.setEnableFieldName(true);
-        config.setEnableEncryptString(true);
-        config.setEnableXOR(true);
-        config.setEnableDeleteCompileInfo(true);
-        config.setEnableParamName(true);
-        config.setEnableMethodName(true);
-        config.setShowAllMainMethods(true);
-
-        config.setJunkLevel(3);
-        config.setMaxJunkOneClass(1000);
-
-        config.setLogLevel("info");
-        config.setObfuscateChars(new String[]{"i", "l", "L", "1", "I"});
-        config.setMainClass("me.n1ar4.fake.gui.Application");
-        config.setAdvanceStringName("GLOBAL_LLLiii");
-
-        String prefix = "# jar obfuscator config\n";
-
-        String data = yaml.dump(config);
-        data = prefix + data;
-        try {
-            Files.write(Const.configPath, data.getBytes());
-        } catch (Exception ex) {
-            logger.error("write config file error: {}", ex.toString());
-        }
-    }
-
     public BaseConfig parse(Path file) {
         if (!Files.exists(file)) {
             logger.error("config file not exist");

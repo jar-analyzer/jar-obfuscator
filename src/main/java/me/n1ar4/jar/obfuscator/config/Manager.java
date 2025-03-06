@@ -15,8 +15,8 @@ public class Manager {
     private static final Logger logger = LogManager.getLogger();
 
     public static boolean initConfig(BaseConfig config) {
-            JRandom random = new JRandom();
-            JRandom.setInstance(random);
+        JRandom random = new JRandom();
+        JRandom.setInstance(random);
 
         // LOG LEVEL
         String logLevel = config.getLogLevel();
