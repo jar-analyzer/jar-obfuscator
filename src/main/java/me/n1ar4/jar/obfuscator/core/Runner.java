@@ -61,7 +61,6 @@ public class Runner {
             logger.error("error reading the directory: " + e.getMessage());
         }
 
-        // 分析引用
         DiscoveryRunner.start(AnalyzeEnv.classFileList, AnalyzeEnv.discoveredClasses,
                 AnalyzeEnv.discoveredMethods, AnalyzeEnv.classMap, AnalyzeEnv.methodMap,
                 AnalyzeEnv.fieldsInClassMap);
@@ -125,9 +124,8 @@ public class Runner {
                 newPackageNameS = packageNameS;
             }
 
-            // 修复 enableClassName: false & enablePackageName: true 时混淆未正确生效 BUG
             String originalName = c.getName();
-            String finalName = originalName;
+            String finalName;
 
             boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
             if (!inBlackClass) {
@@ -158,11 +156,9 @@ public class Runner {
                         ObfEnv.classNameObfMapping.put(originalName, finalName);
                     }
                 }
-            }
-
-            if (originalName.equals(ObfEnv.MAIN_CLASS)) {
-                ObfEnv.NEW_MAIN_CLASS = finalName.replace("/", ".");
-                logger.info("new main: {}", ObfEnv.NEW_MAIN_CLASS);
+            }else{
+                // 如果是黑名单类 也需要记录
+                ObfEnv.classNameObfMapping.put(originalName, originalName);
             }
         }
 
@@ -283,9 +279,6 @@ public class Runner {
             // 异或混淆常数
             XORTransformer.transform();
         }
-
-        // BUG FIX 处理 Class.forName 等反射遇到的类名
-        ReflectionTransformer.transform();
 
         if (config.isEnableEncryptString()) {
             // 创建加密解密类

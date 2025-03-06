@@ -28,7 +28,7 @@ public class ClassNameTransformer {
             } catch (Exception ignored) {
             }
             if (!Files.exists(classPath)) {
-                logger.error("class not exist: {}", classPath.toString());
+                logger.warn("class not exist: {}", classPath.toString());
                 continue;
             }
             try {
