@@ -23,7 +23,7 @@ public class FieldNameTransformer {
             Path tempDir = Paths.get(Const.TEMP_DIR);
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
             if (!Files.exists(newClassPath)) {
-                logger.error("class not exist: {}", newClassPath.toString());
+                logger.debug("class not exist: {}", newClassPath.toString());
                 continue;
             }
             try {

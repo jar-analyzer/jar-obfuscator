@@ -1,0 +1,49 @@
+logLevel: info
+obfuscateChars:
+- "i"
+- "l"
+- "L"
+- "1"
+- "I"
+classBlackList:
+- "me.n1ar4.fake.gui.Application"
+classBlackRegexList:
+- "java.*"
+- "javax.*"
+- "kotlin.*"
+- "net.*"
+- "okhttp3.*"
+- "okio.*"
+- "org.*"
+- "com.*"
+- "edu.*"
+- "javassist.*"
+methodBlackList:
+- "visit.*"
+- "start.*"
+
+enableClassName: true
+enablePackageName: true
+enableMethodName: true
+enableFieldName: true
+enableParamName: true
+enableXOR: true
+
+enableEncryptString: false
+stringAesKey: Y4SuperSecretKey
+enableAdvanceString: false
+advanceStringName: GIiIiLA
+decryptClassName: org.apache.commons.collections.list.AbstractHashMap
+decryptMethodName: newMap
+decryptKeyName: LiLiLLLiiiLLiiLLi
+
+enableHideMethod: false
+enableHideField: false
+enableDeleteCompileInfo: false
+
+enableJunk: false
+junkLevel: 5
+maxJunkOneClass: 2000
+
+showAllMainMethods: false
+keepTempFile: false
