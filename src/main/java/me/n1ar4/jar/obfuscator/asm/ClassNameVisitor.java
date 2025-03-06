@@ -8,8 +8,8 @@ import org.objectweb.asm.*;
 import java.util.List;
 
 @SuppressWarnings("all")
-public class ClassNameChanger extends ClassVisitor {
-    public ClassNameChanger(ClassVisitor classVisitor) {
+public class ClassNameVisitor extends ClassVisitor {
+    public ClassNameVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 

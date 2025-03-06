@@ -1,27 +1,40 @@
 package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.base.ClassField;
-import me.n1ar4.jar.obfuscator.core.ObfEnv;
+import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
+import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
 import org.objectweb.asm.*;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.Method;
 
-public class FieldNameChanger extends ClassVisitor {
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class StringVisitor extends ClassVisitor {
+    private final Map<String, String> fieldValues = new HashMap<>();
     private String className;
+    private boolean isInterface = false;
+    private boolean noClinit = true;
 
-    public FieldNameChanger(ClassVisitor classVisitor) {
+    public StringVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        this.className = name;
         super.visit(version, access, name, signature, superName, interfaces);
+        this.className = name;
+        isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        if (name.equals("<clinit>")) {
+            noClinit = false;
+        }
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new FieldNameChangerMethodAdapter(mv);
+        return new StringChangerMethodAdapter(mv);
     }
 
     @Override
@@ -36,14 +49,10 @@ public class FieldNameChanger extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        ClassField cf = new ClassField();
-        cf.setClassName(this.className);
-        cf.setFieldName(name);
-        ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
-        if (ObfEnv.config.isEnableHideField()) {
-            access = access | Opcodes.ACC_SYNTHETIC;
+        if (value instanceof String) {
+            fieldValues.put(name, (String) value);
         }
-        return super.visitField(access, newCF.getFieldName(), descriptor, signature, value);
+        return super.visitField(access, name, descriptor, signature, null);
     }
 
     @Override
@@ -63,7 +72,27 @@ public class FieldNameChanger extends ClassVisitor {
 
     @Override
     public void visitEnd() {
+        if (isInterface && noClinit) {
+            generateClinit();
+        }
         super.visitEnd();
+    }
+
+    private void generateClinit() {
+        MethodVisitor mv = cv.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+        GeneratorAdapter ga = new GeneratorAdapter(mv, Opcodes.ACC_STATIC, "<clinit>", "()V");
+        ga.visitCode();
+
+        fieldValues.forEach((fieldName, encryptedValue) -> {
+            encryptedValue = StringDecrypt.encrypt(encryptedValue);
+            ga.push(encryptedValue);
+            ga.invokeStatic(Type.getObjectType(StringDecryptDump.className),
+                    new Method("I", "(Ljava/lang/String;)Ljava/lang/String;"));
+            ga.putStatic(Type.getObjectType(className), fieldName, Type.getType("Ljava/lang/String;"));
+        });
+
+        ga.returnValue();
+        ga.endMethod();
     }
 
     @Override
@@ -101,8 +130,8 @@ public class FieldNameChanger extends ClassVisitor {
         return super.getDelegate();
     }
 
-    static class FieldNameChangerMethodAdapter extends MethodVisitor {
-        FieldNameChangerMethodAdapter(MethodVisitor mv) {
+    static class StringChangerMethodAdapter extends MethodVisitor {
+        StringChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
         }
 
@@ -113,11 +142,7 @@ public class FieldNameChanger extends ClassVisitor {
 
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-            ClassField cf = new ClassField();
-            cf.setClassName(owner);
-            cf.setFieldName(name);
-            ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
-            super.visitFieldInsn(opcode, owner, newCF.getFieldName(), descriptor);
+            super.visitFieldInsn(opcode, owner, name, descriptor);
         }
 
         @Override
@@ -222,6 +247,18 @@ public class FieldNameChanger extends ClassVisitor {
 
         @Override
         public void visitLdcInsn(Object value) {
+            if (value instanceof String) {
+                String decryptedValue = StringDecrypt.encrypt((String) value);
+                if (decryptedValue != null) {
+                    super.visitLdcInsn(decryptedValue);
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC,
+                            StringDecryptDump.className,
+                            StringDecryptDump.methodName,
+                            "(Ljava/lang/String;)Ljava/lang/String;",
+                            false);
+                    return;
+                }
+            }
             super.visitLdcInsn(value);
         }
 

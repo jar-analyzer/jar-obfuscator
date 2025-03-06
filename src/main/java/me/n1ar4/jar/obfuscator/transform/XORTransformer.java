@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.transform;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.asm.IntToXorChanger;
+import me.n1ar4.jar.obfuscator.asm.IntToXorVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -29,7 +29,7 @@ public class XORTransformer {
             try {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
                 ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
-                IntToXorChanger changer = new IntToXorChanger(classWriter);
+                IntToXorVisitor changer = new IntToXorVisitor(classWriter);
                 classReader.accept(changer, Const.AnalyzeASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());

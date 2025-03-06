@@ -6,8 +6,8 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 
-public class CompileInfoChanger extends ClassVisitor {
-    public CompileInfoChanger(ClassVisitor classVisitor) {
+public class CompileInfoVisitor extends ClassVisitor {
+    public CompileInfoVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 

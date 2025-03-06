@@ -1,25 +1,27 @@
 package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.utils.NameUtil;
+import me.n1ar4.jar.obfuscator.base.ClassField;
+import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.*;
 
-import java.util.HashSet;
+public class FieldNameVisitor extends ClassVisitor {
+    private String className;
 
-public class ParameterChanger extends ClassVisitor {
-    public ParameterChanger(ClassVisitor classVisitor) {
+    public FieldNameVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.className = name;
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new ParameterChangerMethodAdapter(mv);
+        return new FieldNameChangerMethodAdapter(mv);
     }
 
     @Override
@@ -34,7 +36,14 @@ public class ParameterChanger extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        return super.visitField(access, name, descriptor, signature, value);
+        ClassField cf = new ClassField();
+        cf.setClassName(this.className);
+        cf.setFieldName(name);
+        ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
+        if (ObfEnv.config.isEnableHideField()) {
+            access = access | Opcodes.ACC_SYNTHETIC;
+        }
+        return super.visitField(access, newCF.getFieldName(), descriptor, signature, value);
     }
 
     @Override
@@ -92,10 +101,8 @@ public class ParameterChanger extends ClassVisitor {
         return super.getDelegate();
     }
 
-    static class ParameterChangerMethodAdapter extends MethodVisitor {
-        private final HashSet<String> obfNames = new HashSet<>();
-
-        ParameterChangerMethodAdapter(MethodVisitor mv) {
+    static class FieldNameChangerMethodAdapter extends MethodVisitor {
+        FieldNameChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
         }
 
@@ -106,7 +113,11 @@ public class ParameterChanger extends ClassVisitor {
 
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-            super.visitFieldInsn(opcode, owner, name, descriptor);
+            ClassField cf = new ClassField();
+            cf.setClassName(owner);
+            cf.setFieldName(name);
+            ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
+            super.visitFieldInsn(opcode, owner, newCF.getFieldName(), descriptor);
         }
 
         @Override
@@ -221,11 +232,6 @@ public class ParameterChanger extends ClassVisitor {
 
         @Override
         public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
-            if (name.equals("this") || name.equals("super")) {
-                super.visitLocalVariable(name, descriptor, signature, start, end, index);
-                return;
-            }
-            name = NameUtil.genWithSet(obfNames);
             super.visitLocalVariable(name, descriptor, signature, start, end, index);
         }
 

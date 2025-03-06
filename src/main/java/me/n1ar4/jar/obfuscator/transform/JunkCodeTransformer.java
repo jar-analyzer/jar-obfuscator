@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.transform;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.asm.JunkCodeChanger;
+import me.n1ar4.jar.obfuscator.asm.JunkCodeVisitor;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.jar.obfuscator.loader.CustomClassLoader;
@@ -36,7 +36,7 @@ public class JunkCodeTransformer {
                 // COMPUTE_FRAMES 需要修改 CLASSLOADER 来计算
                 ClassWriter classWriter = new CustomClassWriter(classReader,
                         ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, loader);
-                JunkCodeChanger changer = new JunkCodeChanger(classWriter, config);
+                JunkCodeVisitor changer = new JunkCodeVisitor(classWriter, config);
                 try {
                     classReader.accept(changer, Const.AnalyzeASMOptions);
                 } catch (Exception ignored) {

@@ -4,10 +4,10 @@ import me.n1ar4.jar.obfuscator.Const;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-public class MainMethodChecker extends ClassVisitor {
+public class MainMethodVisitor extends ClassVisitor {
     private boolean hasMainMethod = false;
 
-    public MainMethodChecker() {
+    public MainMethodVisitor() {
         super(Const.ASMVersion);
     }
 

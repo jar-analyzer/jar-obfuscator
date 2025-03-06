@@ -10,12 +10,12 @@ import org.objectweb.asm.commons.Method;
 import java.util.ArrayList;
 
 @SuppressWarnings("all")
-public class StringArrayChanger extends ClassVisitor {
+public class StringArrayVisitor extends ClassVisitor {
     private String className;
     private boolean isClinitPresent = false;
     private boolean isInterface;
 
-    public StringArrayChanger(ClassVisitor classVisitor) {
+    public StringArrayVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
     }
 

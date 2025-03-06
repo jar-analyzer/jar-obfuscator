@@ -1,7 +1,7 @@
 package me.n1ar4.jar.obfuscator.transform;
 
 import me.n1ar4.jar.obfuscator.Const;
-import me.n1ar4.jar.obfuscator.asm.MainMethodChecker;
+import me.n1ar4.jar.obfuscator.asm.MainMethodVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
@@ -23,7 +23,7 @@ public class MainClassTransformer {
                 Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
                 byte[] classBytes = Files.readAllBytes(classPath);
                 ClassReader classReader = new ClassReader(classBytes);
-                MainMethodChecker checker = new MainMethodChecker();
+                MainMethodVisitor checker = new MainMethodVisitor();
                 classReader.accept(checker, Const.AnalyzeASMOptions);
                 if (checker.hasMainMethod()) {
                     logger.info("find main class: {}", originalName);
