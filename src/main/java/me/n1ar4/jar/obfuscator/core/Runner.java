@@ -143,20 +143,33 @@ public class Runner {
                                 String outerClassName = originalName.split("\\$")[0];
                                 String exist = ObfEnv.classNameObfMapping.get(outerClassName);
                                 if (exist == null) {
-                                    exist = finalPackageName + "/" + NameUtil.genNewName();
-                                    ObfEnv.classNameObfMapping.put(outerClassName, exist);
+                                    if (finalPackageName.isEmpty()) {
+                                        exist = NameUtil.genNewName();
+                                        ObfEnv.classNameObfMapping.put(outerClassName, exist);
+                                    } else {
+                                        exist = finalPackageName + "/" + NameUtil.genNewName();
+                                        ObfEnv.classNameObfMapping.put(outerClassName, exist);
+                                    }
                                 }
                                 finalName = exist + "$" + NameUtil.genNewName();
                             } else {
-                                finalName = finalPackageName + "/" + NameUtil.genNewName();
+                                if (finalPackageName.isEmpty()) {
+                                    finalName = NameUtil.genNewName();
+                                } else {
+                                    finalName = finalPackageName + "/" + NameUtil.genNewName();
+                                }
                             }
                         } else {
-                            finalName = finalPackageName + "/" + className;
+                            if (finalPackageName.isEmpty()) {
+                                finalName = className;
+                            } else {
+                                finalName = finalPackageName + "/" + className;
+                            }
                         }
                         ObfEnv.classNameObfMapping.put(originalName, finalName);
                     }
                 }
-            }else{
+            } else {
                 // 如果是黑名单类 也需要记录
                 ObfEnv.classNameObfMapping.put(originalName, originalName);
             }
@@ -172,7 +185,7 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(key.getName(), key.getName());
-            if(newClassName.equals(key.getName())){
+            if (newClassName.equals(key.getName())) {
                 // 如果无需混淆那么不做 method 混淆
                 continue;
             }
@@ -236,7 +249,7 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(c.getName(), c.getName());
-            if(newClassName.equals(c.getName())){
+            if (newClassName.equals(c.getName())) {
                 // 如果无需混淆那么不做 field 混淆
                 continue;
             }
