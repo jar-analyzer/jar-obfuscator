@@ -22,7 +22,7 @@ public class DeleteInfoTransformer {
             Path tempDir = Paths.get(Const.TEMP_DIR);
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
             if (!Files.exists(classPath)) {
-                logger.error("class not exist: {}", classPath.toString());
+                logger.debug("class not exist: {}", classPath.toString());
                 continue;
             }
             try {

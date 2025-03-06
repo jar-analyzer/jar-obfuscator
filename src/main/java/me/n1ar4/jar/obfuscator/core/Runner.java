@@ -172,6 +172,11 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(key.getName(), key.getName());
+            if(newClassName.equals(key.getName())){
+                // 如果无需混淆那么不做 method 混淆
+                continue;
+            }
+
             for (MethodReference mr : value) {
                 String desc = mr.getDesc();
                 List<String> s = DescUtil.extractClassNames(desc);
@@ -231,6 +236,11 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(c.getName(), c.getName());
+            if(newClassName.equals(c.getName())){
+                // 如果无需混淆那么不做 field 混淆
+                continue;
+            }
+
             for (String s : AnalyzeEnv.fieldsInClassMap.get(c.getName())) {
                 ClassField oldMember = new ClassField();
                 oldMember.setClassName(newClassName);
@@ -259,8 +269,6 @@ public class Runner {
         }
 
         if (config.isEnableMethodName()) {
-            logger.warn("方法名混淆可能导致某些 子类和接口实现 出现问题");
-            logger.warn("如果混淆后无法运行请自行调整配置文件的 方法/类黑名单");
             // 方法名重命名
             MethodNameTransformer.transform();
         }
