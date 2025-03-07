@@ -21,6 +21,14 @@ public class StringTransformer {
         for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
             String newName = entry.getValue();
             Path tempDir = Paths.get(Const.TEMP_DIR);
+
+            if (ObfEnv.config.isUseSpringBoot()) {
+                tempDir = tempDir.resolve("BOOT-INF/classes/");
+            }
+            if (ObfEnv.config.isUseWebWar()) {
+                tempDir = tempDir.resolve("WEB-INF/classes/");
+            }
+
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
             if (!Files.exists(newClassPath)) {
                 logger.debug("class not exist: {}", newClassPath.toString());

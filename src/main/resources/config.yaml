@@ -6,6 +6,11 @@
 # debug info warn error
 logLevel: info
 
+# 如果你是 springboot 请开启
+useSpringBoot: false
+# 如果你是 war web 项目请开启
+useWebWar: false
+
 # 混淆字符配置
 # 类名方法名等信息会根据字符进行随机排列组合
 obfuscateChars:

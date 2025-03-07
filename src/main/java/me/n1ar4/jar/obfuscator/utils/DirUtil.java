@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -64,6 +65,9 @@ public class DirUtil {
     public static void zip(String sourceDir, String outputZip) {
         File sourceFolder = new File(sourceDir);
         try (ZipOutputStream jos = new ZipOutputStream(Files.newOutputStream(Paths.get(outputZip)))) {
+            // 设置压缩方法为 STORED（不压缩）
+            jos.setMethod(ZipOutputStream.STORED);
+
             if (sourceFolder.exists() && sourceFolder.isDirectory()) {
                 File[] files = sourceFolder.listFiles();
                 if (files != null) {
@@ -73,7 +77,7 @@ public class DirUtil {
                 }
             }
         } catch (IOException e) {
-            logger.error("zip Zip error: {}", e.toString());
+            System.err.println("zip Zip error: " + e.toString());
         }
     }
 
@@ -81,6 +85,10 @@ public class DirUtil {
         if (source.isDirectory()) {
             String dirPath = parentDir + source.getName() + "/";
             ZipEntry entry = new ZipEntry(dirPath);
+            entry.setMethod(ZipEntry.STORED);
+            entry.setSize(0);
+            entry.setCompressedSize(0);
+            entry.setCrc(0);
             jos.putNextEntry(entry);
             jos.closeEntry();
             for (File file : Objects.requireNonNull(source.listFiles())) {
@@ -89,6 +97,13 @@ public class DirUtil {
         } else {
             String entryName = parentDir + source.getName();
             ZipEntry entry = new ZipEntry(entryName);
+            entry.setMethod(ZipEntry.STORED);
+            long size = source.length();
+            long crc = computeCRC32(source);
+
+            entry.setSize(size);
+            entry.setCompressedSize(size);
+            entry.setCrc(crc);
             jos.putNextEntry(entry);
             try (FileInputStream fis = new FileInputStream(source)) {
                 byte[] buffer = new byte[1024];
@@ -101,6 +116,17 @@ public class DirUtil {
         }
     }
 
+    private static long computeCRC32(File file) throws IOException {
+        CRC32 crc = new CRC32();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                crc.update(buffer, 0, bytesRead);
+            }
+        }
+        return crc.getValue();
+    }
     public static void deleteDirectory(File directory) {
         File[] files = directory.listFiles();
         if (files != null) {

@@ -2,6 +2,8 @@ package me.n1ar4.jar.obfuscator.config;
 
 public class BaseConfig {
     private String logLevel;
+    private boolean useSpringBoot;
+    private boolean useWebWar;
     private String[] obfuscateChars;
     private String[] classBlackList;
     private String[] classBlackRegexList;
@@ -27,6 +29,22 @@ public class BaseConfig {
     private int maxJunkOneClass;
     private boolean showAllMainMethods;
     private boolean keepTempFile;
+
+    public boolean isUseSpringBoot() {
+        return useSpringBoot;
+    }
+
+    public void setUseSpringBoot(boolean useSpringBoot) {
+        this.useSpringBoot = useSpringBoot;
+    }
+
+    public boolean isUseWebWar() {
+        return useWebWar;
+    }
+
+    public void setUseWebWar(boolean useWebWar) {
+        this.useWebWar = useWebWar;
+    }
 
     public String getLogLevel() {
         return logLevel;

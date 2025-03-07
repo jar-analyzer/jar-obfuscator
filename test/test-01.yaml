@@ -1,4 +1,6 @@
 logLevel: info
+useSpringBoot: false
+useWebWar: false
 obfuscateChars:
 - "i"
 - "l"

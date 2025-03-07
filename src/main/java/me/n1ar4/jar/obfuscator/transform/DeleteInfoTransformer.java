@@ -20,6 +20,14 @@ public class DeleteInfoTransformer {
         for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
             String originalName = entry.getKey();
             Path tempDir = Paths.get(Const.TEMP_DIR);
+
+            if (ObfEnv.config.isUseSpringBoot()) {
+                tempDir = tempDir.resolve("BOOT-INF/classes/");
+            }
+            if (ObfEnv.config.isUseWebWar()) {
+                tempDir = tempDir.resolve("WEB-INF/classes/");
+            }
+
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
             if (!Files.exists(classPath)) {
                 logger.debug("class not exist: {}", classPath.toString());

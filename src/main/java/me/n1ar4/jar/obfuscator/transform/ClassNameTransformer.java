@@ -21,6 +21,14 @@ public class ClassNameTransformer {
             String originalName = entry.getKey();
             String newName = entry.getValue();
             Path tempDir = Paths.get(Const.TEMP_DIR);
+
+            if (ObfEnv.config.isUseSpringBoot()) {
+                tempDir = tempDir.resolve("BOOT-INF/classes/");
+            }
+            if (ObfEnv.config.isUseWebWar()) {
+                tempDir = tempDir.resolve("WEB-INF/classes/");
+            }
+
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
             try {

@@ -40,6 +40,12 @@ public class Runner {
     public static void run(Path path, BaseConfig config) {
         ObfEnv.config = config;
         logger.info("start obfuscator");
+
+        if(config.isUseSpringBoot() && config.isUseWebWar()){
+            logger.error("注意 useSpringBoot 和 useWebWar 只能开启一项");
+            return;
+        }
+
         String fileName = FileUtil.getFileNameWithoutExt(path);
         jarName = fileName + ".jar";
         String newFile = fileName + "_obf.jar";
