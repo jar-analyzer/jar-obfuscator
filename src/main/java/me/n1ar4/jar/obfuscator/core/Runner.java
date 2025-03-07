@@ -31,6 +31,16 @@ public class Runner {
     private static String jarName;
 
     private static void addClass(Path path) {
+        if (ObfEnv.config.isUseSpringBoot()) {
+            if (!path.toString().contains("BOOT-INF")) {
+                return;
+            }
+        }
+        if (ObfEnv.config.isUseWebWar()) {
+            if (!path.toString().contains("WEB-INF")) {
+                return;
+            }
+        }
         ClassFileEntity cf = new ClassFileEntity();
         cf.setPath(path);
         cf.setJarName(jarName);
@@ -41,7 +51,7 @@ public class Runner {
         ObfEnv.config = config;
         logger.info("start obfuscator");
 
-        if(config.isUseSpringBoot() && config.isUseWebWar()){
+        if (config.isUseSpringBoot() && config.isUseWebWar()) {
             logger.error("注意 useSpringBoot 和 useWebWar 只能开启一项");
             return;
         }

@@ -20,19 +20,19 @@ classBlackRegexList:
 - "edu.*"
 - "javassist.*"
 methodBlackList:
-- "visit.*"
-- "start.*"
+- "doGetAuthorizationInfo"
+- "doGetAuthenticationInfo"
 
 enableClassName: true
-enablePackageName: true
+enablePackageName: false
 enableMethodName: true
 enableFieldName: true
 enableParamName: true
 enableXOR: true
 
-enableEncryptString: false
+enableEncryptString: true
 stringAesKey: Y4SuperSecretKey
-enableAdvanceString: false
+enableAdvanceString: true
 advanceStringName: GIiIiLA
 decryptClassName: org.apache.commons.collections.list.AbstractHashMap
 decryptMethodName: newMap
@@ -42,7 +42,7 @@ enableHideMethod: false
 enableHideField: false
 enableDeleteCompileInfo: false
 
-enableJunk: false
+enableJunk: true
 junkLevel: 5
 maxJunkOneClass: 2000
 
