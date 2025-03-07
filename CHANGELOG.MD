@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2.0.0-RC2
+
+更新日志：
+
+- [重要] 开启配置 `useSpringBoot` 初步支持 `SpringBoot` 混淆
+- [重要] 开启配置 `useWebWar` 初步支持 `war` 包混淆
+- [优化] 优化 `jar` 压缩代码兼容 `SpringBoot` 等禁用压缩环境
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 2.0.0-RC1
 
 jar-obfuscator v2 初版 RC1 发布（非正式 仅供测试）
