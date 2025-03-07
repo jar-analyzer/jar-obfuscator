@@ -143,6 +143,15 @@ showAllMainMethods: true
 keepTempFile: false
 ```
 
+## 配置指南
+
+大概思路如下：
+
+- 通常情况必须把 `main` 入口加入 `classBlackList`
+- 通常需要配置 `classBlackRegexList` 拉黑所有的第三方库类（如 `org/apache/.*` 等）
+- 如果某些类集成或者实现某些库的接口，重写方法不允许重命名，注意配置 `methodBlackList`
+- 建议测试配置时不要开启 `enableJunk` 和 `enableHide*` 方法，一切没问题再开启这些 
+
 ## 更新内容
 
 2.0.0-RC2 版本已初步支持 `SpringBoot` 混淆
