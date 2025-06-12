@@ -37,7 +37,7 @@ public class PackageUtil {
         List<String> classBlackList = config.getClassBlackList();
         List<String> classBlackRegexList = config.getClassBlackRegexList();
 
-        if (!classBlackList.isEmpty()) {
+        if (classBlackList != null && !classBlackList.isEmpty()) {
             for (String s : classBlackList) {
                 s = s.replace(".", "/");
                 if (className.equals(s)) {
@@ -46,7 +46,7 @@ public class PackageUtil {
             }
         }
 
-        if (!classBlackRegexList.isEmpty()) {
+        if (classBlackRegexList != null &&!classBlackRegexList.isEmpty()) {
             for (String s : classBlackRegexList) {
                 className = className.replace(".", "/");
                 Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
