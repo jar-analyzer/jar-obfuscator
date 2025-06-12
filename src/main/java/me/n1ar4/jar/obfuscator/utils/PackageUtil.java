@@ -33,24 +33,36 @@ public class PackageUtil {
 
     public static boolean inBlackClass(String className, BaseConfig config) {
         className = className.replace(".", "/");
-        for (String s : config.getClassBlackList()) {
-            s = s.replace(".", "/");
-            if (className.equals(s)) {
-                return true;
+
+        List<String> classBlackList = config.getClassBlackList();
+        List<String> classBlackRegexList = config.getClassBlackRegexList();
+
+        if (!classBlackList.isEmpty()) {
+            for (String s : classBlackList) {
+                s = s.replace(".", "/");
+                if (className.equals(s)) {
+                    return true;
+                }
             }
         }
-        for (String s : config.getClassBlackRegexList()) {
-            className = className.replace(".", "/");
-            Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
-            Matcher matcher = pattern.matcher(className);
-            if (matcher.matches()) {
-                return true;
+
+        if (!classBlackRegexList.isEmpty()) {
+            for (String s : classBlackRegexList) {
+                className = className.replace(".", "/");
+                Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
+                Matcher matcher = pattern.matcher(className);
+                if (matcher.matches()) {
+                    return true;
+                }
             }
         }
-        for (String s : internalList) {
-            s = s.replace(".", "/");
-            if (className.equals(s)) {
-                return true;
+
+        if (!internalList.isEmpty()) {
+            for (String s : internalList) {
+                s = s.replace(".", "/");
+                if (className.equals(s)) {
+                    return true;
+                }
             }
         }
         return false;

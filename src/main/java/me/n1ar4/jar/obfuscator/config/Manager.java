@@ -44,13 +44,13 @@ public class Manager {
 
         // CHARS
         if (config.getObfuscateChars() == null ||
-                config.getObfuscateChars().length < 3) {
+                config.getObfuscateChars().size() < 3) {
             logger.warn("obfuscate chars length too small");
             NameUtil.CHAR_POOL = new char[]{'i', 'l', 'L', '1', 'I'};
         } else {
-            char[] data = new char[config.getObfuscateChars().length];
-            for (int i = 0; i < config.getObfuscateChars().length; i++) {
-                String s = config.getObfuscateChars()[i];
+            char[] data = new char[config.getObfuscateChars().size()];
+            for (int i = 0; i < config.getObfuscateChars().size(); i++) {
+                String s = config.getObfuscateChars().get(i);
                 if (s == null || s.isEmpty()) {
                     logger.error("null in obfuscate chars");
                     return false;
