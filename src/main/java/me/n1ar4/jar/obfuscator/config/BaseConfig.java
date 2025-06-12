@@ -1,13 +1,15 @@
 package me.n1ar4.jar.obfuscator.config;
 
+import java.util.List;
+
 public class BaseConfig {
     private String logLevel;
     private boolean useSpringBoot;
     private boolean useWebWar;
-    private String[] obfuscateChars;
-    private String[] classBlackList;
-    private String[] classBlackRegexList;
-    private String[] methodBlackList;
+    private List<String> obfuscateChars;
+    private List<String> classBlackList;
+    private List<String> classBlackRegexList;
+    private List<String> methodBlackList;
     private boolean enableClassName;
     private boolean enablePackageName;
     private boolean enableMethodName;
@@ -54,35 +56,35 @@ public class BaseConfig {
         this.logLevel = logLevel;
     }
 
-    public String[] getObfuscateChars() {
+    public List<String> getObfuscateChars() {
         return obfuscateChars;
     }
 
-    public void setObfuscateChars(String[] obfuscateChars) {
+    public void setObfuscateChars(List<String> obfuscateChars) {
         this.obfuscateChars = obfuscateChars;
     }
 
-    public String[] getClassBlackList() {
+    public List<String> getClassBlackList() {
         return classBlackList;
     }
 
-    public void setClassBlackList(String[] classBlackList) {
+    public void setClassBlackList(List<String> classBlackList) {
         this.classBlackList = classBlackList;
     }
 
-    public String[] getClassBlackRegexList() {
+    public List<String> getClassBlackRegexList() {
         return classBlackRegexList;
     }
 
-    public void setClassBlackRegexList(String[] classBlackRegexList) {
+    public void setClassBlackRegexList(List<String> classBlackRegexList) {
         this.classBlackRegexList = classBlackRegexList;
     }
 
-    public String[] getMethodBlackList() {
+    public List<String> getMethodBlackList() {
         return methodBlackList;
     }
 
-    public void setMethodBlackList(String[] methodBlackList) {
+    public void setMethodBlackList(List<String> methodBlackList) {
         this.methodBlackList = methodBlackList;
     }
 
