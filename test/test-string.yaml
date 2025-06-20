@@ -1,0 +1,47 @@
+logLevel: error
+useSpringBoot: false
+useWebWar: false
+obfuscateChars:
+- "i"
+- "l"
+- "L"
+- "1"
+- "I"
+classBlackList:
+- "me.n1ar4.jar.obfuscator.Main"
+classBlackRegexList:
+- "java.*"
+- "javax.*"
+- "kotlin.*"
+- "org.*"
+- "com.*"
+- "edu.*"
+- "javassist.*"
+methodBlackList:
+- "testInterface"
+
+enableClassName: true
+enablePackageName: true
+enableMethodName: true
+enableFieldName: true
+enableParamName: true
+enableXOR: true
+
+enableEncryptString: true
+stringAesKey: QWERasdfZXCVlkhj
+enableAdvanceString: true
+advanceStringName: sdiaobqwbyic
+decryptClassName: a.b.c.d.E
+decryptMethodName: fg
+decryptKeyName: sidaosdoqwqwvyqcnowqUUIIO
+
+enableHideMethod: false
+enableHideField: false
+enableDeleteCompileInfo: false
+
+enableJunk: false
+junkLevel: 5
+maxJunkOneClass: 2000
+
+showAllMainMethods: false
+keepTempFile: false

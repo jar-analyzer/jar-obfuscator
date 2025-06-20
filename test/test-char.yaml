@@ -1,0 +1,48 @@
+logLevel: error
+useSpringBoot: false
+useWebWar: false
+obfuscateChars:
+- "啊"
+- "嗷"
+- "呜"
+- "呼"
+- "咕"
+- "嘻"
+classBlackList:
+- "me.n1ar4.jar.obfuscator.Main"
+classBlackRegexList:
+- "java.*"
+- "javax.*"
+- "kotlin.*"
+- "org.*"
+- "com.*"
+- "edu.*"
+- "javassist.*"
+methodBlackList:
+- "testInterface"
+
+enableClassName: true
+enablePackageName: true
+enableMethodName: true
+enableFieldName: true
+enableParamName: true
+enableXOR: true
+
+enableEncryptString: false
+stringAesKey: Y4SuperSecretKey
+enableAdvanceString: false
+advanceStringName: GIiIiLA
+decryptClassName: org.apache.commons.collections.list.AbstractHashMap
+decryptMethodName: newMap
+decryptKeyName: LiLiLLLiiiLLiiLLi
+
+enableHideMethod: false
+enableHideField: false
+enableDeleteCompileInfo: false
+
+enableJunk: false
+junkLevel: 5
+maxJunkOneClass: 2000
+
+showAllMainMethods: false
+keepTempFile: false

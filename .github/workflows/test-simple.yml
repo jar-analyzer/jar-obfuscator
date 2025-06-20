@@ -1,4 +1,4 @@
-name: ci test
+name: ci test simple
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
         run: |
           java -jar ./target/jar-obfuscator-${{ env.VERSION }}-jar-with-dependencies.jar \
                 --jar test-1.0.jar \
-                --config test/test-001.yaml
+                --config test/test-simple.yaml
       - name: do run jar
         run: rm -rf test_output.txt && java -jar test-1.0_obf.jar  > test_output.txt 2>&1
       - name: verify test results

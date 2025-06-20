@@ -1,4 +1,4 @@
-logLevel: debug
+logLevel: error
 useSpringBoot: false
 useWebWar: false
 obfuscateChars:
