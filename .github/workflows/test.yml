@@ -1,0 +1,66 @@
+name: maven check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  VERSION: "2.0.0-RC3"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          cache: maven
+      - name: download test file
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/jar-analyzer/jar-obfuscator-test/releases/download/1.0/test-1.0.jar -O test-1.0.jar
+      - name: build project
+        run: mvn -B package --file pom.xml
+      - name: do test 001
+        run: |
+          java -jar ./target/jar-obfuscator-${{ env.VERSION }}-jar-with-dependencies.jar \
+                --jar test-1.0.jar \
+                --config test/test-001.yaml > test_output.txt 2>&1
+      - name: verify test results
+        run: |
+          echo "=== 测试输出内容 ==="
+          cat test_output.txt
+          echo "\n=== 开始验证测试结果 ==="
+          
+          # 检查关键输出内容
+          if grep -q "JAR混淆测试程序启动" test_output.txt && \
+             grep -q "Testing new features:" test_output.txt && \
+             grep -q "Total items: 3" test_output.txt && \
+             grep -q "CSS选择器" test_output.txt && \
+             grep -q "修改HTML内容" test_output.txt && \
+             grep -q "解析HTML字符串" test_output.txt && \
+             grep -q "资源文件读取成功: 4ra1n" test_output.txt && \
+             grep -q "测试完成" test_output.txt; then
+            echo "✅ 测试成功：所有关键输出都已找到"
+            exit 0
+          else
+            echo "❌ 测试失败：缺少关键输出内容"
+            echo "\n=== 缺失的内容检查 ==="
+            grep -q "JAR混淆测试程序启动" test_output.txt || echo "- 缺少：JAR混淆测试程序启动"
+            grep -q "Testing new features:" test_output.txt || echo "- 缺少：Testing new features:"
+            grep -q "Total items: 3" test_output.txt || echo "- 缺少：Total items: 3"
+            grep -q "CSS选择器" test_output.txt || echo "- 缺少：CSS选择器测试"
+            grep -q "修改HTML内容" test_output.txt || echo "- 缺少：修改HTML内容测试"
+            grep -q "解析HTML字符串" test_output.txt || echo "- 缺少：解析HTML字符串测试"
+            grep -q "资源文件读取成功: 4ra1n" test_output.txt || echo "- 缺少：资源文件读取成功"
+            grep -q "测试完成" test_output.txt || echo "- 缺少：测试完成"
+            exit 1
+          fi
