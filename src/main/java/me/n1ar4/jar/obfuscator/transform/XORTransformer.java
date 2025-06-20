@@ -30,6 +30,9 @@ public class XORTransformer {
             }
 
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
+
+            logger.debug("整数异或混淆进行中 {} -> {}", newClassPath.toAbsolutePath());
+
             if (!Files.exists(newClassPath)) {
                 logger.debug("class not exist: {}", newClassPath.toString());
                 continue;

@@ -31,6 +31,9 @@ public class ClassNameTransformer {
 
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
+
+            logger.debug("混淆类名进行中 {} -> {}", classPath.toAbsolutePath(), newClassPath.toAbsolutePath());
+
             try {
                 Files.createDirectories(newClassPath.getParent());
             } catch (Exception ignored) {

@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2.0.0-RC3
+
+更新日志：
+
+- [BUG] 修复了某些空指针问题 @TheXeler
+- [优化] 开启 `debug` 日志时输出更多混淆过程 @4ra1n
+
+感谢以下用户的贡献:
+
+- 4ra1n (https://github.com/4ra1n)
+- TheXeler (https://github.com/TheXeler)
+
+可供下载的文件由 `Github Actions` 构建，使用 `java -jar` 启动
+
 ## 2.0.0-RC2
 
 更新日志：

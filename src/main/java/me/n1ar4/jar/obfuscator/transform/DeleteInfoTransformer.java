@@ -29,6 +29,9 @@ public class DeleteInfoTransformer {
             }
 
             Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
+
+            logger.debug("删除编译信息进行中 {} -> {}", classPath.toAbsolutePath());
+
             if (!Files.exists(classPath)) {
                 logger.debug("class not exist: {}", classPath.toString());
                 continue;

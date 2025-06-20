@@ -29,6 +29,9 @@ public class MainClassTransformer {
                 }
 
                 Path classPath = tempDir.resolve(Paths.get(originalName + ".class"));
+
+                logger.debug("主类分析进行中 {} -> {}", classPath.toAbsolutePath());
+
                 byte[] classBytes = Files.readAllBytes(classPath);
                 ClassReader classReader = new ClassReader(classBytes);
                 MainMethodVisitor checker = new MainMethodVisitor();

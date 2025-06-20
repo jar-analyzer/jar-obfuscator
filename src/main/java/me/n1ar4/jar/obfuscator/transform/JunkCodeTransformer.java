@@ -34,6 +34,9 @@ public class JunkCodeTransformer {
             }
 
             Path newClassPath = tempDir.resolve(Paths.get(newName + ".class"));
+
+            logger.debug("花指令混淆进行中 {} -> {}", newClassPath.toAbsolutePath());
+
             if (!Files.exists(newClassPath)) {
                 logger.debug("class not exist: {}", newClassPath.toString());
                 continue;
