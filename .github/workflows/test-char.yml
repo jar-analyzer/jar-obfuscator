@@ -1,4 +1,4 @@
-name: ci test all
+name: ci test char
 
 on:
   push:
