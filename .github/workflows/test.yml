@@ -1,4 +1,4 @@
-name: maven check
+name: ci test
 
 on:
   push:
