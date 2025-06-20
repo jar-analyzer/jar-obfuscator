@@ -4,6 +4,7 @@
 
 # 日志级别
 # debug info warn error
+# 开启 debug 会打印更多的混淆细节
 logLevel: info
 
 # 如果你是 springboot 请开启
