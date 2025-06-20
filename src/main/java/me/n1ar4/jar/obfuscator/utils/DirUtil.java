@@ -1,6 +1,5 @@
 package me.n1ar4.jar.obfuscator.utils;
 
-import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -10,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -127,6 +125,7 @@ public class DirUtil {
         }
         return crc.getValue();
     }
+
     public static void deleteDirectory(File directory) {
         File[] files = directory.listFiles();
         if (files != null) {

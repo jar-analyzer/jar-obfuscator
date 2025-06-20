@@ -46,7 +46,7 @@ public class PackageUtil {
             }
         }
 
-        if (classBlackRegexList != null &&!classBlackRegexList.isEmpty()) {
+        if (classBlackRegexList != null && !classBlackRegexList.isEmpty()) {
             for (String s : classBlackRegexList) {
                 className = className.replace(".", "/");
                 Pattern pattern = Pattern.compile(s, Pattern.DOTALL);

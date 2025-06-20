@@ -35,6 +35,7 @@ public class JunkUtil {
         newMethod.visitMaxs(3, 2);
         newMethod.visitEnd();
     }
+
     public static void addPrintMethod(ClassVisitor cv) {
         MethodVisitor newMethod = cv.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC,
                 JRandom.getInstance().randomString(8), "()V", null, null);
