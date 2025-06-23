@@ -298,7 +298,7 @@ public class Runner {
             }
         }
 
-        CustomClassLoader loader = new CustomClassLoader();
+        CustomClassLoader loader = new CustomClassLoader(path.toAbsolutePath());
 
         if (config.isShowAllMainMethods()) {
             // 向用户提示可能的主类

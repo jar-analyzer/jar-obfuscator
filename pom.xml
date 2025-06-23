@@ -13,7 +13,7 @@
 
     <properties>
         <!-- Dependencies Version -->
-        <asm.version>9.7.1</asm.version>
+        <asm.version>9.8</asm.version>
         <jcommander.version>1.82</jcommander.version>
         <snake.yaml.version>2.4</snake.yaml.version>
         <flatlaf.version>3.5.1</flatlaf.version>

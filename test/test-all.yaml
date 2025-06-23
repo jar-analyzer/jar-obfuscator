@@ -1,4 +1,4 @@
-logLevel: error
+logLevel: info
 asmAutoCompute: true
 useSpringBoot: false
 useWebWar: false
@@ -21,9 +21,9 @@ classBlackRegexList:
 methodBlackList:
 - "testInterface"
 
-enableClassName: true
-enablePackageName: true
-enableMethodName: true
+enableClassName: false
+enablePackageName: false
+enableMethodName: false
 enableFieldName: true
 enableParamName: true
 enableXOR: true
@@ -36,11 +36,11 @@ decryptClassName: org.apache.commons.collections.list.AbstractHashMap
 decryptMethodName: newMap
 decryptKeyName: LiLiLLLiiiLLiiLLi
 
-enableHideMethod: true
-enableHideField: true
-enableDeleteCompileInfo: true
+enableHideMethod: false
+enableHideField: false
+enableDeleteCompileInfo: false
 
-enableJunk: true
+enableJunk: false
 junkLevel: 5
 maxJunkOneClass: 2000
 
