@@ -1,4 +1,5 @@
 logLevel: error
+asmAutoCompute: true
 useSpringBoot: false
 useWebWar: false
 obfuscateChars:

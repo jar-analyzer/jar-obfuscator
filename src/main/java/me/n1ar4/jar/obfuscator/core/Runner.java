@@ -6,6 +6,7 @@ import me.n1ar4.jar.obfuscator.base.ClassFileEntity;
 import me.n1ar4.jar.obfuscator.base.ClassReference;
 import me.n1ar4.jar.obfuscator.base.MethodReference;
 import me.n1ar4.jar.obfuscator.config.BaseConfig;
+import me.n1ar4.jar.obfuscator.loader.CustomClassLoader;
 import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
 import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
 import me.n1ar4.jar.obfuscator.transform.*;
@@ -15,6 +16,7 @@ import me.n1ar4.log.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,6 +68,20 @@ public class Runner {
             logger.info("unzip jar file success");
         } catch (IOException e) {
             logger.error("run error: {}", e.toString());
+        }
+
+        // 2025/06/23 处理某些情况下找不到依赖的问题
+        Path dirPath = Paths.get(CustomClassLoader.LIB_DIR);
+        try {
+            Files.createDirectory(dirPath);
+            logger.info("已成功创建 {} 目录", CustomClassLoader.LIB_DIR);
+            Files.write(dirPath.resolve(Paths.get("README.md")), ("# README\n" +
+                    "\n" +
+                    "一些情况下混淆可能需要接触依赖库\n" +
+                    "\n" +
+                    "请将依赖放在 `jar-obf-lib` 目录中").getBytes(StandardCharsets.UTF_8));
+        } catch (Exception ignored) {
+            logger.warn("无法创建 {} 目录", CustomClassLoader.LIB_DIR);
         }
 
         Path tmpDir = Paths.get(Const.TEMP_DIR);
@@ -282,6 +298,8 @@ public class Runner {
             }
         }
 
+        CustomClassLoader loader = new CustomClassLoader();
+
         if (config.isShowAllMainMethods()) {
             // 向用户提示可能的主类
             MainClassTransformer.transform();
@@ -289,32 +307,32 @@ public class Runner {
 
         if (config.isEnableDeleteCompileInfo()) {
             // 删除编译信息
-            DeleteInfoTransformer.transform();
+            DeleteInfoTransformer.transform(loader);
         }
 
         if (config.isEnablePackageName() || config.isEnableClassName()) {
             // 包名或类名重命名
-            ClassNameTransformer.transform();
+            ClassNameTransformer.transform(loader);
         }
 
         if (config.isEnableMethodName()) {
             // 方法名重命名
-            MethodNameTransformer.transform();
+            MethodNameTransformer.transform(loader);
         }
 
         if (config.isEnableFieldName()) {
             // 属性重命名
-            FieldNameTransformer.transform();
+            FieldNameTransformer.transform(loader);
         }
 
         if (config.isEnableParamName()) {
             // 方法内参数混淆
-            ParameterTransformer.transform();
+            ParameterTransformer.transform(loader);
         }
 
         if (config.isEnableXOR()) {
             // 异或混淆常数
-            XORTransformer.transform();
+            XORTransformer.transform(loader);
         }
 
         if (config.isEnableEncryptString()) {
@@ -336,7 +354,7 @@ public class Runner {
             }
 
             // 字符串加密和解密
-            StringTransformer.transform();
+            StringTransformer.transform(loader);
 
             if (config.isEnableAdvanceString()) {
                 // 字符串提取处理
@@ -353,18 +371,18 @@ public class Runner {
                 }
 
                 // 字符串提取
-                StringArrayTransformer.transform();
+                StringArrayTransformer.transform(loader);
 
                 if (config.isEnableXOR()) {
                     // 提取后再次异或处理
-                    XORTransformer.transform();
+                    XORTransformer.transform(loader);
                 }
             }
         }
 
         if (config.isEnableJunk()) {
             // 花指令混淆
-            JunkCodeTransformer.transform(config);
+            JunkCodeTransformer.transform(config, loader);
         }
 
         // 生成混淆后目标

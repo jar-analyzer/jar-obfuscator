@@ -35,7 +35,7 @@ public class MainClassTransformer {
                 byte[] classBytes = Files.readAllBytes(classPath);
                 ClassReader classReader = new ClassReader(classBytes);
                 MainMethodVisitor checker = new MainMethodVisitor();
-                classReader.accept(checker, Const.AnalyzeASMOptions);
+                classReader.accept(checker, Const.ReaderASMOptions);
                 if (checker.hasMainMethod()) {
                     logger.info("find main class: {}", originalName);
                 }

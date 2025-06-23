@@ -58,6 +58,11 @@ jar-obfuscator 功能点
 # 开启 debug 会打印更多的混淆细节
 logLevel: info
 
+# 内部参数
+# 是否启动 JAVA ASM 的 COMPUTE FRAMES/MAX 自动计算
+# 如果遇到 TYPE * NOT PRESENT 报错可以尝试设置该选项为 FALSE
+asmAutoCompute: true
+
 # 如果你是 springboot 请开启
 useSpringBoot: false
 # 如果你是 war web 项目请开启

@@ -4,6 +4,7 @@ import java.util.List;
 
 public class BaseConfig {
     private String logLevel;
+    private boolean asmAutoCompute;
     private boolean useSpringBoot;
     private boolean useWebWar;
     private List<String> obfuscateChars;
@@ -254,5 +255,13 @@ public class BaseConfig {
 
     public void setKeepTempFile(boolean keepTempFile) {
         this.keepTempFile = keepTempFile;
+    }
+
+    public boolean isAsmAutoCompute() {
+        return asmAutoCompute;
+    }
+
+    public void setAsmAutoCompute(boolean asmAutoCompute) {
+        this.asmAutoCompute = asmAutoCompute;
     }
 }

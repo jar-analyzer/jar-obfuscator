@@ -3,6 +3,8 @@ package me.n1ar4.jar.obfuscator.transform;
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.asm.StringArrayVisitor;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
+import me.n1ar4.jar.obfuscator.loader.CustomClassLoader;
+import me.n1ar4.jar.obfuscator.loader.CustomClassWriter;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 import org.objectweb.asm.ClassReader;
@@ -18,7 +20,7 @@ public class StringArrayTransformer {
     private static final Logger logger = LogManager.getLogger();
     public static int INDEX = 0;
 
-    public static void transform() {
+    public static void transform(CustomClassLoader loader) {
         for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
             String newName = entry.getValue();
             Path tempDir = Paths.get(Const.TEMP_DIR);
@@ -41,9 +43,10 @@ public class StringArrayTransformer {
             try {
                 INDEX = 0;
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
-                ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
+                ClassWriter classWriter = new CustomClassWriter(classReader,
+                        ObfEnv.config.isAsmAutoCompute() ? Const.WriterASMOptions : 0, loader);
                 StringArrayVisitor changer = new StringArrayVisitor(classWriter);
-                classReader.accept(changer, ClassReader.EXPAND_FRAMES);
+                classReader.accept(changer, Const.ReaderASMOptions);
                 Files.delete(newClassPath);
                 Files.write(newClassPath, classWriter.toByteArray());
             } catch (Exception ex) {

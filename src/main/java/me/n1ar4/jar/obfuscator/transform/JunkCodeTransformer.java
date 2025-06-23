@@ -21,7 +21,7 @@ import java.util.Map;
 public class JunkCodeTransformer {
     private static final Logger logger = LogManager.getLogger();
 
-    public static void transform(BaseConfig config) {
+    public static void transform(BaseConfig config, CustomClassLoader loader) {
         for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
             String newName = entry.getValue();
             Path tempDir = Paths.get(Const.TEMP_DIR);
@@ -43,13 +43,12 @@ public class JunkCodeTransformer {
             }
             try {
                 ClassReader classReader = new ClassReader(Files.readAllBytes(newClassPath));
-                CustomClassLoader loader = new CustomClassLoader();
                 // COMPUTE_FRAMES 需要修改 CLASSLOADER 来计算
                 ClassWriter classWriter = new CustomClassWriter(classReader,
-                        ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS, loader);
+                        ObfEnv.config.isAsmAutoCompute() ? Const.WriterASMOptions : 0, loader);
                 JunkCodeVisitor changer = new JunkCodeVisitor(classWriter, config);
                 try {
-                    classReader.accept(changer, Const.AnalyzeASMOptions);
+                    classReader.accept(changer, Const.ReaderASMOptions);
                 } catch (Exception ignored) {
                     // CustomClassLoader 可能会找不到类
                     // 这个地方目前做法是跳过这个类的花指令混淆
