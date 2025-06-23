@@ -56,9 +56,25 @@ public class StringDecrypt {
             SecretKeySpec key = new SecretKeySpec(KEY.getBytes(CHARSET), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] data = encrypted.getBytes(CHARSET);
-            byte[] original = cipher.doFinal(Base64.getDecoder().decode(data));
-            return new String(original, CHARSET);
+            Class<?> base64;
+            byte[] value = null;
+            try {
+                base64 = Class.forName("java.util.Base64");
+                Object decoder = base64.getMethod("getDecoder", null).invoke(base64, null);
+                value = (byte[]) decoder.getClass().getMethod("decode",
+                        new Class[]{String.class}).invoke(decoder, new Object[]{encrypted});
+            } catch (Exception e) {
+                try {
+                    base64 = Class.forName("sun.misc.BASE64Decoder");
+                    Object decoder = base64.newInstance();
+                    value = (byte[]) decoder.getClass().getMethod("decodeBuffer",
+                            new Class[]{String.class}).invoke(decoder, new Object[]{encrypted});
+                } catch (Exception ex) {
+                    return "";
+                }
+            }
+            byte[] decryptedBytes = cipher.doFinal(value);
+            return new String(decryptedBytes, CHARSET);
         } catch (Exception e) {
             return null;
         }
