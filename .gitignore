@@ -45,5 +45,6 @@ log/
 *.yaml
 cmake-*/
 code-encryptor-temp/
+jar-obf-lib/
 jar-obfuscator-temp/
 token.txt

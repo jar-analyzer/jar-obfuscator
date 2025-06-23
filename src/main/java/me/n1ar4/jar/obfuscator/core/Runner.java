@@ -77,7 +77,7 @@ public class Runner {
             logger.info("已成功创建 {} 目录", CustomClassLoader.LIB_DIR);
             Files.write(dirPath.resolve(Paths.get("README.md")), ("# README\n" +
                     "\n" +
-                    "一些情况下混淆可能需要接触依赖库\n" +
+                    "一些情况下混淆报错可能需要依赖库\n" +
                     "\n" +
                     "请将依赖放在 `jar-obf-lib` 目录中").getBytes(StandardCharsets.UTF_8));
         } catch (Exception ignored) {
