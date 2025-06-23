@@ -23,7 +23,7 @@ public class MethodCallRunner {
                 MethodCallClassVisitor mcv =
                         new MethodCallClassVisitor(methodCalls);
                 ClassReader cr = new ClassReader(file.getFile());
-                cr.accept(mcv, Const.AnalyzeASMOptions);
+                cr.accept(mcv, Const.ReaderASMOptions);
             } catch (Exception e) {
                 logger.error("method call error: {}", e.toString());
             }

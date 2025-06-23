@@ -28,7 +28,7 @@ public class DiscoveryRunner {
                 DiscoveryClassVisitor dcv = new DiscoveryClassVisitor(discoveredClasses,
                         discoveredMethods, fieldsInClassMap, file.getJarName());
                 ClassReader cr = new ClassReader(file.getFile());
-                cr.accept(dcv, Const.AnalyzeASMOptions);
+                cr.accept(dcv, Const.ReaderASMOptions);
             } catch (Exception e) {
                 logger.error("discovery error: {}", e.toString());
             }
