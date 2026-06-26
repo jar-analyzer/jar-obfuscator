@@ -1,8 +1,5 @@
 # Jar-Obfuscator V2
 
-# 作者精力有限，暂不维护了
-# 作者主要精力将放在 jar-analzyer 和 class-obf 工具的维护
-
 <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
 
 ![](https://github.com/jar-analyzer/jar-obfuscator/workflows/maven%20check/badge.svg)
@@ -19,8 +16,6 @@
 - 仅单个 `JAR` 文件小于 `1 MB` 超轻量
 - 简洁的配置文件快速上手
 - 输入 `JAR` 直接输出混淆后的 `JAR`
-
-注意：目前是 `v2` 版本，如果你需要 `v1` 版本可以从 `release` 页面下载
 
 ## 开始
 
@@ -46,8 +41,8 @@ jar-obfuscator 功能点
 - 添加垃圾代码（可指定多级别）   
 - IDEA 反编译时隐藏方法     
 - IDEA 反编译时隐藏字段     
-- 初步支持 SpringBoot 混淆
-- 初步支持 Web WAR 混淆   
+- 支持 SpringBoot 混淆
+- 支持 Web WAR 混淆   
 
 ## 配置
 
@@ -158,9 +153,3 @@ keepTempFile: false
 - 通常需要配置 `classBlackRegexList` 拉黑所有的第三方库类（如 `org/apache/.*` 等）
 - 如果某些类集成或者实现某些库的接口，重写方法不允许重命名，注意配置 `methodBlackList`
 - 建议测试配置时不要开启 `enableJunk` 和 `enableHide*` 方法，一切没问题再开启这些 
-
-## 更新内容
-
-2.0.0-RC2 版本已初步支持 `SpringBoot` 混淆
-
-![](img/001.png)
