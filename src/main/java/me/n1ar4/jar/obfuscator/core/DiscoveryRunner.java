@@ -14,6 +14,7 @@ package me.n1ar4.jar.obfuscator.core;
 
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.analyze.DiscoveryClassVisitor;
+import me.n1ar4.jar.obfuscator.base.ClassField;
 import me.n1ar4.jar.obfuscator.base.ClassFileEntity;
 import me.n1ar4.jar.obfuscator.base.ClassReference;
 import me.n1ar4.jar.obfuscator.base.MethodReference;
@@ -33,12 +34,13 @@ public class DiscoveryRunner {
                              Set<MethodReference> discoveredMethods,
                              Map<ClassReference.Handle, ClassReference> classMap,
                              Map<MethodReference.Handle, MethodReference> methodMap,
-                             Map<String, List<String>> fieldsInClassMap) {
+                             Map<String, List<String>> fieldsInClassMap,
+                             Map<ClassField, Set<String>> fieldAnnotationsMap) {
         logger.info("start class analyze");
         for (ClassFileEntity file : classFileList) {
             try {
                 DiscoveryClassVisitor dcv = new DiscoveryClassVisitor(discoveredClasses,
-                        discoveredMethods, fieldsInClassMap, file.getJarName());
+                        discoveredMethods, fieldsInClassMap, fieldAnnotationsMap, file.getJarName());
                 ClassReader cr = new ClassReader(file.getFile());
                 cr.accept(dcv, Const.ReaderASMOptions);
             } catch (Exception e) {

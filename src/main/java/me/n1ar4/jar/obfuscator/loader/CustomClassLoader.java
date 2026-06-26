@@ -42,7 +42,7 @@ public class CustomClassLoader extends ClassLoader {
         if (classData != null) {
             return defineClass(name, classData, 0, classData.length);
         }
-        logger.warn("not found class: " + name);
+        logger.debug("not found class: " + name);
         throw new ClassNotFoundException(name);
     }
 

@@ -25,9 +25,12 @@ import me.n1ar4.jar.obfuscator.transform.*;
 import me.n1ar4.jar.obfuscator.utils.*;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
+import org.objectweb.asm.Type;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +42,12 @@ import java.util.stream.Stream;
 
 public class Runner {
     private static final Logger logger = LogManager.getLogger();
+    private static final List<String> FRAMEWORK_INTERFACE_PREFIXES = Arrays.asList(
+            "org/springframework/data/repository/",
+            "org/springframework/data/jpa/repository/",
+            "org/springframework/data/mongodb/repository/",
+            "org/springframework/data/redis/repository/"
+    );
     private static String jarName;
 
     private static void addClass(Path path) {
@@ -177,9 +186,156 @@ public class Runner {
                 methodName.startsWith("access$") ||
                 methodName.equals("<init>") ||
                 methodName.equals("<clinit>") ||
+                isSerializationHook(mr) ||
                 ("main".equals(methodName) && "([Ljava/lang/String;)V".equals(mr.getDesc()) &&
-                        (mr.getAccess() & java.lang.reflect.Modifier.PUBLIC) != 0 &&
-                        (mr.getAccess() & java.lang.reflect.Modifier.STATIC) != 0);
+                        (mr.getAccess() & Modifier.PUBLIC) != 0 &&
+                        (mr.getAccess() & Modifier.STATIC) != 0);
+    }
+
+    private static boolean isSerializationHook(MethodReference method) {
+        String name = method.getName();
+        String desc = method.getDesc();
+        return ("writeObject".equals(name) && "(Ljava/io/ObjectOutputStream;)V".equals(desc)) ||
+                ("readObject".equals(name) && "(Ljava/io/ObjectInputStream;)V".equals(desc)) ||
+                ("readObjectNoData".equals(name) && "()V".equals(desc)) ||
+                ("writeReplace".equals(name) && "()Ljava/lang/Object;".equals(desc)) ||
+                ("readResolve".equals(name) && "()Ljava/lang/Object;".equals(desc));
+    }
+
+    private static boolean extendsFrameworkInterface(ClassReference owner) {
+        if (!owner.isInterface()) {
+            return false;
+        }
+        List<String> interfaces = owner.getInterfaces();
+        if (interfaces == null) {
+            return false;
+        }
+        Set<String> visited = new HashSet<>();
+        for (String interfaceName : interfaces) {
+            if (isFrameworkInterface(interfaceName, visited)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isFrameworkInterface(String className, Set<String> visited) {
+        if (className == null || !visited.add(className)) {
+            return false;
+        }
+        for (String prefix : FRAMEWORK_INTERFACE_PREFIXES) {
+            if (className.startsWith(prefix)) {
+                return true;
+            }
+        }
+        ClassReference internalClass = AnalyzeEnv.classMap.get(new ClassReference.Handle(className));
+        if (internalClass == null) {
+            return false;
+        }
+        List<String> interfaces = internalClass.getInterfaces();
+        if (interfaces == null) {
+            return false;
+        }
+        for (String interfaceName : interfaces) {
+            if (isFrameworkInterface(interfaceName, visited)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean overridesExternalApi(CustomClassLoader loader,
+                                                ClassReference owner,
+                                                MethodReference method) {
+        int access = method.getAccess();
+        if ((access & (Modifier.PRIVATE | Modifier.STATIC)) != 0) {
+            return false;
+        }
+        Set<String> visited = new HashSet<>();
+        if (methodExistsInExternalHierarchy(loader, owner.getSuperClass(),
+                method.getName(), method.getDesc(), visited)) {
+            return true;
+        }
+        List<String> interfaces = owner.getInterfaces();
+        if (interfaces == null) {
+            return false;
+        }
+        for (String interfaceName : interfaces) {
+            if (methodExistsInExternalHierarchy(loader, interfaceName,
+                    method.getName(), method.getDesc(), visited)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean methodExistsInExternalHierarchy(CustomClassLoader loader,
+                                                           String className,
+                                                           String methodName,
+                                                           String desc,
+                                                           Set<String> visited) {
+        if (className == null || !visited.add(className)) {
+            return false;
+        }
+
+        ClassReference internalClass = AnalyzeEnv.classMap.get(new ClassReference.Handle(className));
+        if (internalClass != null) {
+            if (methodExistsInExternalHierarchy(loader, internalClass.getSuperClass(), methodName, desc, visited)) {
+                return true;
+            }
+            List<String> interfaces = internalClass.getInterfaces();
+            if (interfaces == null) {
+                return false;
+            }
+            for (String interfaceName : interfaces) {
+                if (methodExistsInExternalHierarchy(loader, interfaceName, methodName, desc, visited)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return methodExistsInLoadedHierarchy(loader, className, methodName, desc, new HashSet<Class<?>>());
+    }
+
+    private static boolean methodExistsInLoadedHierarchy(CustomClassLoader loader,
+                                                         String className,
+                                                         String methodName,
+                                                         String desc,
+                                                         Set<Class<?>> visited) {
+        try {
+            Class<?> clazz = Class.forName(className.replace('/', '.'), false, loader);
+            return methodExistsInLoadedHierarchy(clazz, methodName, desc, visited);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static boolean methodExistsInLoadedHierarchy(Class<?> clazz,
+                                                         String methodName,
+                                                         String desc,
+                                                         Set<Class<?>> visited) {
+        if (clazz == null || !visited.add(clazz)) {
+            return false;
+        }
+        for (Method method : clazz.getDeclaredMethods()) {
+            int modifiers = method.getModifiers();
+            if ((modifiers & (Modifier.PRIVATE | Modifier.STATIC)) != 0) {
+                continue;
+            }
+            if (method.getName().equals(methodName) && Type.getMethodDescriptor(method).equals(desc)) {
+                return true;
+            }
+        }
+        if (methodExistsInLoadedHierarchy(clazz.getSuperclass(), methodName, desc, visited)) {
+            return true;
+        }
+        for (Class<?> interfaceClass : clazz.getInterfaces()) {
+            if (methodExistsInLoadedHierarchy(interfaceClass, methodName, desc, visited)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void run(Path path, BaseConfig config) {
@@ -230,7 +386,7 @@ public class Runner {
 
         DiscoveryRunner.start(AnalyzeEnv.classFileList, AnalyzeEnv.discoveredClasses,
                 AnalyzeEnv.discoveredMethods, AnalyzeEnv.classMap, AnalyzeEnv.methodMap,
-                AnalyzeEnv.fieldsInClassMap);
+                AnalyzeEnv.fieldsInClassMap, AnalyzeEnv.fieldAnnotationsMap);
         logger.info("all classes: {}", AnalyzeEnv.discoveredClasses.size());
         logger.info("all methods: {}", AnalyzeEnv.discoveredMethods.size());
         for (MethodReference mr : AnalyzeEnv.discoveredMethods) {
@@ -252,6 +408,7 @@ public class Runner {
         PackageUtil.buildInternalBlackList();
 
         Map<String, String> packageNameMap = new HashMap<>();
+        CustomClassLoader loader = new CustomClassLoader(path.toAbsolutePath());
 
         // 处理 class name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
@@ -265,7 +422,8 @@ public class Runner {
             }
             String originalName = c.getName();
 
-            boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
+            boolean inBlackClass = PackageUtil.inBlackClass(originalName, config) ||
+                    FrameworkRuleUtil.shouldKeepClassName(c);
             if (!inBlackClass) {
                 buildClassNameMapping(originalName, packageNameMap);
             } else {
@@ -285,11 +443,15 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(key.getName(), key.getName());
+            boolean keepFrameworkInterfaceMethods = extendsFrameworkInterface(classReference);
 
             for (MethodReference mr : value) {
                 String originalDesc = mr.getDesc();
                 String oldMethodName = mr.getName();
-                if (shouldSkipMethod(mr)) {
+                if (shouldSkipMethod(mr) ||
+                        FrameworkRuleUtil.shouldKeepMethodName(classReference, mr) ||
+                        keepFrameworkInterfaceMethods ||
+                        overridesExternalApi(loader, classReference, mr)) {
                     continue;
                 }
                 String desc = BytecodeRemapUtil.remapDesc(originalDesc);
@@ -366,6 +528,9 @@ public class Runner {
                 continue;
             }
             for (String s : fields) {
+                if (FrameworkRuleUtil.shouldKeepFieldName(c, s)) {
+                    continue;
+                }
                 ClassField oldMember = new ClassField();
                 oldMember.setClassName(newClassName);
                 oldMember.setFieldName(s);
@@ -376,8 +541,6 @@ public class Runner {
                 ObfEnv.fieldNameObfMapping.put(oldMember, newMember);
             }
         }
-
-        CustomClassLoader loader = new CustomClassLoader(path.toAbsolutePath());
 
         if (config.isShowAllMainMethods()) {
             // 向用户提示可能的主类

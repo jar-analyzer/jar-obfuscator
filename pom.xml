@@ -13,9 +13,9 @@
 
     <properties>
         <!-- Dependencies Version -->
-        <asm.version>9.8</asm.version>
+        <asm.version>9.10.1</asm.version>
         <jcommander.version>1.82</jcommander.version>
-        <snake.yaml.version>2.4</snake.yaml.version>
+        <snake.yaml.version>2.6</snake.yaml.version>
         <flatlaf.version>3.5.1</flatlaf.version>
         <idea.forms.version>7.0.3</idea.forms.version>
         <!-- Maven Build Version -->

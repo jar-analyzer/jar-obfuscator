@@ -13,6 +13,7 @@
 package me.n1ar4.jar.obfuscator.analyze;
 
 import me.n1ar4.jar.obfuscator.Const;
+import me.n1ar4.jar.obfuscator.base.ClassField;
 import me.n1ar4.jar.obfuscator.base.ClassReference;
 import me.n1ar4.jar.obfuscator.base.MethodReference;
 import org.objectweb.asm.*;
@@ -31,15 +32,18 @@ public class DiscoveryClassVisitor extends ClassVisitor {
     private final Set<ClassReference> discoveredClasses;
     private final Set<MethodReference> discoveredMethods;
     private final Map<String, List<String>> fieldsInClassMap;
+    private final Map<ClassField, Set<String>> fieldAnnotationsMap;
     private final List<String> fieldsList = new ArrayList<>();
     private final String jar;
 
     public DiscoveryClassVisitor(Set<ClassReference> discoveredClasses,
                                  Set<MethodReference> discoveredMethods,
                                  Map<String, List<String>> fieldsInClassMap,
+                                 Map<ClassField, Set<String>> fieldAnnotationsMap,
                                  String jarName) {
         super(Const.ASMVersion);
         this.fieldsInClassMap = fieldsInClassMap;
+        this.fieldAnnotationsMap = fieldAnnotationsMap;
         this.discoveredClasses = discoveredClasses;
         this.discoveredMethods = discoveredMethods;
         this.jar = jarName;
@@ -78,7 +82,27 @@ public class DiscoveryClassVisitor extends ClassVisitor {
             members.add(new ClassReference.Member(name, access, new ClassReference.Handle(typeName)));
         }
         fieldsList.add(name);
-        return super.visitField(access, name, desc, signature, value);
+        ClassField field = new ClassField();
+        field.setClassName(this.name);
+        field.setFieldName(name);
+        Set<String> fieldAnnotations = new HashSet<>();
+        fieldAnnotationsMap.put(field, fieldAnnotations);
+
+        FieldVisitor fv = super.visitField(access, name, desc, signature, value);
+        return new FieldVisitor(Const.ASMVersion, fv) {
+            @Override
+            public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+                fieldAnnotations.add(descriptor);
+                return super.visitAnnotation(descriptor, visible);
+            }
+
+            @Override
+            public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath,
+                                                         String descriptor, boolean visible) {
+                fieldAnnotations.add(descriptor);
+                return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+            }
+        };
     }
 
     @Override
