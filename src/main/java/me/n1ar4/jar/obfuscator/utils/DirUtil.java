@@ -12,6 +12,7 @@
 
 package me.n1ar4.jar.obfuscator.utils;
 
+import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.log.LogManager;
 import me.n1ar4.log.Logger;
 
@@ -32,6 +33,7 @@ public class DirUtil {
 
     public static void unzip(String ZipFilePath, String destDir) throws IOException {
         File destDirectory = new File(destDir);
+        String destCanonicalPath = destDirectory.getCanonicalPath() + File.separator;
         if (!destDirectory.exists()) {
             boolean s = destDirectory.mkdirs();
             if (!s) {
@@ -43,36 +45,32 @@ public class DirUtil {
         ZipEntry ZipEntry;
         while ((ZipEntry = ZipInputStream.getNextEntry()) != null) {
             File file = new File(destDir, ZipEntry.getName());
+            String fileCanonicalPath = file.getCanonicalPath();
+            if (!fileCanonicalPath.startsWith(destCanonicalPath)) {
+                ZipInputStream.closeEntry();
+                throw new IOException("unsafe zip entry: " + ZipEntry.getName());
+            }
             if (ZipEntry.isDirectory()) {
                 boolean s = file.mkdirs();
                 if (!s) {
                     logger.warn("create dir {} error", destDirectory);
                 }
             } else {
-                // BUG FIX
-                try {
-                    Files.createDirectories(Paths.get(file.getParent()));
-                } catch (Exception ignored) {
-                }
+                Files.createDirectories(Paths.get(file.getParent()));
                 byte[] buffer = new byte[1024];
-                FileOutputStream fos;
-                try {
-                    fos = new FileOutputStream(file);
-                } catch (Exception ignored) {
-                    continue;
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    int bytesRead;
+                    while ((bytesRead = ZipInputStream.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                    }
                 }
-                int bytesRead;
-                while ((bytesRead = ZipInputStream.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
-                }
-                fos.close();
             }
             ZipInputStream.closeEntry();
         }
         ZipInputStream.close();
     }
 
-    public static void zip(String sourceDir, String outputZip) {
+    public static void zip(String sourceDir, String outputZip) throws IOException {
         File sourceFolder = new File(sourceDir);
         try (ZipOutputStream jos = new ZipOutputStream(Files.newOutputStream(Paths.get(outputZip)))) {
             // 设置压缩方法为 STORED（不压缩）
@@ -86,8 +84,6 @@ public class DirUtil {
                     }
                 }
             }
-        } catch (IOException e) {
-            System.err.println("zip Zip error: " + e.toString());
         }
     }
 
@@ -139,11 +135,24 @@ public class DirUtil {
     }
 
     public static void deleteDirectory(File directory) {
+        try {
+            File tempDir = new File(Const.TEMP_DIR).getCanonicalFile();
+            File target = directory.getCanonicalFile();
+            if (!target.equals(tempDir)) {
+                throw new IllegalArgumentException("refuse to delete non-temp directory: " + target);
+            }
+            deleteDirectoryInternal(target);
+        } catch (IOException ex) {
+            throw new IllegalStateException("delete temp directory failed: " + directory, ex);
+        }
+    }
+
+    private static void deleteDirectoryInternal(File directory) {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    deleteDirectory(file);
+                    deleteDirectoryInternal(file);
                 } else {
                     boolean s = file.delete();
                     if (!s) {

@@ -43,6 +43,7 @@ public class DiscoveryRunner {
                 cr.accept(dcv, Const.ReaderASMOptions);
             } catch (Exception e) {
                 logger.error("discovery error: {}", e.toString());
+                throw new IllegalStateException("class discovery failed: " + file.getPath(), e);
             }
         }
         for (ClassReference clazz : discoveredClasses) {

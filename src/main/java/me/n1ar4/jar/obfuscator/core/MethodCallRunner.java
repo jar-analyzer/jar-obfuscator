@@ -38,6 +38,7 @@ public class MethodCallRunner {
                 cr.accept(mcv, Const.ReaderASMOptions);
             } catch (Exception e) {
                 logger.error("method call error: {}", e.toString());
+                throw new IllegalStateException("method call discovery failed: " + file.getPath(), e);
             }
         }
     }

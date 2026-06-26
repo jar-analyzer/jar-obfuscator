@@ -28,4 +28,15 @@ public class AnalyzeEnv {
     public static final Map<MethodReference.Handle, MethodReference> methodMap = new HashMap<>();
     public static final HashMap<MethodReference.Handle,
             HashSet<MethodReference.Handle>> methodCalls = new HashMap<>();
+
+    public static void reset() {
+        classFileList.clear();
+        discoveredClasses.clear();
+        discoveredMethods.clear();
+        methodsInClassMap.clear();
+        fieldsInClassMap.clear();
+        classMap.clear();
+        methodMap.clear();
+        methodCalls.clear();
+    }
 }

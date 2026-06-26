@@ -17,6 +17,10 @@ import me.n1ar4.jar.obfuscator.base.MethodReference;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.SignatureRemapper;
+import org.objectweb.asm.signature.SignatureReader;
+import org.objectweb.asm.signature.SignatureWriter;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,25 @@ public class BytecodeRemapUtil {
             descriptor = descriptor.replace(c, remapClassName(c));
         }
         return descriptor;
+    }
+
+    public static String remapSignature(String signature) {
+        if (signature == null) {
+            return null;
+        }
+        try {
+            SignatureReader reader = new SignatureReader(signature);
+            SignatureWriter writer = new SignatureWriter();
+            reader.accept(new SignatureRemapper(writer, new Remapper() {
+                @Override
+                public String map(String internalName) {
+                    return remapClassName(internalName);
+                }
+            }));
+            return writer.toString();
+        } catch (Exception ignored) {
+            return remapDesc(signature);
+        }
     }
 
     public static Type remapType(Type type) {

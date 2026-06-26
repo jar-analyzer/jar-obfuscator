@@ -32,10 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -140,8 +137,55 @@ public class Runner {
         return finalName;
     }
 
+    private static boolean hasMethod(String className, String methodName, String desc) {
+        List<MethodReference> methods = AnalyzeEnv.methodsInClassMap.get(new ClassReference.Handle(className));
+        if (methods == null) {
+            return false;
+        }
+        for (MethodReference method : methods) {
+            if (method.getName().equals(methodName) && method.getDesc().equals(desc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String findMethodGroupOwner(String className, String methodName, String desc) {
+        ClassReference clazz = AnalyzeEnv.classMap.get(new ClassReference.Handle(className));
+        if (clazz == null) {
+            return className;
+        }
+
+        String superClass = clazz.getSuperClass();
+        if (superClass != null && hasMethod(superClass, methodName, desc)) {
+            return findMethodGroupOwner(superClass, methodName, desc);
+        }
+
+        List<String> interfaces = new ArrayList<>(clazz.getInterfaces());
+        Collections.sort(interfaces);
+        for (String interfaceName : interfaces) {
+            if (hasMethod(interfaceName, methodName, desc)) {
+                return findMethodGroupOwner(interfaceName, methodName, desc);
+            }
+        }
+        return className;
+    }
+
+    private static boolean shouldSkipMethod(MethodReference mr) {
+        String methodName = mr.getName();
+        return methodName.startsWith("lambda$") ||
+                methodName.startsWith("access$") ||
+                methodName.equals("<init>") ||
+                methodName.equals("<clinit>") ||
+                ("main".equals(methodName) && "([Ljava/lang/String;)V".equals(mr.getDesc()) &&
+                        (mr.getAccess() & java.lang.reflect.Modifier.PUBLIC) != 0 &&
+                        (mr.getAccess() & java.lang.reflect.Modifier.STATIC) != 0);
+    }
+
     public static void run(Path path, BaseConfig config) {
-        ObfEnv.config = config;
+        AnalyzeEnv.reset();
+        PackageUtil.reset();
+        ObfEnv.reset(config);
         logger.info("start obfuscator");
 
         if (config.isUseSpringBoot() && config.isUseWebWar()) {
@@ -235,39 +279,38 @@ public class Runner {
             ClassReference.Handle key = entry.getKey();
             List<MethodReference> value = entry.getValue();
 
-            if (AnalyzeEnv.classMap.get(key).isEnum()) {
+            ClassReference classReference = AnalyzeEnv.classMap.get(key);
+            if (classReference == null || classReference.isEnum()) {
                 continue;
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(key.getName(), key.getName());
-            if (newClassName.equals(key.getName())) {
-                // 如果无需混淆那么不做 method 混淆
-                continue;
-            }
 
             for (MethodReference mr : value) {
-                String desc = mr.getDesc();
-                List<String> s = DescUtil.extractClassNames(desc);
-                for (String c : s) {
-                    String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                    desc = desc.replace(c, co);
-                }
+                String originalDesc = mr.getDesc();
                 String oldMethodName = mr.getName();
-                if (oldMethodName.startsWith("lambda$") ||
-                        oldMethodName.startsWith("access$") ||
-                        oldMethodName.equals("<init>") ||
-                        oldMethodName.equals("<clinit>")) {
+                if (shouldSkipMethod(mr)) {
                     continue;
                 }
+                String desc = BytecodeRemapUtil.remapDesc(originalDesc);
+                String groupOwner = findMethodGroupOwner(key.getName(), oldMethodName, originalDesc);
+                String newGroupOwner = ObfEnv.classNameObfMapping.getOrDefault(groupOwner, groupOwner);
+                MethodReference.Handle groupHandle = new MethodReference.Handle(
+                        new ClassReference.Handle(newGroupOwner), oldMethodName, desc);
+                MethodReference.Handle existGroup = ObfEnv.methodNameObfMapping.get(groupHandle);
 
                 MethodReference.Handle oldHandle = new MethodReference.Handle(
                         new ClassReference.Handle(newClassName),
                         oldMethodName, desc);
 
-                String newMethodName = NameUtil.genNewMethod();
+                String newMethodName = existGroup == null ? NameUtil.genNewMethod() : existGroup.getName();
                 MethodReference.Handle newHandle = new MethodReference.Handle(
                         new ClassReference.Handle(newClassName),
                         newMethodName, desc);
+                if (existGroup == null) {
+                    ObfEnv.methodNameObfMapping.put(groupHandle, new MethodReference.Handle(
+                            new ClassReference.Handle(newGroupOwner), newMethodName, desc));
+                }
                 ObfEnv.methodNameObfMapping.put(oldHandle, newHandle);
             }
         }
@@ -277,15 +320,28 @@ public class Runner {
                 methodNameObfMapping = new HashMap<>(ObfEnv.methodNameObfMapping);
         for (Map.Entry<MethodReference.Handle, MethodReference.Handle> en : ObfEnv.methodNameObfMapping.entrySet()) {
             String oldClassName = en.getKey().getName();
-            for (String s : ObfEnv.config.getMethodBlackList()) {
-                if (s.equals(oldClassName)) {
+            String originalClassName = oldClassName;
+            for (Map.Entry<String, String> mapping : ObfEnv.classNameObfMapping.entrySet()) {
+                if (mapping.getValue().equals(oldClassName)) {
+                    originalClassName = mapping.getKey();
+                    break;
+                }
+            }
+            List<String> methodBlackList = ObfEnv.config.getMethodBlackList();
+            if (methodBlackList == null) {
+                continue;
+            }
+            for (String s : methodBlackList) {
+                String normalized = s.replace(".", "/");
+                if (normalized.equals(oldClassName) || normalized.equals(originalClassName)) {
                     methodNameObfMapping.remove(en.getKey());
                     methodNameObfMapping.put(en.getKey(), en.getKey());
                     break;
                 }
-                Pattern pattern = Pattern.compile(s, Pattern.DOTALL);
-                Matcher matcher = pattern.matcher(oldClassName);
-                if (matcher.matches()) {
+                Pattern pattern = Pattern.compile(normalized, Pattern.DOTALL);
+                Matcher newMatcher = pattern.matcher(oldClassName);
+                Matcher oldMatcher = pattern.matcher(originalClassName);
+                if (newMatcher.matches() || oldMatcher.matches()) {
                     methodNameObfMapping.remove(en.getKey());
                     methodNameObfMapping.put(en.getKey(), en.getKey());
                     break;
@@ -304,12 +360,12 @@ public class Runner {
             }
 
             String newClassName = ObfEnv.classNameObfMapping.getOrDefault(c.getName(), c.getName());
-            if (newClassName.equals(c.getName())) {
-                // 如果无需混淆那么不做 field 混淆
+
+            List<String> fields = AnalyzeEnv.fieldsInClassMap.get(c.getName());
+            if (fields == null) {
                 continue;
             }
-
-            for (String s : AnalyzeEnv.fieldsInClassMap.get(c.getName())) {
+            for (String s : fields) {
                 ClassField oldMember = new ClassField();
                 oldMember.setClassName(newClassName);
                 oldMember.setFieldName(s);
@@ -372,8 +428,9 @@ public class Runner {
             } catch (Exception ignored) {
             }
             try {
-                Files.write(dir.resolve(parts[parts.length - 1] + ".class"), code);
-            } catch (Exception ignored) {
+                TransformerUtil.writeAtomically(dir.resolve(parts[parts.length - 1] + ".class"), code);
+            } catch (Exception ex) {
+                throw new IllegalStateException("write string decrypt class failed", ex);
             }
 
             // 字符串加密和解密
@@ -414,6 +471,10 @@ public class Runner {
         }
 
         // 生成混淆后目标
+        if (config.isEnablePackageName() || config.isEnableClassName()) {
+            ResourceTransformer.transform();
+        }
+
         try {
             DirUtil.zip(Const.TEMP_DIR, newFile);
             if (!config.isKeepTempFile()) {
@@ -422,6 +483,7 @@ public class Runner {
             logger.info("generate jar file: {}", newFile);
         } catch (Exception e) {
             logger.error("zip file error: {}", e.toString());
+            throw new IllegalStateException("zip output jar failed", e);
         }
     }
 }

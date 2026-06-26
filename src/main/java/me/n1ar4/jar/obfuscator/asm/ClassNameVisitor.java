@@ -14,6 +14,7 @@ package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
+import me.n1ar4.jar.obfuscator.utils.BytecodeRemapUtil;
 import me.n1ar4.jar.obfuscator.utils.DescUtil;
 import org.objectweb.asm.*;
 
@@ -41,6 +42,10 @@ public class ClassNameVisitor extends ClassVisitor {
             descriptor = descriptor.replace(c, remapClassName(c));
         }
         return descriptor;
+    }
+
+    private static String remapSignature(String signature) {
+        return BytecodeRemapUtil.remapSignature(signature);
     }
 
     private static String remapInnerName(String name, String innerName) {
@@ -86,14 +91,14 @@ public class ClassNameVisitor extends ClassVisitor {
         for (int i = 0; i < interfaces.length; i++) {
             interfaces[i] = remapClassName(interfaces[i]);
         }
-        signature = remapDesc(signature);
+        signature = remapSignature(signature);
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         desc = remapDesc(desc);
-        signature = remapDesc(signature);
+        signature = remapSignature(signature);
         if (exceptions != null) {
             for (int i = 0; i < exceptions.length; i++) {
                 exceptions[i] = remapClassName(exceptions[i]);
@@ -118,7 +123,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        FieldVisitor fv = super.visitField(access, name, remapDesc(descriptor), remapDesc(signature), value);
+        FieldVisitor fv = super.visitField(access, name, remapDesc(descriptor), remapSignature(signature), value);
         return new ClassNameFieldAdapter(fv);
     }
 
@@ -129,7 +134,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public RecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
-        RecordComponentVisitor rv = super.visitRecordComponent(name, remapDesc(descriptor), remapDesc(signature));
+        RecordComponentVisitor rv = super.visitRecordComponent(name, remapDesc(descriptor), remapSignature(signature));
         return new ClassNameRecordComponentAdapter(rv);
     }
 
@@ -388,7 +393,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
-            super.visitLocalVariable(name, remapDesc(descriptor), remapDesc(signature), start, end, index);
+            super.visitLocalVariable(name, remapDesc(descriptor), remapSignature(signature), start, end, index);
         }
 
         @Override

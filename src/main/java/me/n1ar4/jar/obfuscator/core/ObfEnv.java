@@ -31,4 +31,15 @@ public class ObfEnv {
     public static Map<ClassField, ClassField> fieldNameObfMapping = new HashMap<>();
     public static final HashMap<ClassReference.Handle, ArrayList<String>> stringInClass = new HashMap<>();
     public static final HashMap<String, ArrayList<String>> newStringInClass = new HashMap<>();
+
+    public static void reset(BaseConfig baseConfig) {
+        config = baseConfig;
+        ADVANCE_STRING_NAME = baseConfig == null ? null : baseConfig.getAdvanceStringName();
+        classNameObfMapping.clear();
+        ignoredClassMethodsMapping.clear();
+        methodNameObfMapping.clear();
+        fieldNameObfMapping.clear();
+        stringInClass.clear();
+        newStringInClass.clear();
+    }
 }

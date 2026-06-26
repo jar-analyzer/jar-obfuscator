@@ -47,7 +47,7 @@ public class ClassFileEntity {
             return Files.readAllBytes(this.path);
         } catch (Exception e) {
             logger.error("get file error: {}", e.toString());
+            throw new IllegalStateException("read class file failed: " + this.path, e);
         }
-        return null;
     }
 }

@@ -4,7 +4,15 @@
 
 更新日志：
 
+- [SECURITY] 修复可能存在的 `Zip Slip` 安全问题 @4ra1n
 - [功能] 支持自定义注解的混淆 @4ra1n
+- [BUG] 修复方法名混淆时继承、接口和覆写方法映射不一致的问题 @4ra1n
+- [BUG] 修复单独开启方法名或字段名混淆时不生效的问题 @4ra1n
+- [BUG] 修复多次运行时全局状态未清理导致映射污染的问题 @4ra1n
+- [BUG] 修复部分 `class` 转换失败后仍继续生成 `jar` 的问题 @4ra1n
+- [优化] 安全加固检查所有的删除点确保不会误删文件 @4ra1n
+- [优化] 混淆类名时同步重写 `MANIFEST.MF` 和`META-INF/services` 等资源文件 @4ra1n
+- [优化] 泛型 `Signature` 使用 `ASM SignatureReader` 重写避免漏改 @4ra1n
 - [BUG] 修复内部类包含 `$` 导致的问题 @4ra1n
 - [BUG] 修复 `UTF-8` 字符串过长问题 @4ra1n
 
