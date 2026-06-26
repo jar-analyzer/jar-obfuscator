@@ -105,17 +105,21 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-        return super.visitAnnotation(remapDesc(descriptor), visible);
+        String newDescriptor = remapDesc(descriptor);
+        return new AnnotationRemapVisitor(super.visitAnnotation(newDescriptor, visible), newDescriptor, false);
     }
 
     @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-        return super.visitTypeAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
+        String newDescriptor = remapDesc(descriptor);
+        return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, newDescriptor, visible),
+                newDescriptor, false);
     }
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        return super.visitField(access, name, remapDesc(descriptor), remapDesc(signature), value);
+        FieldVisitor fv = super.visitField(access, name, remapDesc(descriptor), remapDesc(signature), value);
+        return new ClassNameFieldAdapter(fv);
     }
 
     @Override
@@ -125,7 +129,8 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public RecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
-        return super.visitRecordComponent(name, remapDesc(descriptor), remapDesc(signature));
+        RecordComponentVisitor rv = super.visitRecordComponent(name, remapDesc(descriptor), remapDesc(signature));
+        return new ClassNameRecordComponentAdapter(rv);
     }
 
     @Override
@@ -176,6 +181,46 @@ public class ClassNameVisitor extends ClassVisitor {
         return super.getDelegate();
     }
 
+    static class ClassNameFieldAdapter extends FieldVisitor {
+        ClassNameFieldAdapter(FieldVisitor fieldVisitor) {
+            super(Const.ASMVersion, fieldVisitor);
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitAnnotation(newDescriptor, visible),
+                    newDescriptor, false);
+        }
+
+        @Override
+        public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, newDescriptor, visible),
+                    newDescriptor, false);
+        }
+    }
+
+    static class ClassNameRecordComponentAdapter extends RecordComponentVisitor {
+        ClassNameRecordComponentAdapter(RecordComponentVisitor recordComponentVisitor) {
+            super(Const.ASMVersion, recordComponentVisitor);
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitAnnotation(newDescriptor, visible),
+                    newDescriptor, false);
+        }
+
+        @Override
+        public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, newDescriptor, visible),
+                    newDescriptor, false);
+        }
+    }
+
     static class ClassNameChangerMethodAdapter extends MethodVisitor {
         ClassNameChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
@@ -203,7 +248,9 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitTypeAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, newDescriptor, visible),
+                    newDescriptor, false);
         }
 
         @Override
@@ -218,32 +265,42 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-            return super.visitAnnotation(remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitAnnotation(newDescriptor, visible),
+                    newDescriptor, false);
         }
 
         @Override
         public AnnotationVisitor visitAnnotationDefault() {
-            return super.visitAnnotationDefault();
+            return new AnnotationRemapVisitor(super.visitAnnotationDefault(), null, false);
         }
 
         @Override
         public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitInsnAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitInsnAnnotation(typeRef, typePath, newDescriptor, visible),
+                    newDescriptor, false);
         }
 
         @Override
         public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String descriptor, boolean visible) {
-            return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index,
+                    newDescriptor, visible), newDescriptor, false);
         }
 
         @Override
         public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
-            return super.visitParameterAnnotation(parameter, remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitParameterAnnotation(parameter, newDescriptor, visible),
+                    newDescriptor, false);
         }
 
         @Override
         public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitTryCatchAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
+            String newDescriptor = remapDesc(descriptor);
+            return new AnnotationRemapVisitor(super.visitTryCatchAnnotation(typeRef, typePath, newDescriptor, visible),
+                    newDescriptor, false);
         }
 
         @Override

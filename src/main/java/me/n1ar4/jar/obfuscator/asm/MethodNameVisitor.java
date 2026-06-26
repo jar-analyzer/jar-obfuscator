@@ -104,17 +104,19 @@ public class MethodNameVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-        return super.visitAnnotation(descriptor, visible);
+        return new AnnotationRemapVisitor(super.visitAnnotation(descriptor, visible),
+                descriptor, true);
     }
 
     @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-        return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+        return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, descriptor, visible),
+                descriptor, true);
     }
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        return super.visitField(access, name, descriptor, signature, value);
+        return new MethodNameFieldAdapter(super.visitField(access, name, descriptor, signature, value));
     }
 
     @Override
@@ -124,7 +126,7 @@ public class MethodNameVisitor extends ClassVisitor {
 
     @Override
     public RecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
-        return super.visitRecordComponent(name, descriptor, signature);
+        return new MethodNameRecordComponentAdapter(super.visitRecordComponent(name, descriptor, signature));
     }
 
     @Override
@@ -172,6 +174,42 @@ public class MethodNameVisitor extends ClassVisitor {
         return super.getDelegate();
     }
 
+    static class MethodNameFieldAdapter extends FieldVisitor {
+        MethodNameFieldAdapter(FieldVisitor fieldVisitor) {
+            super(Const.ASMVersion, fieldVisitor);
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            return new AnnotationRemapVisitor(super.visitAnnotation(descriptor, visible),
+                    descriptor, true);
+        }
+
+        @Override
+        public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, descriptor, visible),
+                    descriptor, true);
+        }
+    }
+
+    static class MethodNameRecordComponentAdapter extends RecordComponentVisitor {
+        MethodNameRecordComponentAdapter(RecordComponentVisitor recordComponentVisitor) {
+            super(Const.ASMVersion, recordComponentVisitor);
+        }
+
+        @Override
+        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            return new AnnotationRemapVisitor(super.visitAnnotation(descriptor, visible),
+                    descriptor, true);
+        }
+
+        @Override
+        public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, descriptor, visible),
+                    descriptor, true);
+        }
+    }
+
     static class MethodNameChangerMethodAdapter extends MethodVisitor {
         MethodNameChangerMethodAdapter(MethodVisitor mv) {
             super(Const.ASMVersion, mv);
@@ -208,7 +246,8 @@ public class MethodNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitTypeAnnotation(typeRef, typePath, descriptor, visible),
+                    descriptor, true);
         }
 
         @Override
@@ -223,32 +262,37 @@ public class MethodNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-            return super.visitAnnotation(descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitAnnotation(descriptor, visible),
+                    descriptor, true);
         }
 
         @Override
         public AnnotationVisitor visitAnnotationDefault() {
-            return super.visitAnnotationDefault();
+            return new AnnotationRemapVisitor(super.visitAnnotationDefault(), null, true);
         }
 
         @Override
         public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitInsnAnnotation(typeRef, typePath, descriptor, visible),
+                    descriptor, true);
         }
 
         @Override
         public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String descriptor, boolean visible) {
-            return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index,
+                    descriptor, visible), descriptor, true);
         }
 
         @Override
         public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
-            return super.visitParameterAnnotation(parameter, descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitParameterAnnotation(parameter, descriptor, visible),
+                    descriptor, true);
         }
 
         @Override
         public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            return super.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
+            return new AnnotationRemapVisitor(super.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible),
+                    descriptor, true);
         }
 
         @Override
