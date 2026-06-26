@@ -3,7 +3,7 @@
  *
  * Project URL: https://github.com/jar-analyzer/jar-obfuscator
  *
- * Copyright (c) 2024-2025 4ra1n (https://github.com/4ra1n)
+ * Copyright (c) 2024-2026 4ra1n (https://github.com/4ra1n)
  *
  * This project is distributed under the MIT license.
  *
@@ -59,6 +59,85 @@ public class Runner {
         cf.setPath(path);
         cf.setJarName(jarName);
         AnalyzeEnv.classFileList.add(cf);
+    }
+
+    private static String getPackageName(String className) {
+        int index = className.lastIndexOf('/');
+        if (index < 0) {
+            return "";
+        }
+        return className.substring(0, index);
+    }
+
+    private static String getSimpleName(String className) {
+        int index = className.lastIndexOf('/');
+        if (index < 0) {
+            return className;
+        }
+        return className.substring(index + 1);
+    }
+
+    private static String getMappedPackageName(String packageName, Map<String, String> packageNameMap) {
+        if (!ObfEnv.config.isEnablePackageName()) {
+            return packageName;
+        }
+        return packageNameMap.computeIfAbsent(packageName, name -> {
+            if (name.isEmpty()) {
+                return "";
+            }
+            String[] parts = name.split("/");
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < parts.length; i++) {
+                if (i > 0) {
+                    builder.append("/");
+                }
+                builder.append(NameUtil.genPackage());
+            }
+            return builder.toString();
+        });
+    }
+
+    private static String buildClassNameMapping(String originalName, Map<String, String> packageNameMap) {
+        String exist = ObfEnv.classNameObfMapping.get(originalName);
+        if (exist != null) {
+            return exist;
+        }
+        if (PackageUtil.inBlackClass(originalName, ObfEnv.config)) {
+            ObfEnv.classNameObfMapping.put(originalName, originalName);
+            return originalName;
+        }
+
+        boolean isEnablePackageName = ObfEnv.config.isEnablePackageName();
+        boolean isEnableClassName = ObfEnv.config.isEnableClassName();
+        if (!isEnablePackageName && !isEnableClassName) {
+            ObfEnv.classNameObfMapping.put(originalName, originalName);
+            return originalName;
+        }
+
+        String packageName = getPackageName(originalName);
+        String finalPackageName = getMappedPackageName(packageName, packageNameMap);
+        String simpleName = getSimpleName(originalName);
+        String finalName;
+
+        if (isEnableClassName) {
+            int innerIndex = originalName.lastIndexOf('$');
+            int packageIndex = originalName.lastIndexOf('/');
+            if (innerIndex > packageIndex) {
+                String parentName = originalName.substring(0, innerIndex);
+                finalName = buildClassNameMapping(parentName, packageNameMap) + "$" + NameUtil.genNewName();
+            } else if (finalPackageName.isEmpty()) {
+                finalName = NameUtil.genNewName();
+            } else {
+                finalName = finalPackageName + "/" + NameUtil.genNewName();
+            }
+        } else if (finalPackageName.isEmpty()) {
+            finalName = simpleName;
+        } else {
+            finalName = finalPackageName + "/" + simpleName;
+        }
+
+        ObfEnv.classNameObfMapping.put(originalName, finalName);
+        return finalName;
     }
 
     public static void run(Path path, BaseConfig config) {
@@ -140,79 +219,11 @@ public class Runner {
             if (c.getName().contains("module-info")) {
                 continue;
             }
-            String[] parts = c.getName().split("/");
-            String className = parts[parts.length - 1];
-            StringBuilder packageName = new StringBuilder();
-            StringBuilder newPackageName = new StringBuilder();
-            for (int i = 0; i < parts.length - 1; i++) {
-                if (i > 0) {
-                    packageName.append("/");
-                    newPackageName.append("/");
-                }
-                packageName.append(parts[i]);
-                newPackageName.append(NameUtil.genPackage());
-            }
-            String packageNameS = packageName.toString();
-
-            String newPackageNameS;
-            if (config.isEnablePackageName()) {
-                String an = packageNameMap.get(packageNameS);
-                newPackageNameS = newPackageName.toString();
-                if (an == null) {
-                    packageNameMap.put(packageNameS, newPackageNameS);
-                    newPackageNameS = newPackageName.toString();
-                } else {
-                    newPackageNameS = an;
-                }
-            } else {
-                newPackageNameS = packageNameS;
-            }
-
             String originalName = c.getName();
-            String finalName;
 
             boolean inBlackClass = PackageUtil.inBlackClass(originalName, config);
             if (!inBlackClass) {
-                String result = ObfEnv.classNameObfMapping.putIfAbsent(originalName, originalName);
-                if (result == null) {
-                    boolean isEnablePackageName = config.isEnablePackageName();
-                    boolean isEnableClassName = config.isEnableClassName();
-                    if (isEnablePackageName || isEnableClassName) {
-                        String finalPackageName = packageNameS;
-                        if (isEnablePackageName) {
-                            finalPackageName = newPackageNameS;
-                        }
-                        if (isEnableClassName) {
-                            if (className.contains("$")) {
-                                String outerClassName = originalName.split("\\$")[0];
-                                String exist = ObfEnv.classNameObfMapping.get(outerClassName);
-                                if (exist == null) {
-                                    if (finalPackageName.isEmpty()) {
-                                        exist = NameUtil.genNewName();
-                                        ObfEnv.classNameObfMapping.put(outerClassName, exist);
-                                    } else {
-                                        exist = finalPackageName + "/" + NameUtil.genNewName();
-                                        ObfEnv.classNameObfMapping.put(outerClassName, exist);
-                                    }
-                                }
-                                finalName = exist + "$" + NameUtil.genNewName();
-                            } else {
-                                if (finalPackageName.isEmpty()) {
-                                    finalName = NameUtil.genNewName();
-                                } else {
-                                    finalName = finalPackageName + "/" + NameUtil.genNewName();
-                                }
-                            }
-                        } else {
-                            if (finalPackageName.isEmpty()) {
-                                finalName = className;
-                            } else {
-                                finalName = finalPackageName + "/" + className;
-                            }
-                        }
-                        ObfEnv.classNameObfMapping.put(originalName, finalName);
-                    }
-                }
+                buildClassNameMapping(originalName, packageNameMap);
             } else {
                 // 如果是黑名单类 也需要记录
                 ObfEnv.classNameObfMapping.put(originalName, originalName);

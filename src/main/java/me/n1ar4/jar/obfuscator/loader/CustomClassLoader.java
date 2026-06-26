@@ -3,7 +3,7 @@
  *
  * Project URL: https://github.com/jar-analyzer/jar-obfuscator
  *
- * Copyright (c) 2024-2025 4ra1n (https://github.com/4ra1n)
+ * Copyright (c) 2024-2026 4ra1n (https://github.com/4ra1n)
  *
  * This project is distributed under the MIT license.
  *
@@ -88,6 +88,12 @@ public class CustomClassLoader extends ClassLoader {
         String classPath = className.replace('.', '/') + ".class";
         try {
             JarEntry entry = jar.getJarEntry(classPath);
+            if (entry == null) {
+                entry = jar.getJarEntry("BOOT-INF/classes/" + classPath);
+            }
+            if (entry == null) {
+                entry = jar.getJarEntry("WEB-INF/classes/" + classPath);
+            }
             if (entry != null) {
                 return readEntryBytes(jar, entry);
             }

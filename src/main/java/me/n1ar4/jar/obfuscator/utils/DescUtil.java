@@ -3,7 +3,7 @@
  *
  * Project URL: https://github.com/jar-analyzer/jar-obfuscator
  *
- * Copyright (c) 2024-2025 4ra1n (https://github.com/4ra1n)
+ * Copyright (c) 2024-2026 4ra1n (https://github.com/4ra1n)
  *
  * This project is distributed under the MIT license.
  *
@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 public class DescUtil {
     public static List<String> extractClassNames(String descriptor) {
         List<String> classNames = new ArrayList<>();
+        if (descriptor == null) {
+            return classNames;
+        }
         Pattern pattern = Pattern.compile("L([^;]+);");
         Matcher matcher = pattern.matcher(descriptor);
         while (matcher.find()) {

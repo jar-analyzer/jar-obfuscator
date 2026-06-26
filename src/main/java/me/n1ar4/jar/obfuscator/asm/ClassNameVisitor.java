@@ -3,7 +3,7 @@
  *
  * Project URL: https://github.com/jar-analyzer/jar-obfuscator
  *
- * Copyright (c) 2024-2025 4ra1n (https://github.com/4ra1n)
+ * Copyright (c) 2024-2026 4ra1n (https://github.com/4ra1n)
  *
  * This project is distributed under the MIT license.
  *
@@ -25,35 +25,78 @@ public class ClassNameVisitor extends ClassVisitor {
         super(Const.ASMVersion, classVisitor);
     }
 
+    private static String remapClassName(String name) {
+        if (name == null) {
+            return null;
+        }
+        return ObfEnv.classNameObfMapping.getOrDefault(name, name);
+    }
+
+    private static String remapDesc(String descriptor) {
+        if (descriptor == null) {
+            return null;
+        }
+        List<String> classes = DescUtil.extractClassNames(descriptor);
+        for (String c : classes) {
+            descriptor = descriptor.replace(c, remapClassName(c));
+        }
+        return descriptor;
+    }
+
+    private static String remapInnerName(String name, String innerName) {
+        if (name == null || innerName == null) {
+            return innerName;
+        }
+        int index = name.lastIndexOf('$');
+        if (index < 0 || index == name.length() - 1) {
+            return innerName;
+        }
+        return name.substring(index + 1);
+    }
+
+    private static Type remapType(Type type) {
+        if (type == null) {
+            return null;
+        }
+        if (type.getSort() == Type.OBJECT) {
+            return Type.getObjectType(remapClassName(type.getInternalName()));
+        }
+        if (type.getSort() == Type.ARRAY || type.getSort() == Type.METHOD) {
+            return Type.getType(remapDesc(type.getDescriptor()));
+        }
+        return type;
+    }
+
+    private static Handle remapHandle(Handle handle) {
+        if (handle == null) {
+            return null;
+        }
+        return new Handle(
+                handle.getTag(),
+                remapClassName(handle.getOwner()),
+                handle.getName(),
+                remapDesc(handle.getDesc()),
+                handle.isInterface());
+    }
+
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-        name = ObfEnv.classNameObfMapping.getOrDefault(name, name);
-        superName = ObfEnv.classNameObfMapping.getOrDefault(superName, superName);
+        name = remapClassName(name);
+        superName = remapClassName(superName);
         for (int i = 0; i < interfaces.length; i++) {
-            interfaces[i] = ObfEnv.classNameObfMapping.getOrDefault(interfaces[i], interfaces[i]);
+            interfaces[i] = remapClassName(interfaces[i]);
         }
-        if (signature != null) {
-            List<String> sig = DescUtil.extractClassNames(signature);
-            for (String c : sig) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                signature = signature.replace(c, co);
-            }
-        }
+        signature = remapDesc(signature);
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        List<String> s = DescUtil.extractClassNames(desc);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            desc = desc.replace(c, co);
-        }
-        if (signature != null) {
-            List<String> sig = DescUtil.extractClassNames(signature);
-            for (String c : sig) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                signature = signature.replace(c, co);
+        desc = remapDesc(desc);
+        signature = remapDesc(signature);
+        if (exceptions != null) {
+            for (int i = 0; i < exceptions.length; i++) {
+                exceptions[i] = remapClassName(exceptions[i]);
             }
         }
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
@@ -62,39 +105,17 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-        List<String> s = DescUtil.extractClassNames(descriptor);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            descriptor = descriptor.replace(c, co);
-        }
-        return super.visitAnnotation(descriptor, visible);
+        return super.visitAnnotation(remapDesc(descriptor), visible);
     }
 
     @Override
     public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-        List<String> s = DescUtil.extractClassNames(descriptor);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            descriptor = descriptor.replace(c, co);
-        }
-        return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+        return super.visitTypeAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
     }
 
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-        List<String> s = DescUtil.extractClassNames(descriptor);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            descriptor = descriptor.replace(c, co);
-        }
-        if (signature != null) {
-            List<String> sig = DescUtil.extractClassNames(signature);
-            for (String c : sig) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                signature = signature.replace(c, co);
-            }
-        }
-        return super.visitField(access, name, descriptor, signature, value);
+        return super.visitField(access, name, remapDesc(descriptor), remapDesc(signature), value);
     }
 
     @Override
@@ -104,17 +125,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public RecordComponentVisitor visitRecordComponent(String name, String descriptor, String signature) {
-        List<String> s = DescUtil.extractClassNames(descriptor);
-        for (String c : s) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            descriptor = descriptor.replace(c, co);
-        }
-        List<String> sig = DescUtil.extractClassNames(signature);
-        for (String c : sig) {
-            String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-            signature = signature.replace(c, co);
-        }
-        return super.visitRecordComponent(name, descriptor, signature);
+        return super.visitRecordComponent(name, remapDesc(descriptor), remapDesc(signature));
     }
 
     @Override
@@ -129,32 +140,30 @@ public class ClassNameVisitor extends ClassVisitor {
 
     @Override
     public void visitInnerClass(String name, String outerName, String innerName, int access) {
-        name = ObfEnv.classNameObfMapping.getOrDefault(name, name);
-        outerName = ObfEnv.classNameObfMapping.getOrDefault(outerName, outerName);
-        innerName = name.split("\\$")[1];
+        name = remapClassName(name);
+        outerName = remapClassName(outerName);
+        innerName = remapInnerName(name, innerName);
         super.visitInnerClass(name, outerName, innerName, access);
     }
 
     @Override
     public void visitNestHost(String nestHost) {
-        super.visitNestHost(nestHost);
+        super.visitNestHost(remapClassName(nestHost));
     }
 
     @Override
     public void visitNestMember(String nestMember) {
-        super.visitNestMember(nestMember);
+        super.visitNestMember(remapClassName(nestMember));
     }
 
     @Override
     public void visitOuterClass(String owner, String name, String descriptor) {
-        owner = ObfEnv.classNameObfMapping.getOrDefault(owner, owner);
-        super.visitOuterClass(owner, name, descriptor);
+        super.visitOuterClass(remapClassName(owner), name, remapDesc(descriptor));
     }
 
     @Override
     public void visitPermittedSubclass(String permittedSubclass) {
-        permittedSubclass = ObfEnv.classNameObfMapping.getOrDefault(permittedSubclass, permittedSubclass);
-        super.visitPermittedSubclass(permittedSubclass);
+        super.visitPermittedSubclass(remapClassName(permittedSubclass));
     }
 
     @Override
@@ -174,30 +183,17 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-            owner = ObfEnv.classNameObfMapping.getOrDefault(owner, owner);
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+            super.visitMethodInsn(opcode, remapClassName(owner), name, remapDesc(descriptor), isInterface);
         }
 
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-            owner = ObfEnv.classNameObfMapping.getOrDefault(owner, owner);
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            super.visitFieldInsn(opcode, owner, name, descriptor);
+            super.visitFieldInsn(opcode, remapClassName(owner), name, remapDesc(descriptor));
         }
 
         @Override
         public void visitTypeInsn(int opcode, String type) {
-            type = ObfEnv.classNameObfMapping.getOrDefault(type, type);
-            super.visitTypeInsn(opcode, type);
+            super.visitTypeInsn(opcode, remapClassName(type));
         }
 
         @Override
@@ -207,12 +203,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitTypeAnnotation(typeRef, typePath, descriptor, visible);
+            return super.visitTypeAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
         }
 
         @Override
@@ -227,12 +218,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitAnnotation(descriptor, visible);
+            return super.visitAnnotation(remapDesc(descriptor), visible);
         }
 
         @Override
@@ -242,42 +228,22 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitInsnAnnotation(typeRef, typePath, descriptor, visible);
+            return super.visitInsnAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
         }
 
         @Override
         public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, descriptor, visible);
+            return super.visitLocalVariableAnnotation(typeRef, typePath, start, end, index, remapDesc(descriptor), visible);
         }
 
         @Override
         public AnnotationVisitor visitParameterAnnotation(int parameter, String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitParameterAnnotation(parameter, descriptor, visible);
+            return super.visitParameterAnnotation(parameter, remapDesc(descriptor), visible);
         }
 
         @Override
         public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            return super.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
+            return super.visitTryCatchAnnotation(typeRef, typePath, remapDesc(descriptor), visible);
         }
 
         @Override
@@ -296,16 +262,14 @@ public class ClassNameVisitor extends ClassVisitor {
                 Object obj = local[i];
                 if (obj instanceof String) {
                     String s = (String) obj;
-                    s = ObfEnv.classNameObfMapping.getOrDefault(s, s);
-                    local[i] = s;
+                    local[i] = remapClassName(s);
                 }
             }
             for (int i = 0; i < stack.length; i++) {
                 Object obj = stack[i];
                 if (obj instanceof String) {
                     String s = (String) obj;
-                    s = ObfEnv.classNameObfMapping.getOrDefault(s, s);
-                    stack[i] = s;
+                    stack[i] = remapClassName(s);
                 }
             }
             super.visitFrame(type, numLocal, local, numStack, stack);
@@ -328,52 +292,16 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle, Object... bootstrapMethodArguments) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-
-            String owner = bootstrapMethodHandle.getOwner();
-            owner = ObfEnv.classNameObfMapping.getOrDefault(owner, owner);
-
-            String handleDesc = bootstrapMethodHandle.getDesc();
-            List<String> handleS = DescUtil.extractClassNames(handleDesc);
-            for (String c : handleS) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                handleDesc = handleDesc.replace(c, co);
-            }
-
-            Handle handle = new Handle(
-                    bootstrapMethodHandle.getTag(),
-                    owner,
-                    bootstrapMethodHandle.getName(),
-                    handleDesc,
-                    bootstrapMethodHandle.isInterface());
-
             for (int i = 0; i < bootstrapMethodArguments.length; i++) {
                 Object obj = bootstrapMethodArguments[i];
                 if (obj instanceof Handle) {
-                    Handle ho = (Handle) obj;
-                    String tempOwner = ho.getOwner();
-                    tempOwner = ObfEnv.classNameObfMapping.getOrDefault(tempOwner, tempOwner);
-                    String tempDesc = ho.getDesc();
-                    List<String> tempS = DescUtil.extractClassNames(tempDesc);
-                    for (String c : tempS) {
-                        String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                        tempDesc = tempDesc.replace(c, co);
-                    }
-                    Handle tempHandle = new Handle(
-                            ho.getTag(),
-                            tempOwner,
-                            ho.getName(),
-                            tempDesc,
-                            ho.isInterface());
-                    bootstrapMethodArguments[i] = tempHandle;
+                    bootstrapMethodArguments[i] = remapHandle((Handle) obj);
+                } else if (obj instanceof Type) {
+                    bootstrapMethodArguments[i] = remapType((Type) obj);
                 }
             }
 
-            super.visitInvokeDynamicInsn(name, descriptor, handle, bootstrapMethodArguments);
+            super.visitInvokeDynamicInsn(name, remapDesc(descriptor), remapHandle(bootstrapMethodHandle), bootstrapMethodArguments);
         }
 
         @Override
@@ -390,14 +318,7 @@ public class ClassNameVisitor extends ClassVisitor {
         public void visitLdcInsn(Object value) {
             if (value instanceof Type) {
                 Type valueType = (Type) value;
-                String desc = valueType.getDescriptor();
-                List<String> s = DescUtil.extractClassNames(desc);
-                for (String c : s) {
-                    String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                    desc = desc.replace(c, co);
-                }
-                Type newValue = Type.getType(desc);
-                super.visitLdcInsn(newValue);
+                super.visitLdcInsn(remapType(valueType));
                 return;
             }
             super.visitLdcInsn(value);
@@ -410,19 +331,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            if (signature != null) {
-                List<String> sig = DescUtil.extractClassNames(signature);
-                for (String c : sig) {
-                    String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                    signature = signature.replace(c, co);
-                }
-            }
-            super.visitLocalVariable(name, descriptor, signature, start, end, index);
+            super.visitLocalVariable(name, remapDesc(descriptor), remapDesc(signature), start, end, index);
         }
 
         @Override
@@ -437,12 +346,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitMultiANewArrayInsn(String descriptor, int numDimensions) {
-            List<String> s = DescUtil.extractClassNames(descriptor);
-            for (String c : s) {
-                String co = ObfEnv.classNameObfMapping.getOrDefault(c, c);
-                descriptor = descriptor.replace(c, co);
-            }
-            super.visitMultiANewArrayInsn(descriptor, numDimensions);
+            super.visitMultiANewArrayInsn(remapDesc(descriptor), numDimensions);
         }
 
         @Override
@@ -457,7 +361,7 @@ public class ClassNameVisitor extends ClassVisitor {
 
         @Override
         public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
-            super.visitTryCatchBlock(start, end, handler, type);
+            super.visitTryCatchBlock(start, end, handler, remapClassName(type));
         }
 
         @Override
