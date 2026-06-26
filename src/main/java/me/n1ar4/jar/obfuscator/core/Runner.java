@@ -412,15 +412,19 @@ public class Runner {
 
         // 处理 class name
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
-            if (c.isEnum()) {
-                continue;
-            }
-            // 不处理这个 CLASS
-            // 常见于高版本的 JAR 中
+            // 枚举类的类名/字段名/方法名本身不混淆，但不能简单跳过：
+            // 枚举类的方法体（如 <clinit>、构造方法）可能引用其他被混淆类的字段/方法，
+            // 需要让它以 identity 映射进入 classNameObfMapping，使各 transformer 仍会处理
+            // 它的方法体中的引用。枚举自身的成员名因构建映射时跳过枚举而保持不变。
             if (c.getName().contains("module-info")) {
                 continue;
             }
             String originalName = c.getName();
+
+            if (c.isEnum()) {
+                ObfEnv.classNameObfMapping.put(originalName, originalName);
+                continue;
+            }
 
             boolean inBlackClass = PackageUtil.inBlackClass(originalName, config) ||
                     FrameworkRuleUtil.shouldKeepClassName(c);
@@ -439,6 +443,12 @@ public class Runner {
 
             ClassReference classReference = AnalyzeEnv.classMap.get(key);
             if (classReference == null || classReference.isEnum()) {
+                continue;
+            }
+
+            // 黑名单类的方法名不混淆：黑名单类（如第三方库）的成员应整体保持不变，
+            // 否则其方法定义被改名后，其他类对其方法的引用无法被一致更新会导致 NoSuchMethodError
+            if (PackageUtil.inBlackClass(key.getName(), config)) {
                 continue;
             }
 
@@ -518,6 +528,11 @@ public class Runner {
         for (ClassReference c : AnalyzeEnv.discoveredClasses) {
 
             if (c.isEnum()) {
+                continue;
+            }
+
+            // 黑名单类的字段名不混淆：与方法名同理，黑名单类成员整体保持不变
+            if (PackageUtil.inBlackClass(c.getName(), config)) {
                 continue;
             }
 

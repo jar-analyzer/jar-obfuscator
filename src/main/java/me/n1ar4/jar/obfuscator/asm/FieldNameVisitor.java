@@ -14,14 +14,66 @@ package me.n1ar4.jar.obfuscator.asm;
 
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.base.ClassField;
+import me.n1ar4.jar.obfuscator.base.ClassReference;
+import me.n1ar4.jar.obfuscator.core.AnalyzeEnv;
 import me.n1ar4.jar.obfuscator.core.ObfEnv;
 import org.objectweb.asm.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class FieldNameVisitor extends ClassVisitor {
     private String className;
 
     public FieldNameVisitor(ClassVisitor classVisitor) {
         super(Const.ASMVersion, classVisitor);
+    }
+
+    /**
+     * 字段引用 {@code getfield/putfield owner.name} 中的 {@code owner} 可能是继承该字段的子类
+     * 而非真正声明该字段的类。字段名混淆映射表以「声明类 + 字段名」为 key，因此当直接查表未命中时，
+     * 需要沿继承链向上找到真正声明该字段的类，再用声明类查表。
+     *
+     * @param owner 字段引用中的 owner（混淆后的新类名）
+     * @param name  字段名（尚未重命名的原始名）
+     * @return 声明该字段的类的新名，若无法解析则返回原 owner
+     */
+    private static String resolveDeclaringClass(String owner, String name) {
+        if (owner == null || name == null) {
+            return owner;
+        }
+        Set<String> visited = new HashSet<>();
+        String current = reverseMapClass(owner);
+        while (current != null && visited.add(current)) {
+            List<String> fields = AnalyzeEnv.fieldsInClassMap.get(current);
+            if (fields != null && fields.contains(name)) {
+                return ObfEnv.classNameObfMapping.getOrDefault(current, current);
+            }
+            ClassReference clazz = AnalyzeEnv.classMap.get(new ClassReference.Handle(current));
+            if (clazz == null) {
+                return owner;
+            }
+            current = clazz.getSuperClass();
+        }
+        return owner;
+    }
+
+    /**
+     * 由混淆后的新类名反查原始类名。{@code classNameObfMapping} 是 原始名 -> 新名 的映射，
+     * 这里需要反向查找。若 owner 本身就是原始名（或不在映射中）则直接返回 owner。
+     */
+    private static String reverseMapClass(String owner) {
+        if (owner == null) {
+            return null;
+        }
+        for (Map.Entry<String, String> entry : ObfEnv.classNameObfMapping.entrySet()) {
+            if (owner.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return owner;
     }
 
     @Override
@@ -128,8 +180,18 @@ public class FieldNameVisitor extends ClassVisitor {
             ClassField cf = new ClassField();
             cf.setClassName(owner);
             cf.setFieldName(name);
-            ClassField newCF = ObfEnv.fieldNameObfMapping.getOrDefault(cf, cf);
-            super.visitFieldInsn(opcode, owner, newCF.getFieldName(), descriptor);
+            ClassField newCF = ObfEnv.fieldNameObfMapping.get(cf);
+            if (newCF == null) {
+                // 直接以 owner 查表未命中：owner 可能是继承该字段的子类，
+                // 沿继承链找到真正声明该字段的类再查一次
+                String declaringClass = resolveDeclaringClass(owner, name);
+                if (!owner.equals(declaringClass)) {
+                    cf.setClassName(declaringClass);
+                    newCF = ObfEnv.fieldNameObfMapping.get(cf);
+                }
+            }
+            String resolvedName = newCF == null ? name : newCF.getFieldName();
+            super.visitFieldInsn(opcode, owner, resolvedName, descriptor);
         }
 
         @Override
