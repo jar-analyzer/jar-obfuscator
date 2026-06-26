@@ -377,7 +377,12 @@ public class Runner {
                     }
                     ArrayList<String> newRes = new ArrayList<>();
                     for (String s : t) {
-                        newRes.add(StringDecrypt.encrypt(s));
+                        String encrypted = StringDecrypt.encrypt(s);
+                        if (BytecodeStringUtil.canStoreAsConstantUtf8(encrypted)) {
+                            newRes.add(encrypted);
+                        } else {
+                            newRes.add(s);
+                        }
                     }
                     ObfEnv.newStringInClass.put(entry.getValue(), newRes);
                 }

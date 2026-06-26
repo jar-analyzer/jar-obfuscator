@@ -15,6 +15,7 @@ package me.n1ar4.jar.obfuscator.asm;
 import me.n1ar4.jar.obfuscator.Const;
 import me.n1ar4.jar.obfuscator.templates.StringDecrypt;
 import me.n1ar4.jar.obfuscator.templates.StringDecryptDump;
+import me.n1ar4.jar.obfuscator.utils.BytecodeStringUtil;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
@@ -62,9 +63,13 @@ public class StringVisitor extends ClassVisitor {
     @Override
     public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
         if (value instanceof String) {
-            fieldValues.put(name, (String) value);
+            String encryptedValue = StringDecrypt.encrypt((String) value);
+            if (BytecodeStringUtil.canStoreAsConstantUtf8(encryptedValue)) {
+                fieldValues.put(name, encryptedValue);
+                return super.visitField(access, name, descriptor, signature, null);
+            }
         }
-        return super.visitField(access, name, descriptor, signature, null);
+        return super.visitField(access, name, descriptor, signature, value);
     }
 
     @Override
@@ -96,7 +101,6 @@ public class StringVisitor extends ClassVisitor {
         ga.visitCode();
 
         fieldValues.forEach((fieldName, encryptedValue) -> {
-            encryptedValue = StringDecrypt.encrypt(encryptedValue);
             ga.push(encryptedValue);
             ga.invokeStatic(Type.getObjectType(StringDecryptDump.className),
                     new Method("I", "(Ljava/lang/String;)Ljava/lang/String;"));
@@ -261,7 +265,7 @@ public class StringVisitor extends ClassVisitor {
         public void visitLdcInsn(Object value) {
             if (value instanceof String) {
                 String decryptedValue = StringDecrypt.encrypt((String) value);
-                if (decryptedValue != null) {
+                if (BytecodeStringUtil.canStoreAsConstantUtf8(decryptedValue)) {
                     super.visitLdcInsn(decryptedValue);
                     super.visitMethodInsn(Opcodes.INVOKESTATIC,
                             StringDecryptDump.className,

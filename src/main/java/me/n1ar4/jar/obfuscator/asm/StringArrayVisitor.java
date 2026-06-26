@@ -36,7 +36,6 @@ public class StringArrayVisitor extends ClassVisitor {
         super.visit(version, access, name, signature, superName, interfaces);
         this.className = name;
         isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
-        super.visit(version, access, name, signature, superName, interfaces);
     }
 
     @Override
@@ -297,13 +296,25 @@ public class StringArrayVisitor extends ClassVisitor {
             if (value instanceof String) {
                 visitFieldInsn(Opcodes.GETSTATIC, className, ObfEnv.ADVANCE_STRING_NAME,
                         "Ljava/util/ArrayList;");
-                visitIntInsn(Opcodes.SIPUSH, StringArrayTransformer.INDEX);
+                pushInt(StringArrayTransformer.INDEX);
                 StringArrayTransformer.INDEX++;
                 visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/ArrayList", "get",
                         "(I)Ljava/lang/Object;", false);
                 visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
             } else {
                 super.visitLdcInsn(value);
+            }
+        }
+
+        private void pushInt(int value) {
+            if (value >= -1 && value <= 5) {
+                visitInsn(Opcodes.ICONST_0 + value);
+            } else if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
+                visitIntInsn(Opcodes.BIPUSH, value);
+            } else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
+                visitIntInsn(Opcodes.SIPUSH, value);
+            } else {
+                visitLdcInsn(value);
             }
         }
 
