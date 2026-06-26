@@ -9,10 +9,10 @@ env:
 jobs:
 
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - name: checkout the source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: jar-obfuscator
 
@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '8'
-          distribution: 'zulu'
+          distribution: 'temurin'
           cache: maven
 
       - name: build core
@@ -30,7 +30,7 @@ jobs:
         working-directory: jar-obfuscator
 
       - name: upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jar-obfuscator
           path: |
