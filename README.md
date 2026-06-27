@@ -1,5 +1,9 @@
 # Jar-Obfuscator V2
 
+**本项目仅用于保护用户的 `jar/war/class` 文件目的，请勿用于非法用途**
+
+**This project is only used to protect users' `class` file and should not be used for illegal purposes**
+
 <img alt="gitleaks badge" src="https://img.shields.io/badge/protected%20by-gitleaks-blue">
 
 ![](https://github.com/jar-analyzer/jar-obfuscator/workflows/maven%20check/badge.svg)
@@ -43,6 +47,23 @@ jar-obfuscator 功能点
 - IDEA 反编译时隐藏字段     
 - 支持 SpringBoot 混淆
 - 支持 Web WAR 混淆   
+
+## 常见问题
+
+大概配置思路如下：
+
+- 通常情况必须把 `main` 入口加入 `classBlackList`
+- 通常需要配置 `classBlackRegexList` 拉黑所有的第三方库类（如 `org/apache/.*` 等）
+- 如果某些类集成或者实现某些库的接口，重写方法不允许重命名，注意配置 `methodBlackList`
+- 建议测试配置时不要开启 `enableJunk` 和 `enableHide*` 方法，一切没问题再开启这些
+
+常见问题：为什么我混淆后的 `JAR` 可以运行，不报错，但是某些功能无法正常使用？
+
+答案：你需要细节配置类和方法的禁止混淆配置，很多功能是依赖反射机制的:
+
+- 例如 `fastjson` 序列化反序列化的 `getter/setter` 混淆后出出问题
+- 例如 `servlet` 的 `doGet/doPost` 方法禁止混淆，混淆后无法执行
+- 例如 `mybatis xml` 中配置了指定的 `mapper` 类，混淆后找不到
 
 ## 配置
 
@@ -144,12 +165,3 @@ showAllMainMethods: true
 # 是否保留临时类文件
 keepTempFile: false
 ```
-
-## 配置指南
-
-大概思路如下：
-
-- 通常情况必须把 `main` 入口加入 `classBlackList`
-- 通常需要配置 `classBlackRegexList` 拉黑所有的第三方库类（如 `org/apache/.*` 等）
-- 如果某些类集成或者实现某些库的接口，重写方法不允许重命名，注意配置 `methodBlackList`
-- 建议测试配置时不要开启 `enableJunk` 和 `enableHide*` 方法，一切没问题再开启这些 
